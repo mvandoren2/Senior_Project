@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('management/', include('management.urls')),
+    path("oauth/", include("django_salesforce_oauth.urls")),
     path('admin/', admin.site.urls),
 ]

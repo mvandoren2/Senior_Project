@@ -130,6 +130,12 @@ input[type=submit], a.button {
     float:left;
     font-size:13px;
 }
+
+#salesforce_btn{
+    margin-left: 50%;
+    margin-top: 5%;
+}
+
 /* messages */
 ul.messages {
     margin:10px 100px;
