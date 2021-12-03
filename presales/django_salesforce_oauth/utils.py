@@ -7,6 +7,7 @@ def get_or_create_user(oauth: OAuth):
     """
     Accepts an OAuth object and retrieves a User, creating one if it doesn't exist
     """
+    # username = oauth.username
     salesforce_id = oauth.id
     email = oauth.email
     password = oauth.password
@@ -15,7 +16,7 @@ def get_or_create_user(oauth: OAuth):
 
     user = User.objects.filter(username=salesforce_id).first()
 
-    if not user:
+    if not user: #we changed the username from salesforce_id
         user = User.objects.create_user(salesforce_id, email, password)
 
     return user
