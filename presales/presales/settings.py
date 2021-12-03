@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_salesforce_oauth',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
+
+# django_salesforce_oauth
+SCOPES = "id refresh_token"
+OAUTH_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
+SFDC_CONSUMER_KEY = "3MVG9p1Q1BCe9GmCzbNEHis6ekvmynHYjtp00lXIfsK3gqLWRzhyEBYOvV4QGsvc3rvKAg7Y.gOKXVs5FsD7U"
+SFDC_CONSUMER_SECRET = "367427909C00EC54CEDDF1CDF27D4BD59AB43508ADFB9E1FA62FA1616C97A3F7"
+CUSTOM_CALLBACK = "management.callback.oauth_callback"
