@@ -1,5 +1,4 @@
-# SalesforceApp190
+# Salesforce & Django Login
 #Pre-Sales Management Solution for Salesforce Application
 
-# Django Logim
-Login Name: user Login Password: user
+#Login Name: user Login Password: user
