@@ -1,3 +1,2 @@
-# DjangoApp190
-Login Name: user
-Login Password: user
+# SalesforceApp190
+#Pre-Sales Management Solution for Salesforce Application
