@@ -1,19 +1,26 @@
 <template>
 
     
-    <lightning-card title="Opportunity ID" icon-name="custom:custom14">
-        <div class="slds-m-around_medium">
-          <p> Opportunity ID </p>
-          <lightning-input label=" " ></lightning-input>
-        </div>
-      </lightning-card> 
-      
-      <lightning-card title="Account ID" icon-name="custom:custom14">
-          <div class="slds-m-around_medium">
-            <p> AccountID </p>
-            <lightning-input label=" " ></lightning-input>
-          </div>
-        </lightning-card> 
+  <lightning-card title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
+    <div class="slds-m-around_medium">
+        <p> Opportunity </p>
+        <lightning-combobox
+          name="Opportunity"
+          label="Available:"
+          value={value}
+          placeholder="Select"
+          options={options}
+          onchange={handleChange} >
+        </lightning-combobox>
+        <p>Selected Opportunity ID: {value}</p>
+    </div>
+        
+    <div class="slds-m-around_medium">
+      <p> AccountID </p>
+      <lightning-input label=" " ></lightning-input>
+    </div>
+    
+  </lightning-card> 
 
 
 </template>
