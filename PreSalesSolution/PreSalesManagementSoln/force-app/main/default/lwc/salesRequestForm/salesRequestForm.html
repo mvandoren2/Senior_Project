@@ -1,3 +1,4 @@
+<!-- sldsValidatorIgnore -->
 <template>
 
     
@@ -19,8 +20,26 @@
       <p> AccountID </p>
       <lightning-input label=" " ></lightning-input>
     </div>
+
+    <!-- new -->
+    <div class="slds-m-around_medium search-table search-wrapper">
+      <label for="search">Search Products</label>
+      <lightning-input label=" " type="search" id="search" onchange={searchEvt} data-search></lightning-input>
+      <ul class="slds-m-around_medium">
+        <template for:each={fproducts} for:item="product">
+            <li key={product.id}>
+              <div class="card">
+                <div class="header" data-header>
+                  {product.name}
+                  <button class="slds-button slds-button_success">ADD</button>
+                </div>
+              </div>
+            </li>
+        </template>
+      </ul>
+    </div>
+    <!-- end of new -->
     
   </lightning-card> 
-
 
 </template>

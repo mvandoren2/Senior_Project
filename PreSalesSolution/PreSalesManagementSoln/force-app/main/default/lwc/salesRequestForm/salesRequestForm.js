@@ -1,6 +1,16 @@
 import { LightningElement } from 'lwc';
+import products from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
+    products = products;
+    fproducts = [];
+
+    searchEvt = (evt) => {
+        const value = evt.target.value.toLowerCase();
+
+        this.fproducts = this.products.filter(item => item.name.toLowerCase().includes(value) || value === '');
+    }
+    
     value = ' ';
 
     get options() {
