@@ -1,0 +1,16 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <lightning-input type="search" variant="standard" label=" " placeholder="Search" onchange={searchHandler}></lightning-input>
+    <lightning-datatable
+        key-field="id"
+        data={filteredData}
+        columns={columns}
+        default-sort-direction="asc"
+        sorted-direction={sortDirection}
+        sorted-by={sortedBy}
+        onsort={listSortHandler}
+        onrowaction={rowActionHandler}
+        hide-checkbox-column
+    >
+    </lightning-datatable>
+</template>
