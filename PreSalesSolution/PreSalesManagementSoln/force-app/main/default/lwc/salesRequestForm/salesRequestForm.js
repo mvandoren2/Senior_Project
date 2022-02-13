@@ -3,16 +3,17 @@ import products from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
     products = products;
-    fproducts = [];
+    filteredProducts = [];
     cart = [];
 
     //search for products in the text bar
     searchEvt = (evt) => {
-        if (evt.target.value === '') {
-            this.fproducts = [];
+        const value = evt.target.value;
+        if (value === '') {
+            this.filteredProducts = [];
         } else {
-            const value = evt.target.value.toLowerCase();
-            this.fproducts = this.products.filter(item => item.name.toLowerCase().includes(value) || value === '');
+            const lValue = value.toLowerCase();
+            this.filteredProducts = this.products.filter(item => item.name.toLowerCase().includes(lValue));
         }
     }
 

@@ -25,7 +25,7 @@
       <label for="search">Search Products</label>
       <lightning-input label=" " type="search" id="search" onchange={searchEvt}></lightning-input>
       <ul class="slds-m-around_medium">
-        <template for:each={fproducts} for:item="product">
+        <template for:each={filteredProducts} for:item="product">
             <li key={product.id}>
               {product.name}
               <lightning-button value={product} variant="success" label="Add" title="Successful action" onclick={addProd} class="slds-m-left_x-small"></lightning-button>
