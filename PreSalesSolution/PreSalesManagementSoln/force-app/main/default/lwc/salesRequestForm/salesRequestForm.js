@@ -5,6 +5,10 @@ export default class SalesRequestForm extends LightningElement {
     products = products;
     filteredProducts = [];
     cart = [];
+    nextSectionId = 1
+    nextTimeId = 1
+    nextId = 1
+    sections = []
 
     //search for products in the text bar
     searchEvt = (evt) => {
@@ -54,4 +58,39 @@ export default class SalesRequestForm extends LightningElement {
     handleChange(event) {
         this.value = event.detail.value;
     }
+
+    connectedCallback() 
+    {
+        this.addSection()
+    }
+    endEvent(event) 
+    {
+        event && event.stopPropagation()
+        this.sections = [...this.sections]
+    }
+    createAnswer() 
+    {
+        return { id: this.nextId++ }
+    }
+    createTime() 
+    {
+        return { id: this.nextTimeId++, answers: [this.createAnswer()]}
+    }
+    createSection() 
+    {
+        return { id: this.nextSectionId++, questions: [this.createTime()]}
+    }
+    addSection(event) 
+    {
+        this.sections.push(this.createSection())
+        this.endEvent(event)
+    }
+    deleteSection(event) 
+    {
+        const { sectionIndex } = this.findSection(event.target)
+        this.sections.splice(sectionIndex, 1)
+        this.endEvent(event)
+    }
+
+
 }
