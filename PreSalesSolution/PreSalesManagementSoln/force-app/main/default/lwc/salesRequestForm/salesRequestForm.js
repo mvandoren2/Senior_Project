@@ -4,13 +4,38 @@ import products from './productsList';
 export default class SalesRequestForm extends LightningElement {
     products = products;
     fproducts = [];
+    cart = [];
 
+    //search for products in the text bar
     searchEvt = (evt) => {
-        const value = evt.target.value.toLowerCase();
-
-        this.fproducts = this.products.filter(item => item.name.toLowerCase().includes(value) || value === '');
+        if (evt.target.value === '') {
+            this.fproducts = [];
+        } else {
+            const value = evt.target.value.toLowerCase();
+            this.fproducts = this.products.filter(item => item.name.toLowerCase().includes(value) || value === '');
+        }
     }
-    
+
+    //event button to add to cart
+    addProd = (evt) => {
+        const prod = evt.target.value;
+        if (this.cart.includes(prod)) {
+            return;
+        }
+        this.cart.push(prod);
+        this.products = this.products.filter(item => item.id !== prod.id);
+        this.searchEvt({ target: { value: '' } });
+        document.getElementById('search').value = ''
+    }
+
+    //event button to remove from cart
+    removeProd = (evt) => {
+        const prod = evt.target.value;
+        this.products.push(prod);
+        this.cart = this.cart.filter(item => item.id !== prod.id);
+        this.searchEvt({ target: { value: '' } });
+    }
+
     value = ' ';
 
     get options() {
