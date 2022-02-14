@@ -77,8 +77,18 @@
           </div>
       </div>
   </div>
-
+  <div>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
+        <div class="slds-form-element__control">
+            <textarea id="textarea-id-01" rows=10 cols=80 class="slds-textarea" style="resize:none" placeholder="Write your description here...."></textarea> 
+        </div>
+    </div>
     
+    <div class="button">
+        <lightning-button variant="submit" label="Submit" title="Submit" class="button" onclick={handleUploadAction} ></lightning-button>
+    </div> 
+</div>
   </lightning-card> 
 
 </template>

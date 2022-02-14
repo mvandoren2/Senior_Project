@@ -9,7 +9,8 @@ export default class SalesRequestForm extends LightningElement {
     nextTimeId = 1
     nextId = 1
     sections = []
-
+    clickedButtonLabel;
+    
     //search for products in the text bar
     searchEvt = (evt) => {
         const value = evt.target.value;
@@ -90,6 +91,10 @@ export default class SalesRequestForm extends LightningElement {
         const { sectionIndex } = this.findSection(event.target)
         this.sections.splice(sectionIndex, 1)
         this.endEvent(event)
+    }
+
+    handleClick(event) {
+        this.clickedButtonLabel = event.target.label;
     }
 
 
