@@ -65,7 +65,7 @@ const dateString = (date) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
     const pm = date.getHours() > 11
 
-    return ' ' + days[date.getDay()] + ' ' + 
+    return days[date.getDay()] + ' ' + 
         months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear() + ' ' +
         ' @ ' + date.getHours() % 12 + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + (pm ? 'PM' : 'AM')
 }
@@ -80,9 +80,12 @@ export const prettyData = () => {
             opportunity: appData.opportunities
                 .filter(opportunity => opportunity.id === request.opportunity)[0]
                 .title,
-            product: request.product.map(product => ' ' + product),
+            product: request.product
+                .map((product, i) =>  (i > 0 ? ' ' : '') + product)
+                .toString(),
             time: request.date
-                .map(date => dateString(date)),
+                .map((date, i) => (i > 0 ? ' ' : '') + dateString(date))
+                .toString(),
             date: request.date,
             submittedBy: request.submittedBy,
             notes: request.notes                
