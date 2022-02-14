@@ -1,0 +1,9 @@
+.task_card{
+    font-family: Arial;
+    width: 50%;
+    min-width: 50%;
+}
+
+.searchTaskInput{
+    width: 50%;
+}
