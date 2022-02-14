@@ -1,35 +1,35 @@
 <template>
-    <lightning-card>
-    <div class = "slds-clearfix">
+    <div class="slds-m-around_medium">
+        <lightning-card variant="narrow">
+            <div class = "slds-clearfix">
 
-        <div class = "slds-float_right">
-        <div class = "slds-align_absolute-center" style ="height:5rem">
-                <label for = "checkbox"> <strong>Task Done</strong> </label>
-                <lightning-input type = "checkbox"> </lightning-input>
-        </div>
+                <div class = "slds-float_right">
+                    <div class = "slds-m-right_x-small" style ="height:5rem">
+                            <label for = "checkbox"> <strong>Task Done</strong> </label>
+                            <lightning-input type = "checkbox"> </lightning-input>
+                    </div>
+                </div>
+            
+    
+                <div class="slds-m-left_x-small">
+                    <h1 slot="title"><strong> <font size="+1">{taskType}: {timeInfo}</font></strong></h1>
+            
+                    <div>
+                        <p>
+                            <strong> Client        :</strong>{clientInfo} <br>
+                            <strong> Product       :</strong>{productInfo} <br>
+                            <strong> Meeting info  :</strong>{meetingInfo} <br>
+                            <strong> Sales Team    :</strong>{salesTeamInfo} <br>
+                            <strong> Meeting Notes :</strong>{meetingNotesInfo} <br>
+                        </p>
+            
+                    </div>
+                </div>
+            </div>
+        
+        
+        
+
+        </lightning-card>
     </div>
-
-    <div class = "slds-float_left">
-        <p><strong>Task: MM/DD/YY</strong></p>
-    </div>
-
-
-    </div>
-
-    <div slot = "footer">
-    <div class = "slds-clearfix">
-    <div class = "slds-float_left">
-    <div>
-        <p>Name:</p>
-        <p>Client:</p>
-        <p>Meeting:</p>
-        <p>Notes:</p>
-    </div>
-    </div>
-    </div>
-    </div>
-
-
-
-</lightning-card>
 </template>
