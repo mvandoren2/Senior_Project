@@ -41,42 +41,90 @@
     </div>
     
     <div>
-      <div class="slds-clearfix">
-          <div slot="actions">
-              <lightning-button label="Add" onclick={addSection} class="slds-align_absolute-center">
-              </lightning-button>
+      <div class="slds-clearfix"> 
+          <div class="slds-align_absolute-center">
+              <p> <strong>Date Option 1:</strong></p>
           </div>
       </div>
-      <div for:each={sections} for:item="section" key={section.id} data-section-id={section.id}>
-          <div style="display: table-row">
-              <div style="width: 100xp; display: table-cell;">
-                  <div class="slds-grid slds-p-around_small section">
-                      <div class="slds-m-around_medium">
-                          <p> Date Requested: </p>
-                          <div class="slds-m-around_medium">
-                              <lightning-input type="date" id="DATE" name="DATE_START"
-                                  value=" "
-                                  min=" " max=" "> 
-                              </lightning-input>
-                          </div>
-                      </div>
-                  </div>       
+      <div style="display: table-row">
+          <div style="width: 100xp; display: table-cell;">
+           <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p> Date Requested: </p>
+                      <lightning-input type="date" id="DATE" name="DATE_START"
+                          value=" "
+                          min=" " max=" "> 
+                      </lightning-input>   
+                  </div>   
+              </div>       
+          </div>
+          <div style="display: table-cell;">
+              <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p> Time Request: </p>
+                      <lightning-input type="time" id="appt" name="appt">
+                      </lightning-input>
+                   </div>
               </div>
-
-              <div style="display: table-cell;">
-                  <div class="slds-grid slds-p-around_small question">
-                      <div class="slds-m-around_medium">
-                          <p> Time Request: </p>
-                          <div class="slds-m-around_medium">
-                              <lightning-input type="time" id="appt" name="appt">
-                              </lightning-input>
-                          </div>
-                      </div>
+          </div>
+      </div>
+      <div class="slds-clearfix"> 
+          <div class="slds-align_absolute-center">
+               <p><strong> Date Option 2:</strong> </p>
+          </div>
+      </div>
+      <div style="display: table-row">
+          <div style="width: 100xp; display: table-cell;">
+              <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p> Date Requested: </p>
+                      <lightning-input type="date" id="DAtE" name="DATE_START"
+                           value=" "
+                           min=" " max=" "> 
+                      </lightning-input>
+                  </div>
+              </div>       
+          </div>
+          <div style="display: table-cell;">
+              <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p>Time Request:</p>
+                      <lightning-input type="time" id="aPpt" name="appt">
+                      </lightning-input>
                   </div>
               </div>
           </div>
       </div>
+      <div class="slds-clearfix"> 
+          <div class="slds-align_absolute-center">
+              <p><strong>Date Option 3:</strong></p>
+          </div>
+      </div>
+      <div style="display: table-row">
+          <div style="width: 100xp; display: table-cell;">
+              <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p> Date Requested: </p>
+                      <lightning-input type="date" id="dATE" name="DATE_START"
+                          value=" "
+                          min=" " max=" "> 
+                      </lightning-input>
+                  </div>
+              </div>       
+          </div>
+          <div style="display: table-cell;">
+              <div class="slds-grid slds-p-around_small">
+                  <div class="slds-p-around_small">
+                      <p> Time Request: </p>
+                      <lightning-input type="time" id="Appt" name="appt">
+                      </lightning-input>
+                   </div>
+              </div>
+          </div>
+      </div>
   </div>
+  
+
   <div>
     <div class="slds-form-element">
         <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
@@ -88,7 +136,8 @@
     <div class="button">
         <lightning-button variant="submit" label="Submit" title="Submit" class="button" onclick={handleUploadAction} ></lightning-button>
     </div> 
-</div>
+  </div>
+
   </lightning-card> 
 
 </template>
