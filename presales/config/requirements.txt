@@ -12,9 +12,9 @@ cffi==1.15.0
 chardet==3.0.4
 charset-normalizer==2.0.8
 Click==7.0
-cloud-init==21.3
+# cloud-init==21.3
 colorama==0.4.3
-command-not-found==0.3
+# command-not-found==0.3
 configobj==5.0.6
 constantly==15.1.0
 cryptography==2.8
@@ -23,7 +23,7 @@ debugpy==1.5.0
 decorator==5.1.0
 defusedxml==0.7.1
 distro==1.4.0
-distro-info===0.23ubuntu1
+# distro-info===0.23ubuntu1
 Django==3.0.14
 django-salesforce-oauth==0.3.4
 entrypoints==0.3
@@ -48,7 +48,7 @@ jupyterlab==3.2.0
 jupyterlab-pygments==0.1.2
 jupyterlab-server==2.8.2
 keyring==18.0.1
-language-selector==0.1
+# language-selector==0.1
 launchpadlib==1.10.13
 lazr.restfulclient==0.14.2
 lazr.uri==1.0.3
