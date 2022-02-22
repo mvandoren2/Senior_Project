@@ -13,13 +13,11 @@ def dashboard(request):
 
    if(request.method == 'POST'):
       activity = json.loads(request.body)
-      print(activity)
 
    if(request.method == 'GET'):
       activity = list(Activity.objects.values())
       if(activity):
          activity_json = json.dumps(activity, indent=4, sort_keys=True, default=str)
-         print(activity_json)
       else:
          activity_json = [{'error': 'No activities found'}]
       
