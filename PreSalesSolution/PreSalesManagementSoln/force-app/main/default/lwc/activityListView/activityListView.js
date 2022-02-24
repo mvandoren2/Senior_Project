@@ -24,7 +24,17 @@ export default class ActivityListView extends LightningElement {
     actions = this.tableData.actions
     data = this.tableData.data.dislpay
 
-    
+    connectedCallback() {
+        setTimeout(() => {
+            this.tableData = getTableColumns(this.profileNum)
+
+            this.columns = this.tableData.columns
+            this.actions = this.tableData.actions
+            this.data = this.tableData.data.dislpay
+
+            this.filteredData = [...this.data]
+        }, 500)
+    }
 
     calculateRowWidth = (component, evt) => {
         console.log(component, evt)  
