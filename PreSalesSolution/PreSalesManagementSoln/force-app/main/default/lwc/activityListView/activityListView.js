@@ -32,48 +32,18 @@ export default class ActivityListView extends LightningElement {
 
         const query = evt.target.value
 
-        if (query === '') {
-            this.filters = this.filters.filter(item => item.filterField !== filterField)
-        }
+        this.filters = this.filters.filter(item => item.field != filterField)
         
+        if(query !== '')
+            this.filters = this.filters.concat({field: filterField, query: query})
+
+        this.filteredData = [...this.data]
         
-        else this.filters += [{field: filterField, query: query}]
-
-        console.log(this.filters)
-
-        for(let filter in this.filters) {
+        this.filters.forEach(filter => {
             this.filteredData = this.filteredData
-                .filter(item => (
-                    item[filter.field].toString().toLowerCase()
-                        .includes(query.toLowerCase())
+                .filter(row => (
+                    row[filter.field].toLowerCase().includes(filter.query.toLowerCase())
                 ))
-        }
+        })
     }
-
-    calculateRowWidth = (component, evt, helper) => {
-        const childObj = evt.target
-        let parObj = childObj.parentNode;
-        let count = 1;
-        while(parObj.tagName != 'TH') {
-            parObj = parObj.parentNode;
-            count++;
-        }
-        console.log('final tag Name'+parObj.tagName);
-        const mouseStart = evt.clientX;
-        component.set("v.mouseStart",mouseStart);
-        component.set("v.oldWidth",parObj.offsetWidth);    
-    }
-
-    setNewWidth = (component, evt, helper) => {
-        const childObj = evt.target
-        let parObj = childObj.parentNode;
-        let count = 1;
-        while(parObj.tagName != 'TH') {
-            parObj = parObj.parentNode;
-            count++;
-        }
-        const mouseStart = component.get("v.mouseStart");
-        const oldWidth = component.get("v.oldWidth");
-        const newWidth = evt.clientX- parseFloat(mouseStart)+parseFloat(oldWidth);
-        parObj.style.width = newWidth+'px';    }
 }
