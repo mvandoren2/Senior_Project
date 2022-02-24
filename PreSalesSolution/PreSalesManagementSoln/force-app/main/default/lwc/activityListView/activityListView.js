@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import { getTableColumns } from './tableColumns';
 
 export default class ActivityListView extends LightningElement {
@@ -24,6 +24,20 @@ export default class ActivityListView extends LightningElement {
     actions = this.tableData.actions
     data = this.tableData.data.dislpay
 
+    
+
+    calculateRowWidth = (component, evt) => {
+        console.log(component, evt)  
+    }
+
+    setNewWidth = (evt) => {
+        console.log(evt)
+    }
+
+    flipShowAssign = () => {
+        this.template.querySelector('c-assign-team-modal').toggleShow(this.rowID)
+    }
+
     filters = []
     filteredData = [...this.data]
 
@@ -47,19 +61,6 @@ export default class ActivityListView extends LightningElement {
         })
     }
 
-    calculateRowWidth = (component, evt) => {
-        console.log(component, evt)  
-    }
-
-    setNewWidth = (evt) => {
-        console.log(evt)
-    }
-
-    flipShowAssign = () => {
-        this.showAssign = !this.showAssign
-    }
-
-    showAssign = false
     rowID
 
     handleMenuAction = (evt) => {
@@ -67,7 +68,9 @@ export default class ActivityListView extends LightningElement {
 
         this.rowID = parentElement.dataset.item
 
+        console.log(this.rowID)
+
         if (evt.target.dataset.item == 'assign_request')
-            this.flipShowAssign() 
+            this.flipShowAssign()
     }
 }

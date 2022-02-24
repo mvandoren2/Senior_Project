@@ -14,6 +14,8 @@
             <!-- table head start -->
             <thead>
                 <tr class="slds-line-height_reset">
+                    
+                    <!-- column headers -->
                     <template for:each={columns} for:item="column">
                         <th key={column.fieldName} 
                             aria-label="Name" 
@@ -159,39 +161,5 @@
         </table>
     </div>
 
-
-    <template if:true={showAssign}>
-        <section    role="dialog" 
-                    tabindex="-1" 
-                    aria-labelledby="modal-heading-01" 
-                    aria-modal="true"
-                    aria-describedby="modal-content-id-1" 
-                    class="slds-modal slds-fade-in-open"
-                    >
-            <div class="slds-modal__container">
-                <!-- modal header start -->
-                <header class="slds-modal__header">
-                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
-                        title="Close" onclick={flipShowAssign}>
-                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
-                            size="small"></lightning-icon>
-                        <span class="slds-assistive-text">Close</span>
-                    </button>
-                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Pre-Sales Teams</h2>
-                </header>
-
-                <!-- modal body start -->
-                <div class="slds-tabs_card">
-                    <lightning-card title="Add Team Members for the Task" icon-name="standard:team_member">
-                        <lightning-input name="enter-search" label="Search Members with Names/Skills" type="search"
-                            onchange={filter}></lightning-input>
-                        <lightning-dual-listbox name="addMembers" label="Select Team Members" source-label="Available"
-                            selected-label="Selected" field-level-help="Select members for the task!" value={selected} options={options}
-                            onchange={handleChange}></lightning-dual-listbox>
-                    </lightning-card>
-                </div>
-
-            </div>
-        </section>
-    </template>
+    <c-assign-team-modal></c-assign-team-modal>
 </template>
