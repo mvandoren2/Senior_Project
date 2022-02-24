@@ -68,8 +68,6 @@ export default class ActivityListView extends LightningElement {
 
         this.rowID = parentElement.dataset.item
 
-        console.log(this.rowID)
-
         if (evt.target.dataset.item == 'assign_request')
             this.flipShowAssign()
     }
