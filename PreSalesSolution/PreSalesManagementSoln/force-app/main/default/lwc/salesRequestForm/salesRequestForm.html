@@ -3,22 +3,37 @@
 
     
   <lightning-card title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
-    <div class="slds-m-around_medium">
-        <p> Opportunity </p>
-        <lightning-combobox
-          name="Opportunity"
-          label="Available:"
-          value={value}
-          placeholder="Select"
-          options={options}
-          onchange={handleChange} >
-        </lightning-combobox>
-        <p>Selected Opportunity ID: {value}</p>
+    <!--Opportuntiy ID... auto fill-->
+    <div class="slds-m-around_medium">   
+        <div class="acc-container">
+            <div class="sld-grid">
+                <div class="slds-col slds-size_1-of-2">
+                   <strong>Opporunity ID :</strong> {recordId}
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <!--Check box...for unknown reason -->
+    <div class="slds-clearfix">
+        <div class="slds-align_absolute-center">  
+            <label for = "checkbox"> Unexpected Event</label>                            
+            <lightning-input type="checkbox"> </lightning-input> 
+        </div>
     </div>
-        
+    
+    <!--Drop down Menu...select Presales Activities -->
     <div class="slds-m-around_medium">
-      <p> AccountID </p>
-      <lightning-input label=" " ></lightning-input>
+        <div>
+            <lightning-combobox 
+                name="Available"
+                label="Pre-Sales Activities"
+                value={value}
+                placeholder="Select Progress"
+                options={options}                            
+                onchange={handleChange} >
+            </lightning-combobox>
+        </div>
     </div>
 
     <div class="slds-m-around_medium search-table search-wrapper">

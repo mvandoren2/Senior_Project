@@ -1,0 +1,140 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <div class="slds-table_edit_container slds-is-relative">
+        <table  aria-multiselectable="true" 
+                class=" slds-table 
+                        slds-table_cell-buffer 
+                        slds-table_bordered 
+                        slds-table_resizable-cols 
+                        slds-table_striped 
+                        slds-table_fixed-layout" 
+                role="grid"
+                >
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <template for:each={columns} for:item="column">
+                        <th key={column.fieldName} 
+                            aria-label="Name" 
+                            aria-sort="none" 
+                            class=" slds-is-resizable 
+                                    slds-is-sortable 
+                                    slds-cell_action-mode" 
+                            scope="col"
+                            >
+                            <a  class=" slds-th__action 
+                                        slds-text-link_reset" 
+                                href="#" 
+                                role="button" 
+                                tabindex="0"
+                                >
+                              <span class="slds-assistive-text">Sort by: </span>
+                              <div class="  slds-grid 
+                                            slds-grid_vertical-align-center 
+                                            slds-has-flexi-truncate"
+                                            >
+                                <span class="slds-truncate" title={column.label}>{column.label}</span>
+                                <span class="   slds-icon_container 
+                                                slds-icon-utility-arrowdown"
+                                                >
+                                  <svg  class=" slds-icon
+                                                slds-icon-text-default 
+                                                slds-is-sortable__icon" 
+                                        aria-hidden="true"
+                                        >
+                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                            </a>
+                            <div class="slds-resizable">
+                                <input    type="range" 
+                                          aria-label="Name column width" 
+                                          class=" slds-resizable__input 
+                                                  slds-assistive-text" 
+                                          max="1000" 
+                                          min="20" 
+                                          tabindex="0"
+                                          id={column.fieldName}
+                                          />
+                                <span   class="slds-resizable__handle" 
+                                        onmousedown={calculateRowWidth}
+                                        ondrag={setNewWidth}
+                                        >
+                                  <span class="slds-resizable__divider"></span>
+                                </span>
+                              </div>
+                          </th>
+                    </template>
+                </tr>
+                <template if:false={format.small}>
+                    <tr class="slds-line-height_reset">
+                        <template for:each={columns} for:item="column">
+                            <th key={column.id}>
+                                <div>
+                                    <lightning-input    type="search" 
+                                                        class="filter_input" 
+                                                        label=" " 
+                                                        variant="label-hidden"
+                                                        data-item={column.fieldName}
+                                                        onchange={handleFilter}>
+                                    </lightning-input>
+                                </div>
+                            </th>
+                        </template>
+                    </tr>
+                </template>
+            </thead>
+            <tbody>
+                <template for:each={filteredData} for:item="row">
+                    <tr key={row.id} class="slds-hint-parent">
+                            <td scope="row" class="slds-cell-wrap">
+                                <div>
+                                    {row.account}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.opportunity}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.product}
+                                </div>
+                            </td>       
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.activity}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div >
+                                    {row.time}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.location}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.description}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.submittedBy}
+                                </div>
+                            </td>
+                            <td class="slds-cell-wrap">
+                                <div>
+                                    {row.status}
+                                </div>
+                            </td>
+                    </tr>
+                </template>             
+            </tbody>
+        </table>
+    </div>
+</template>
