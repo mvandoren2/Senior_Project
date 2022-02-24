@@ -39,13 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_salesforce_oauth',
-    
+    'corsheaders',
     'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -135,3 +136,5 @@ OAUTH_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 SFDC_CONSUMER_KEY = "3MVG9p1Q1BCe9GmCzbNEHis6ekvmynHYjtp00lXIfsK3gqLWRzhyEBYOvV4QGsvc3rvKAg7Y.gOKXVs5FsD7U"
 SFDC_CONSUMER_SECRET = "367427909C00EC54CEDDF1CDF27D4BD59AB43508ADFB9E1FA62FA1616C97A3F7"
 CUSTOM_CALLBACK = "management.callback.oauth_callback"
+
+CORS_ORIGIN_ALLOW_ALL = True  
