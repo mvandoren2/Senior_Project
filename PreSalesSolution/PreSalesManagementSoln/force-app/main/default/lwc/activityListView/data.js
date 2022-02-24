@@ -1,6 +1,9 @@
-import DisplayUrl from "@salesforce/schema/Product2.DisplayUrl"
+fetch('http://localhost:8080/api/get_activity')
+    .then(res => res.json())
+    .then(data => appData.requests = data)
 
-const appData = {
+
+let appData = {
     clients: [
         {
             accountId: 456,
@@ -15,61 +18,96 @@ const appData = {
 
     opportunities: [
         {
-            id: 123,
+            id: "234232",
             client: 456,
             title: 'Pumphrey-Product1-Product2',
             salesTeam: ['Eddy', "Ol' Remus"]
         },
 
         {
-            id: 762,
+            id: "sdas",
             client: 137,
-            title: 'James-Product2',
-            salesTeam: ['Lance', 'Jim', 'Frankie']
+            title: 'James-opportunity'
+        }
+    ],
+
+    teamMembers: [
+        {
+            id: '231212',
+            name: 'Emily'
+        },
+
+        {
+            id: '43534',
+            name: 'Paul'
+        },
+
+        {
+            id: '2132131',
+            name: 'Hal'
+        },
+
+        {
+            id: '123123',
+            name: 'Frankie'
+        },
+
+        {
+            id: '54644342',
+            name: 'Mickey'
         }
     ],
 
     requests: [
         {
-            id: 0,
-            opportunity: 123,
-            account: 456,
-            product: ['product1', 'product2'],
-            activity: 'Demonstration',
-            activityLevel: 1,
-            date: [new Date(2022, 4, 23, 15, 30), new Date(1989, 6, 12, 12, 4, 20)],
-            location: '123 Alpha Way, Sacramento, CA, 95959',
-            submittedBy:'Eddy',
-            description: "Here's some notes",
-            status: "rescheduled"
-        },
-
-        {   
-            id: 1,
-            opportunity: 762,
-            account: 137,
-            product: ['product2'],
-            activity: 'Guided Lab',
-            activityLevel: 2,
-            date: [new Date(2022, 3, 13, 8, 30)],
-            location: 'www.zoom.link/123',
-            submittedBy: 'Lance',
-            description: "More notes? Here you go!",
-            status: "complete"
-        },
-
-        {
-            id: 2,
-            opportunity: 762,
-            account: 137,
-            product: ['product1'],
-            activity: 'Sandbox',
-            activityLevel: 3,
-            date: [new Date()],
-            location: 'www.zoom.link/456',
-            submittedBy: 'Jim',
-            description: "Take another note!",
-            status: "cancelled"
+            "activity_ID": 4,
+            "members": [
+                {
+                    "presales_member_ID": 1,
+                    "user_role": {
+                        "roles_ID": 3,
+                        "name": "Sales Representative"
+                    },
+                    "external_presales_member_ID": "231212"
+                },
+                {
+                    "presales_member_ID": 2,
+                    "user_role": {
+                        "roles_ID": 2,
+                        "name": "Pre Sales Manager"
+                    },
+                    "external_presales_member_ID": "43534"
+                },
+                {
+                    "presales_member_ID": 12,
+                    "user_role": null,
+                    "external_presales_member_ID": "2132131"
+                },
+                {
+                    "presales_member_ID": 13,
+                    "user_role": null,
+                    "external_presales_member_ID": "123123"
+                }
+            ],
+            "products": [
+                {
+                    "product_ID": 1,
+                    "external_product_ID": "1",
+                    "name": "Coffee"
+                },
+                {
+                    "product_ID": 3,
+                    "external_product_ID": "2",
+                    "name": "Icecream"
+                }
+            ],
+            "opportunity_ID": "234232",
+            "oneDateTime": "2022-02-22T00:49:51Z",
+            "twoDateTime": null,
+            "threeDateTime": null,
+            "selectedDateTime": "2022-02-22T00:49:53Z",
+            "description": "sdaSDASDasd",
+            "flag": false
         }
     ]
 }
@@ -88,24 +126,23 @@ export const prettyData = () => {
     
     let dislpayData = appData.requests.map(request => (
         {
-            id: request.id,
+            id: request.activity_ID,
             account: appData.clients
-                .filter(client => client.accountId === request.account)[0]
+                .filter(client => client.accountId === appData.opportunities.filter(opportunity => opportunity.id == request.opportunity_ID)[0].client)[0]
                 .name,
             opportunity: appData.opportunities
-                .filter(opportunity => opportunity.id === request.opportunity)[0]
+                .filter(opportunity => opportunity.id === request.opportunity_ID)[0]
                 .title,
-            product: request.product
-                .map((product, i) =>  (i > 0 ? ' ' : '') + product)
+            product: request.products
+                .map((product, i) =>  (i > 0 ? ' ' : '') + product.name)
                 .toString(),
             activity: request.activity + '-' + request.activityLevel,
-            time: request.date
-                .map((date, i) => (i > 0 ? ' ' : '') + dateString(date))
-                .toString(),
+            time: request.selectedDateTime,
             location: request.location,
-            submittedBy: request.submittedBy,
+            submittedBy: request.members
+                .map((member, i) => (i > 0 ? ' ' : '') + appData.teamMembers.filter(item => item.id == member.external_presales_member_ID)[0].name).toString(),
             description: request.description,
-            status: request.status                
+            status: 'complete'
         }
     ))
 
