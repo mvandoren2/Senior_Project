@@ -11,9 +11,20 @@ def dashboard(request):
    myUser = Activity.objects.all()
    print(myUser)
 
+   return render(request, 'management/dashboard.html', {'myUser': myUser})
+
+@csrf_exempt
+def post_activity(request):
+   json_activity = None
    if(request.method == 'POST'):
       activity = json.loads(request.body)
+      
+      
 
+   return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+
+@csrf_exempt
+def get_activity(request):
    if(request.method == 'GET'):
       activity = list(Activity.objects.values())
       if(activity):
@@ -22,5 +33,3 @@ def dashboard(request):
          activity_json = [{'error': 'No activities found'}]
       
       return HttpResponse(activity_json, content_type='application/json')
-
-   return render(request, 'management/dashboard.html', {'myUser': myUser})
