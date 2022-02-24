@@ -57,6 +57,7 @@ class Activity(models.Model):
    selectedDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    products = models.ManyToManyField(Product)
    description = models.CharField(blank=True, null=True, max_length=500)
+   flag = models.BooleanField(default=False)
 
    class meta:
       verbose_name_plural = 'Activities'
