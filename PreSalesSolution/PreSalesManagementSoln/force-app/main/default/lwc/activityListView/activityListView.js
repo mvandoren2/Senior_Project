@@ -46,4 +46,28 @@ export default class ActivityListView extends LightningElement {
                 ))
         })
     }
+
+    calculateRowWidth = (component, evt) => {
+        console.log(component, evt)  
+    }
+
+    setNewWidth = (evt) => {
+        console.log(evt)
+    }
+
+    flipShowAssign = () => {
+        this.showAssign = !this.showAssign
+    }
+
+    showAssign = false
+    rowID
+
+    handleMenuAction = (evt) => {
+        const parentElement = evt.target.closest('tr')
+
+        this.rowID = parentElement.dataset.item
+
+        if (evt.target.dataset.item == 'assign_request')
+            this.flipShowAssign() 
+    }
 }

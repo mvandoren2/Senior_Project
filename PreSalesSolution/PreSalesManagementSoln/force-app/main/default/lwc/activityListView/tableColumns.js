@@ -34,7 +34,8 @@ export const getTableColumns = (userProfileNum) => {
 
         case 2: 
             actions = [
-                {id: 'action_' + 0, label: 'Request Date Change', name: 'date_change'}
+                {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
+                {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'}
             ]
 
             columns.filter(obj => obj.fieldName === 'status')[0].editable = true
