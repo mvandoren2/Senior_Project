@@ -1,7 +1,5 @@
 import { prettyData } from "./data.js"
 
-const data = prettyData()
-
 const fixCamelCase = (s) => {
     return s.replace(/([A-Z])/g, ' $1')
         .replace(/^./, s => { 
@@ -10,6 +8,8 @@ const fixCamelCase = (s) => {
 }
 
 export const getTableColumns = (userProfileNum) => {
+    let data = prettyData()
+
     let columns = Object.keys(data.dislpay[0]).map((column, i) => ({
             id: "column_" + i,
             label: fixCamelCase(column),
