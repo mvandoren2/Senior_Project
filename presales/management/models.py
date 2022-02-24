@@ -38,7 +38,7 @@ class Product(models.Model):
 class PresalesMember(models.Model):
    presales_member_ID = models.AutoField(primary_key=True)
    external_presales_member_ID = models.CharField(max_length=50)
-   user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE)
+   user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
 
    class meta:
       verbose_name = 'Presales Member'

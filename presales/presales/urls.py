@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path('api/', include('api.urls')),
     path('management/', include('management.urls')),
     path("oauth/", include("django_salesforce_oauth.urls")),
     path('admin/', admin.site.urls),
