@@ -1,4 +1,4 @@
-import { LightningElement } from 'lwc';
+import { LightningElement,api } from 'lwc';
 import products from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
@@ -7,6 +7,11 @@ export default class SalesRequestForm extends LightningElement {
     cart = [];
     clickedButtonLabel;
     
+
+    //check
+    @api recordId;
+
+
     //search for products in the text bar
     searchEvt = (evt) => {
         const value = evt.target.value;
@@ -38,17 +43,18 @@ export default class SalesRequestForm extends LightningElement {
         this.searchEvt({ target: { value: '' } });
     }
 
+    //Dropdown menu for Pre-sales activities
     value = ' ';
-
-    get options() {
+    get options() 
+    {
         return [
-            { label: 'Opportunity #1', value: '1234445' },
-            { label: 'Opportunity #2', value: '3455567' },
-            { label: 'Opportunity #3', value: '8133456' },
-            { label: 'Opportunity #4', value: '8139080' },
-            { label: 'Opportunity #5', value: '8567890' },
-            { label: 'Opportunity #6', value: '9178889' },
-            { label: 'Opportunity #7', value: '9808891' },
+            { label: 'Demonstration', value: 'Demo' },
+            { label: 'Guided lab', value: 'Lab' },
+            { label: 'Sandbox', value: 'SandBox' },
+            { label: 'Consult', value: 'Consult' },
+            { label: 'Host Sale Support', value: 'Support' },
+            { label: 'Shadow', value: 'Shadow' },
+            { label: 'Proposal Request', value: 'Proposal' },
         ];
     }
 
