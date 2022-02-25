@@ -16,7 +16,7 @@ def getActivity(request):
 @api_view(['GET'])
 def getMembers(request):
     members = PresalesMember.objects.all()
-    serializer = PresaleMemberSerializer(members, many=True)
+    serializer = MemberSerializer(members, many=True)
     return Response(serializer.data)
 
 def searchMember(members):
