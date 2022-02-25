@@ -65,6 +65,16 @@ export default class SalesRequestForm extends LightningElement {
     handleClick(event) {
         this.clickedButtonLabel = event.target.label;
     }
+    //for the new submit button
+    handleSubmit(event) 
+    {
+        console.log('onsubmit event recordEditForm'+ event.detail.fields);
+    }
+    handleSuccess(event) 
+    {
+        console.log('onsuccess event recordEditForm', event.detail.id);
+    }
+    //------------------------------------
 
 
 }
