@@ -68,3 +68,41 @@ export default class SalesRequestForm extends LightningElement {
 
 
 }
+
+
+//--JSON 
+    var xhr = new XMLHttpRequest()
+    var url = 'http://localhost:8050/api/add_activity'
+
+    xhr.open("POST", url , true)
+
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UFT-8')
+    xhr.onreadystatechange = function(){
+        if (this.readyState === 4 && this.status === 201) {
+            let object = JSON.parse(xhr.response)
+            console.log(object)
+        }
+    }
+
+    let body = JSON.stringify = ({
+            "members": [21312312],
+            "products": [
+                {
+                    "external_product_ID": 1,
+                    "name": "Coffee"
+                },
+                {
+                    "external_product_ID": 2,
+                    "name": "Icecream"
+                }
+            ],
+            "opportunity_ID": recordId,
+            "oneDateTime": [salesReqForm.getElementById(DATE), salesReqForm.getElementById(appt)], 
+            "twoDateTime": [salesReqForm.getElementById(DAtE), salesReqForm.getElementById(aPpt)],
+            "threeDateTime": [salesReqForm.getElementById(dATE), salesReqForm.getElementById(Appt)],
+            "selectedDateTime": null,
+            "description": salesReqForm.getElementById(textarea-id),
+            "flag": false
+        })
+
+    xhr.send(body)
