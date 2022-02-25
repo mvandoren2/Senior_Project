@@ -5,19 +5,9 @@ import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMem
 export default class preSalesTeamAssignmentForm extends LightningElement {
 
     salesforceUsers = [];
-    activity;
+    activityID;
 
-    //functions to show and hide modal
-    @track isShowModal = false;
-
-    showModalBox() {
-        this.isShowModal = true;
-    }
-
-    hideModalBox() {
-        this.isShowModal = false;
-    }
-    
+    //functions to show and hide modal    
     handleFetch() {
         fetch('http://localhost:8080/api/get_activity/')
             .then(response => response.json())
@@ -27,9 +17,14 @@ export default class preSalesTeamAssignmentForm extends LightningElement {
             });
     }
 
-    showModalAndHandleFetch(){
-        this.showModalBox();
-        this.handleFetch();
+    @track boxClasses = 'slds-modal'
+    @track backdropClasses = 'slds-backdrop'
+
+    @api toggleShow = (rowID) => {
+        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
+        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
+
+        this.activityID = rowID
     }
 
     //get the users from salesforce
