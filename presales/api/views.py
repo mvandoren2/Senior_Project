@@ -13,6 +13,12 @@ def getActivity(request):
     serializer = ActivitySerializer(activity, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def getMembers(request):
+    members = PresalesMember.objects.all()
+    serializer = PresaleMemberSerializer(members, many=True)
+    return Response(serializer.data)
+
 def searchMember(members):
     arrM = []
     for m in members:

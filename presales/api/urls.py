@@ -5,4 +5,5 @@ urlpatterns = [
     path('add_activity/', views.addActivity),
     path('add_members/', views.addMembers),
     path('get_activity/', views.getActivity),
+    path('get_members/', views.getMembers),
 ]
