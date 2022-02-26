@@ -72,9 +72,9 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="DATE" name="DATE_START"
-                                    value=" "
-                                    min=" " max=" "> 
+                                <lightning-input type="date" id="date_1" name="DATE_START"
+                                    value="myDate_1"
+                                    min=" " max=" " onchange={dateInput_1}> 
                                 </lightning-input>   
                             </div>   
                         </div>       
@@ -83,7 +83,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Time Request: </p>
-                                <lightning-input type="time" id="appt" name="appt">
+                                <lightning-input type="time" id="time_1" name="appt" value="select_Time_1" onchange={timeInput_1}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -101,9 +101,9 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="DAtE" name="DATE_START"
-                                    value=" "
-                                    min=" " max=" "> 
+                                <lightning-input type="date" id="date_2" name="DATE_START"
+                                    value="myDate_2"
+                                    min=" " max=" " onchange={dateInput_2}> 
                                 </lightning-input>
                             </div>
                         </div>       
@@ -112,7 +112,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p>Time Request:</p>
-                                <lightning-input type="time" id="aPpt" name="appt">
+                                <lightning-input type="time" id="time_2" name="appt" value="select_Time_2" onchange={timeInput_2}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -130,9 +130,9 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="dATE" name="DATE_START"
-                                    value=" "
-                                    min=" " max=" "> 
+                                <lightning-input type="date" id="date_3" name="DATE_START"
+                                    value="myDate_3"
+                                    min=" " max=" " onchange={dateInput_3}> 
                                 </lightning-input>
                             </div>
                         </div>       
@@ -141,7 +141,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Time Request: </p>
-                                <lightning-input type="time" id="Appt" name="appt">
+                                <lightning-input type="time" id="time_3" name="appt" value="select_Time_3" onchange={timeInput_3}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                 <div class="slds-form-element">
                     <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
                     <div class="slds-form-element__control">
-                        <textarea id="textarea-id" rows=10 cols=80 class="slds-textarea" style="resize:none" placeholder="Write your description here...."></textarea> 
+                        <lightning-textarea id="textarea-id" rows=10 cols=80 class="slds-textarea" style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
                     </div>
                 </div>
             </div>

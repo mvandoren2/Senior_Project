@@ -1,4 +1,4 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement,api,track } from 'lwc';
 import products from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
@@ -74,27 +74,38 @@ export default class SalesRequestForm extends LightningElement {
     {
         console.log('onsuccess event recordEditForm', event.detail.id);
     }
-    //------------------------------------
 
 
-}
 
+    //----------Sending JSON to backend--------------------
 
-//--JSON 
-    var xhr = new XMLHttpRequest()
-    var url = 'http://localhost:8050/api/add_activity'
-
-    xhr.open("POST", url , true)
-
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UFT-8')
-    xhr.onreadystatechange = function(){
-        if (this.readyState === 4 && this.status === 201) {
-            let object = JSON.parse(xhr.response)
-            console.log(object)
-        }
+    @track myDate_1 = 0;
+    dateInput_1(event){
+        this.myDate_1 = event.target.value;
+    }
+    @track select_Time_1 = 0;
+    timeInput_1(event){
+        this.select_Time_1 = event.target.value;
+    }
+    @track myDate_2 = 0;
+    dateInput_2(event){
+        this.myDate_2 = event.target.value;
+    }
+    @track select_Time_2 = 0;
+    timeInput_2(event){
+        this.select_Time_2 = event.target.value;
+    }
+    @track myDate_3 = 0;
+    dateInput_3(event){
+        this.myDate_3 = event.target.value;
+    }
+    @track select_Time_3 = 0;
+    timeInput_3(event){
+        this.select_Time_3 = event.target.value;
     }
 
-    let body = JSON.stringify = ({
+
+    jsonData = JSON.stringify({
             "members": [21312312],
             "products": [
                 {
@@ -106,13 +117,31 @@ export default class SalesRequestForm extends LightningElement {
                     "name": "Icecream"
                 }
             ],
-            "opportunity_ID": recordId,
-            "oneDateTime": [salesReqForm.getElementById(DATE), salesReqForm.getElementById(appt)], 
-            "twoDateTime": [salesReqForm.getElementById(DAtE), salesReqForm.getElementById(aPpt)],
-            "threeDateTime": [salesReqForm.getElementById(dATE), salesReqForm.getElementById(Appt)],
+            "opportunity_ID": this.recordId,
+            "oneDateTime": [this.myDate_1, this.select_Time_1],
+            "twoDateTime": [this.myDate_2, this.select_Time_2],
+            "threeDateTime": [this.myDate_3, this.select_Time_3],
             "selectedDateTime": null,
-            "description": salesReqForm.getElementById(textarea-id),
+            "description": this.template.querySelector("lightning-textarea"),
             "flag": false
-        })
+    })
 
-    xhr.send(body)
+    //-----POST-----
+
+    pushJsonData(){
+        console.log(this.jsonData);
+
+        fetch('http://localhost:8050/api/add_activity/', {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: this.jsonData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', this.jsonData);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+}
