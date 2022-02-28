@@ -154,16 +154,20 @@
                 <div class="slds-form-element">
                     <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
                     <div class="slds-form-element__control">
-                        <lightning-textarea id="textarea-id" rows=10 cols=80 class="slds-textarea" style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
+                        <lightning-textarea id="textarea" rows=10 cols=80 class="slds-textarea" onchange ={textDescription} style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
                     </div>
                 </div>
             </div>
-    
+
+            <!--Submit button class="button"-->
             <div class="button">
-                <lightning-button variant="submit" label="Submit" title="Submit" class="button" onclick={handleUploadAction} ></lightning-button>
+                <lightning-button variant="submit" label="Submit" type = "button" class="slds-m-left_small" disabled ={disableButton} title="Submit" onclick={handleUploadAction} ></lightning-button>
             </div> 
-            
+
         </lightning-record-edit-form>
     </lightning-card> 
+
+
+
 
 </template>
