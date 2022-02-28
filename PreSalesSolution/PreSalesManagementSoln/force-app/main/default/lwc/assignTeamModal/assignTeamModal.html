@@ -17,12 +17,17 @@
                 <!-- modal body start -->
                 <div class="slds-tabs_card">
                     <lightning-card title="Add Team Members for the Task" icon-name="standard:team_member">
-                        <lightning-input name="enter-search" label="Search Members with Names/Skills" type="search"
-                            onchange={filter}></lightning-input>
-                        <lightning-dual-listbox name="addMembers" label="Select Team Members" source-label="Available"
-                            selected-label="Selected" field-level-help="Select members for the task!" value={selected} options={options}
+                        <lightning-input name="enter-search" label="Search Members with Names/Skills" type="search"></lightning-input>
+                            <lightning-dual-listbox name="languages"
+                            label="Select Team Members"
+                            source-label="Available"
+                            selected-label="Selected"
+                            field-level-help="Select the members you want to assign this task to!"
+                            options={options}
+                            value={values}
                             onchange={handleChange}></lightning-dual-listbox>
                     </lightning-card>
+                    <lightning-button variant="brand" label="Save" title="Primary action" onclick={pushDataAndHideModal} class="slds-m-left_x-small"></lightning-button>
                 </div>
 
             </div>

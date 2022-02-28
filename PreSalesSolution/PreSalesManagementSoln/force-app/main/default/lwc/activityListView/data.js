@@ -1,4 +1,4 @@
-fetch('http://localhost:8080/api/get_activity')
+fetch('http://localhost:8080/api/get_activity/')
     .then(res => res.json())
     .then(data => appData.requests = data)
 
