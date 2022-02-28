@@ -44,6 +44,7 @@ export default class SalesRequestForm extends LightningElement {
     }
 
     //Dropdown menu for Pre-sales activities
+
     value = ' ';
     get options() 
     {
@@ -56,10 +57,13 @@ export default class SalesRequestForm extends LightningElement {
             { label: 'Shadow', value: 'Shadow' },
             { label: 'Proposal Request', value: 'Proposal' },
         ];
+     
     }
-
+   
     handleChange(event) {
+        
         this.value = event.detail.value;
+    
     }
 
     handleClick(event) {
@@ -74,9 +78,19 @@ export default class SalesRequestForm extends LightningElement {
     {
         console.log('onsuccess event recordEditForm', event.detail.id);
     }
-
-
-
+    @track description;
+    textDescription(event){
+        console.log(this.description)
+        this.description = event.target.value;
+    }
+    get disableButton(){
+       return !(this.description 
+                && this.cart.push()
+                && this.value !== ' '
+                && this.myDate_1 
+                && this.select_Time_1)
+    }
+      
     //----------Sending JSON to backend--------------------
 
     @track myDate_1 = 0;
@@ -105,7 +119,7 @@ export default class SalesRequestForm extends LightningElement {
     }
 
 
-    jsonData = JSON.stringify({
+    jsonData = {
             "members": [21312312],
             "products": [
                 {
@@ -124,7 +138,7 @@ export default class SalesRequestForm extends LightningElement {
             "selectedDateTime": null,
             "description": this.template.querySelector("lightning-textarea"),
             "flag": false
-    })
+    }
 
     //-----POST-----
 
@@ -138,7 +152,7 @@ export default class SalesRequestForm extends LightningElement {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Success:', this.jsonData);
+            console.log('Success:', data);
         })
         .catch((error) => {
             console.error('Error:', error);
