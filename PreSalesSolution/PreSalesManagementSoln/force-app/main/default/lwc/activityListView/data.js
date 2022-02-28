@@ -117,6 +117,7 @@ const emptyActivity = {
     location: '',
     submittedBy: '',
     description: '',
+    flagstatus: '',
     status: ''
 }
 
