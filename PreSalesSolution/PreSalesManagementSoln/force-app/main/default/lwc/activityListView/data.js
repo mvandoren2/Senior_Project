@@ -1,3 +1,5 @@
+import { wire } from "lwc"
+
 fetch('http://localhost:8080/api/get_activity')
     .then(res => res.json())
     .then(data => appData.requests = data)
@@ -58,58 +60,7 @@ let appData = {
         }
     ],
 
-    requests: [
-        {
-            "activity_ID": 4,
-            "members": [
-                {
-                    "presales_member_ID": 1,
-                    "user_role": {
-                        "roles_ID": 3,
-                        "name": "Sales Representative"
-                    },
-                    "external_presales_member_ID": "231212"
-                },
-                {
-                    "presales_member_ID": 2,
-                    "user_role": {
-                        "roles_ID": 2,
-                        "name": "Pre Sales Manager"
-                    },
-                    "external_presales_member_ID": "43534"
-                },
-                {
-                    "presales_member_ID": 12,
-                    "user_role": null,
-                    "external_presales_member_ID": "2132131"
-                },
-                {
-                    "presales_member_ID": 13,
-                    "user_role": null,
-                    "external_presales_member_ID": "123123"
-                }
-            ],
-            "products": [
-                {
-                    "product_ID": 1,
-                    "external_product_ID": "1",
-                    "name": "Coffee"
-                },
-                {
-                    "product_ID": 3,
-                    "external_product_ID": "2",
-                    "name": "Icecream"
-                }
-            ],
-            "opportunity_ID": "234232",
-            "oneDateTime": "2022-02-22T00:49:51Z",
-            "twoDateTime": null,
-            "threeDateTime": null,
-            "selectedDateTime": "2022-02-22T00:49:53Z",
-            "description": "sdaSDASDasd",
-            "flag": false
-        }
-    ]
+    requests: []
 }
 
 const dateString = (date) => {
@@ -122,29 +73,76 @@ const dateString = (date) => {
         ' @ ' + date.getHours() % 12 + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + (pm ? 'PM' : 'AM')
 }
 
-export const prettyData = () => {
+const getMemberByID = (member_ID) => {
+    let member = appData.teamMembers.filter(member => member.id == member_ID)
+
+    return member == [] ? console.error('Team member ID not found') : member[0]
+}
+
+const getTeamMembers = (request) => {
+    return request.members
+        .map(member => getMemberByID(member.external_presales_member_ID))
+        .filter(member => member)
+}
+
+const getOpportunity = (opportunity_ID) => {
+    let opportunity = appData.opportunities.filter(opportunity => opportunity.id == opportunity_ID)
+
+    return opportunity == [] ? console.error('Opportunity not found') : opportunity[0]
+}
+
+const getClient = (opportunity_ID) => {
+    const opportunity = getOpportunity(opportunity_ID)
     
-    let dislpayData = appData.requests.map(request => (
-        {
-            id: request.activity_ID,
-            account: appData.clients
-                .filter(client => client.accountId === appData.opportunities.filter(opportunity => opportunity.id == request.opportunity_ID)[0].client)[0]
-                .name,
-            opportunity: appData.opportunities
-                .filter(opportunity => opportunity.id === request.opportunity_ID)[0]
-                .title,
-            product: request.products
-                .map((product, i) =>  (i > 0 ? ' ' : '') + product.name)
-                .toString(),
-            activity: request.activity + '-' + request.activityLevel,
-            time: request.selectedDateTime,
-            location: request.location,
-            submittedBy: request.members
-                .map((member, i) => (i > 0 ? ' ' : '') + appData.teamMembers.filter(item => item.id == member.external_presales_member_ID)[0].name).toString(),
-            description: request.description,
-            status: 'complete'
-        }
-    ))
+    const client_ID = opportunity.client
+
+    let client = appData.clients
+        .filter(client => client.accountId == client_ID)
+
+    return client == [] ? console.error('Client not found') : client[0]
+}
+
+
+Array.prototype.toDisplayString = function() {
+    return this.map((str, i) => (i > 0 ? ' ' : '') + str.name).toString()
+}
+
+const emptyActivity = {
+    id: '',
+    account: '',
+    opportunity: '',
+    product: '',
+    activity: '',
+    time: '',
+    location: '',
+    submittedBy: '',
+    description: '',
+    flagstatus: '',
+    status: ''
+}
+
+const generateDisplayRow = (request) => {
+    let newRow = Object.assign({}, emptyActivity)
+    
+    newRow.id = request.activity_ID
+    newRow.account = getClient(request.opportunity_ID).name
+    newRow.opportunity = getOpportunity(request.opportunity_ID).title
+    newRow.product = request.products.toDisplayString()
+    newRow.time = request.selectedDateTime
+    newRow.submittedBy = getTeamMembers(request).toDisplayString()
+    newRow.description = request.description
+
+    return newRow
+}
+
+export const getTableData = () => {    
+    let dislpayData 
+    
+    if (!appData.requests.length)
+        dislpayData = [emptyActivity]
+    
+    else {
+        dislpayData = appData.requests.map(request => generateDisplayRow(request))}
 
     return {dislpay: dislpayData, detailed: appData.requests}
 }
