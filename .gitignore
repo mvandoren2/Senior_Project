@@ -1,3 +1,4 @@
 env
 
 __pycache__
+presales/db.sqlite3

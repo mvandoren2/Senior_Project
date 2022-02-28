@@ -45,7 +45,7 @@ export default class ActivityListView extends LightningElement {
     }
 
     flipShowAssign = () => {
-        this.template.querySelector('c-assign-team-modal').toggleShow(this.rowID)
+        this.template.querySelector('c-pre-Sales-Team-Assignment-Form').toggleShow(this.rowID)
     }
 
     filters = []
