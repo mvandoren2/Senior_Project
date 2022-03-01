@@ -118,7 +118,6 @@ export default class SalesRequestForm extends LightningElement {
         this.select_Time_3 = event.target.value;
     }
 
-
     jsonData = {
             "members": [21312312],
             "products": [
@@ -136,13 +135,13 @@ export default class SalesRequestForm extends LightningElement {
             "twoDateTime": [this.myDate_2, this.select_Time_2],
             "threeDateTime": [this.myDate_3, this.select_Time_3],
             "selectedDateTime": null,
-            "description": this.template.querySelector("lightning-textarea"),
+            "description": this.description,
             "flag": false
     }
 
     //-----POST-----
 
-    pushJsonData(){
+    handleUploadAction(){
         console.log(this.jsonData);
 
         fetch('http://localhost:8050/api/add_activity/', {
