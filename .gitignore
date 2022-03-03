@@ -1,6 +1,5 @@
 env
 
 **/__pycache__/
-__pycache__/
 
-presales/db.sqlite3
+**/db.sqlite3
