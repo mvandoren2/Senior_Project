@@ -80,6 +80,12 @@ def addMembers(request):
         updateActivity = Activity.objects.get(activity_ID=memberForm['activity_ID'])
         
         members = memberForm['members']
+
+        #remove members from the update activity if they do not exist in the memberForm
+        for m in updateActivity.members.all():
+            if(m.external_presales_member_ID not in members):
+                updateActivity.members.remove(m)
+
         arrM = searchMember(members)
         for m in arrM:
             updateActivity.members.add(m)
