@@ -1,7 +1,14 @@
 import { LightningElement, track } from 'lwc';
-import { getTableColumns } from './tableColumns';
+import { getTableColumns, TableFormatter } from './tableFormatter';
 
 export default class ActivityListView extends LightningElement {
+    constructor() {
+        super()
+
+        this.tableDataObject.getTableFormat()
+            .then(data => this.fillTable(data))           
+    }
+
     
     profileNum = 1
     formatNum = 1
@@ -18,22 +25,34 @@ export default class ActivityListView extends LightningElement {
         small: this.formatNum === 3
     }
 
-    tableData = getTableColumns(this.profileNum)
+    tableDataObject = new TableFormatter(this.profileNum)
 
+    tableData = this.tableDataObject.getEmptyTableFormat()
     columns = this.tableData.columns
     actions = this.tableData.actions
     data = this.tableData.data.dislpay
 
-    connectedCallback() {
-        setTimeout(() => {
-            this.tableData = getTableColumns(this.profileNum)
+    get columns() {
+        return this.tableData.columns
+    }
 
-            this.columns = this.tableData.columns
-            this.actions = this.tableData.actions
-            this.data = this.tableData.data.dislpay
+    get actions() {
+        return this.tableData.actions
+    }
 
-            this.filteredData = [...this.data]
-        }, 500)
+    get data() {
+        this.filteredData = [... this.tableData.data]
+        return this.filteredData
+    }
+
+    fillTable = (data) => {
+        this.tableData = data
+
+        this.columns = this.tableData.columns
+        this.actions = this.tableData.actions
+        this.data = this.tableData.data.dislpay
+
+        this.filteredData = [...this.data]
     }
 
     calculateRowWidth = (component, evt) => {
@@ -45,7 +64,7 @@ export default class ActivityListView extends LightningElement {
     }
 
     flipShowAssign = () => {
-        this.template.querySelector('c-pre-Sales-Team-Assignment-Form').toggleShow(this.rowID)
+        this.template.querySelector('c-assign-team-modal').toggleShow(this.rowID)
     }
 
     filters = []
@@ -81,4 +100,6 @@ export default class ActivityListView extends LightningElement {
         if (evt.target.dataset.item == 'assign_request')
             this.flipShowAssign()
     }
+
+    
 }
