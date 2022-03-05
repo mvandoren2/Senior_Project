@@ -14,10 +14,22 @@ def getActivity(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getMembers(request):
+def getallMembers(request):
     members = PresalesMember.objects.all()
+    if(not members):
+        members = {"Members": None}
     serializer = MemberSerializer(members, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def getMember(request, id):
+    try:
+        print(id)
+        member = PresalesMember.objects.filter(external_presales_member_ID=id)
+        serializer = MemberSerializer(member, many=True)
+        return Response(serializer.data[0])
+    except:
+        return Response(status=204)
 
 def searchMember(members):
     arrM = []
