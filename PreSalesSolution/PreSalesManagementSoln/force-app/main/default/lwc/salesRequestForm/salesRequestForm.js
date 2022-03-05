@@ -32,7 +32,8 @@ export default class SalesRequestForm extends LightningElement {
         this.cart.push(prod);
         this.products = this.products.filter(item => item.id !== prod.id);
         this.searchEvt({ target: { value: '' } });
-        document.getElementById('search').value = ''
+        //document.getElementById('search').value = '' 
+        this.template.querySelector(".search").value = '';
     }
 
     //event button to remove from cart
@@ -91,7 +92,6 @@ export default class SalesRequestForm extends LightningElement {
                 && this.select_Time_1)
     }
       
-    //----------Sending JSON to backend--------------------
 
     @track myDate_1 = 0;
     dateInput_1(event){
@@ -118,43 +118,42 @@ export default class SalesRequestForm extends LightningElement {
         this.select_Time_3 = event.target.value;
     }
 
-    jsonData = {
+
+    //POST JSON ----------
+    handleUploadAction(){
+        let jsonData = {
             "members": [21312312],
             "products": [
                 {
-                    "external_product_ID": 1,
-                    "name": "Coffee"
-                },
-                {
-                    "external_product_ID": 2,
-                    "name": "Icecream"
-                }
-            ],
-            "opportunity_ID": this.recordId,
-            "oneDateTime": [this.myDate_1, this.select_Time_1],
-            "twoDateTime": [this.myDate_2, this.select_Time_2],
-            "threeDateTime": [this.myDate_3, this.select_Time_3],
-            "selectedDateTime": null,
-            "description": this.description,
-            "flag": false
-    }
-
-    //-----POST-----
-
-    handleUploadAction(){
-        console.log(this.jsonData);
-
-        fetch('http://localhost:8050/api/add_activity/', {
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'},
-            body: this.jsonData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+                        "external_product_ID": 1,
+                        "name": "Coffee"
+                    },
+                    {
+                        "external_product_ID": 2,
+                        "name": "Icecream"
+                    }
+                ],
+                "opportunity_ID": 234232,
+                "oneDateTime": [this.myDate_1, this.select_Time_1],
+                "twoDateTime": [this.myDate_2, this.select_Time_2],
+                "threeDateTime": [this.myDate_3, this.select_Time_3],
+                "selectedDateTime": null,
+                "description": this.description,
+                "flag": false
+        }
+        fetch('http://localhost:8080/api/add_activity/', {
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(jsonData),
+            })
+            .then(response => response.json())   
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            }); 
+            console.log(jsonData)
     }
 }
+

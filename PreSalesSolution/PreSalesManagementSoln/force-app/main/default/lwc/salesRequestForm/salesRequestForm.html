@@ -1,7 +1,7 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <!--Title of the Form -->  
-    <lightning-card  id="salesReqForm" title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
+    <lightning-card title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
     
         <!--opening the Opportunity api object, to retieve ID-->
         <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity"
@@ -19,12 +19,14 @@
             </div> 
 
             <!--Check box...for unknown reason -->
+            
             <div class="slds-clearfix">
                 <div class="slds-align_absolute-center">  
                     <label for = "checkbox"> Unexpected Event</label>                            
-                    <lightning-input type="checkbox"> </lightning-input> 
+                    <lightning-input label="checkbox" variant="label-hidden" type="checkbox"> </lightning-input> 
                 </div>
             </div>
+            
     
             <!--Drop down Menu...select Presales Activities -->
             <div class="slds-m-around_medium">
@@ -43,7 +45,7 @@
             <!--Search Products..add and remove -->
             <div class="slds-m-around_medium search-table search-wrapper">
                 <label for="search">Search Products</label>
-                <lightning-input label=" " type="search" id="search" onchange={searchEvt}></lightning-input>
+                <lightning-input class="search" label=" " type="search" id="search" onchange={searchEvt}></lightning-input>
                 <ul class="slds-m-around_medium">
                     <template for:each={filteredProducts} for:item="product">
                         <li key={product.id}>
@@ -72,8 +74,8 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_1" name="DATE_START"
-                                    value="myDate_1"
+                                <lightning-input type="date" id="date_1" label="Date_1" variant="label-hidden" name="DATE_START"
+                                    
                                     min=" " max=" " onchange={dateInput_1}> 
                                 </lightning-input>   
                             </div>   
@@ -83,7 +85,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Time Request: </p>
-                                <lightning-input type="time" id="time_1" name="appt" value="select_Time_1" onchange={timeInput_1}>
+                                <lightning-input type="time" id="time_1" label="Time_2" variant="label-hidden" name="appt" onchange={timeInput_1}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -101,8 +103,8 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_2" name="DATE_START"
-                                    value="myDate_2"
+                                <lightning-input type="date" id="date_2" label="Date_2" variant="label-hidden" name="DATE_START"
+                                    
                                     min=" " max=" " onchange={dateInput_2}> 
                                 </lightning-input>
                             </div>
@@ -112,7 +114,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p>Time Request:</p>
-                                <lightning-input type="time" id="time_2" name="appt" value="select_Time_2" onchange={timeInput_2}>
+                                <lightning-input type="time" id="time_2" label="Time_2" variant="label-hidden" name="appt"  onchange={timeInput_2}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -130,8 +132,8 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_3" name="DATE_START"
-                                    value="myDate_3"
+                                <lightning-input type="date" id="date_3" label="Date_3" variant="label-hidden" name="DATE_START"
+                                    
                                     min=" " max=" " onchange={dateInput_3}> 
                                 </lightning-input>
                             </div>
@@ -141,7 +143,7 @@
                         <div class="slds-grid slds-p-around_small">
                             <div class="slds-p-around_small">
                                 <p> Time Request: </p>
-                                <lightning-input type="time" id="time_3" name="appt" value="select_Time_3" onchange={timeInput_3}>
+                                <lightning-input type="time" id="time_3" label="Time_3" variant="label-hidden" name="appt" onchange={timeInput_3}>
                                 </lightning-input>
                             </div>
                         </div>
@@ -154,7 +156,7 @@
                 <div class="slds-form-element">
                     <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
                     <div class="slds-form-element__control">
-                        <lightning-textarea id="textarea" rows=10 cols=80 class="slds-textarea" onchange ={textDescription} style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
+                        <lightning-textarea id="textarea" label="description" variant="label-hidden" class="slds-textarea" onchange ={textDescription} style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
                     </div>
                 </div>
             </div>
@@ -166,8 +168,6 @@
 
         </lightning-record-edit-form>
     </lightning-card> 
-
-
 
 
 </template>
