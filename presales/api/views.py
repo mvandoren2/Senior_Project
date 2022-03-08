@@ -86,7 +86,7 @@ def addActivity(request):
     return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
 
 @csrf_exempt
-def addMembers(request):
+def addMembersandDate(request):
     if(request.method == 'POST'):
         memberForm = json.loads(request.body)
         updateActivity = Activity.objects.get(activity_ID=memberForm['activity_ID'])
@@ -101,5 +101,9 @@ def addMembers(request):
         arrM = searchMember(members)
         for m in arrM:
             updateActivity.members.add(m)
+
+        #add a selectedDateTime to the activity from membersForm['selectedDateTime']
+        updateActivity.selectedDateTime = memberForm['selectedDateTime']
+        updateActivity.save()
     
     return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')  
