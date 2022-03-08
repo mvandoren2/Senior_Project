@@ -34,6 +34,7 @@ class MemberSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     members = MemberSerializer(read_only=True, many=True)
     products = ProductSerializer(read_only=True, many=True)
+    createdByMember = MemberSerializer(read_only=True)
 
     class Meta:
         model = Activity

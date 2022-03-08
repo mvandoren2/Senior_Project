@@ -64,6 +64,7 @@ class PresalesMember(models.Model):
 class Activity(models.Model):
    activity_ID = models.AutoField(primary_key=True)
    opportunity_ID = models.CharField(max_length=100)
+   createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(PresalesMember)
    oneDateTime = models.CharField(blank=True, null=True, max_length=25)
    twoDateTime = models.CharField(blank=True, null=True, max_length=25)
