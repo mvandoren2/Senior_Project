@@ -6,17 +6,22 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+class ProductName(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('name',)
+
 class ProficiencySerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+    product = ProductName(read_only=True)
 
     class Meta:
         model = Proficiency
-        fields = '__all__'
+        fields = ('product', 'level')
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRole
-        fields = '__all__'
+        fields = ('name',)
 
 class MemberSerializer(serializers.ModelSerializer):
     user_role = RoleSerializer(many=False)
@@ -24,7 +29,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PresalesMember
-        fields = '__all__'
+        fields = ('external_presales_member_ID', 'user_role', 'proficiency')
 
 class ActivitySerializer(serializers.ModelSerializer):
     members = MemberSerializer(read_only=True, many=True)
