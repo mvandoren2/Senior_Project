@@ -6,6 +6,13 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+class ProficiencySerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = Proficiency
+        fields = '__all__'
+
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRole
@@ -13,6 +20,7 @@ class RoleSerializer(serializers.ModelSerializer):
 
 class MemberSerializer(serializers.ModelSerializer):
     user_role = RoleSerializer(many=False)
+    proficiency = ProficiencySerializer(many=True)
 
     class Meta:
         model = PresalesMember

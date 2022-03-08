@@ -1,3 +1,4 @@
+from itertools import product
 from django.db import models
 
 class StatusHistory(models.Model):
@@ -35,10 +36,23 @@ class Product(models.Model):
    def __str__(self):
       return self.name
 
+class Proficiency(models.Model):
+   proficiency_ID = models.AutoField(primary_key=True)
+   product = models.ForeignKey(Product, on_delete=models.CASCADE)
+   level = models.IntegerField(default=1)
+
+   class meta:
+      verbose_name = 'Proficiency'
+      verbose_name_plural = 'Proficiencies'
+
+   def __str__(self):
+      return self.product.name + " " + str(self.level)
+
 class PresalesMember(models.Model):
    presales_member_ID = models.AutoField(primary_key=True)
    external_presales_member_ID = models.CharField(max_length=50)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
+   proficiency = models.ManyToManyField(Proficiency)
 
    class meta:
       verbose_name = 'Presales Member'
