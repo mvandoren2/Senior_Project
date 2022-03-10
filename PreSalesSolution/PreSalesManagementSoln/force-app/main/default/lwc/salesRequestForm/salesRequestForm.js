@@ -122,7 +122,7 @@ export default class SalesRequestForm extends LightningElement {
     //POST JSON ----------
     handleUploadAction(){
         let jsonData = {
-            "members": [21312312],
+            "createdByMember": 21312312,
             "products": [
                 {
                         "external_product_ID": 1,
