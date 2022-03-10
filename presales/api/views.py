@@ -66,17 +66,38 @@ def searchProduct(products):
 def addActivity(request):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
+
+        date1 = activity['oneDateTime']
+        if(date1):
+            date1 = date1.split(".")[0] + "Z"
+
+        date2 = activity['twoDateTime']
+        if(date2):
+            date2 = date2.split(".")[0] + "Z"
+
+        date3 = activity['threeDateTime']
+        if(date3):
+            date3 = date3.split(".")[0] + "Z"
+
+        sdate = activity['selectedDateTime']
+        if(sdate):
+            sdate = sdate.split(".")[0] + "Z"
+
+        print(date1, date2, date3, sdate)
         
         #create a new activity
-        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], oneDateTime=activity['oneDateTime'], twoDateTime=activity['twoDateTime'], threeDateTime=activity['threeDateTime'], selectedDateTime=activity['selectedDateTime'], description=activity['description'], flag=activity['flag'])
+        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], flag=activity['flag'])
         newActivity.save()
 
         #add presales_member_ID to the activity
-        members = activity['createdByMember']
-        arrM = searchMember(members)
-        for m in arrM:
-            newActivity.members.add(m)
-        
+        member = activity['createdByMember']
+        if(type(member) != list):
+            member = [member]
+        member = searchMember(member)
+        member = member[0]
+        newActivity.createdByMember = PresalesMember.objects.get(presales_member_ID=member)
+        newActivity.save()
+
         #add product_ID to the activity
         products = activity['products']
         arrP = searchProduct(products)
@@ -103,7 +124,8 @@ def addMembersandDate(request):
             updateActivity.members.add(m)
 
         #add a selectedDateTime to the activity from membersForm['selectedDateTime']
-        updateActivity.selectedDateTime = memberForm['selectedDateTime']
+        selectedDateTime = memberForm['selectedDateTime'].split(".")[0]
+        updateActivity.selectedDateTime = selectedDateTime
         updateActivity.save()
     
     return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')  
