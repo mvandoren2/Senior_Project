@@ -134,9 +134,9 @@ export default class SalesRequestForm extends LightningElement {
                     }
                 ],
                 "opportunity_ID": 234232,
-                "oneDateTime": this.myDate_1+"T"+this.select_Time_1+"Z",
-                "twoDateTime": this.myDate_2+"T"+this.select_Time_2+"Z",
-                "threeDateTime": this.myDate_3+"T"+this.select_Time_3+"Z",
+                "oneDateTime": this.myDate_1+"T"+this.select_Time_1,
+                "twoDateTime": this.myDate_2+"T"+this.select_Time_2,
+                "threeDateTime": this.myDate_3+"T"+this.select_Time_3,
                 "selectedDateTime": null,
                 "description": this.description,
                 "flag": false
