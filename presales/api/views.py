@@ -72,7 +72,7 @@ def addActivity(request):
         newActivity.save()
 
         #add presales_member_ID to the activity
-        members = activity['members']
+        members = activity['createdByMember']
         arrM = searchMember(members)
         for m in arrM:
             newActivity.members.add(m)
