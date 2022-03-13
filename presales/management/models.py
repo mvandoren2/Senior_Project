@@ -1,18 +1,5 @@
 from itertools import product
 from django.db import models
-
-class StatusHistory(models.Model):
-   status_history_ID = models.AutoField(primary_key=True)
-   activity_ID = models.ForeignKey('Activity', on_delete=models.CASCADE)
-   status = models.CharField(max_length=50)
-   date_time = models.DateTimeField(auto_now_add=True)
-
-   class Meta:
-      verbose_name = 'Status History'
-      verbose_name_plural = 'Status History'
-
-   def __str__(self):
-      return str(self.status_history_ID)
    
 #-----------------------------------------------------
 #status table
@@ -84,6 +71,7 @@ class PresalesMember(models.Model):
 
 class Activity(models.Model):
    activity_ID = models.AutoField(primary_key=True)
+   ActivtyType = models.CharField(max_length=50)
    opportunity_ID = models.CharField(max_length=100)
    createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(PresalesMember, blank=True)
