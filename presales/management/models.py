@@ -85,6 +85,8 @@ class PresalesMember(models.Model):
 class Activity(models.Model):
    activity_ID = models.AutoField(primary_key=True)
    opportunity_ID = models.CharField(max_length=100)
+   ''' activityType = models.CharField(max_length=50) Card #259, Task #261'''
+   ''' location = models.CharField(max_length = 50) Card #259 Task #260'''
    createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(PresalesMember, blank=True)
    oneDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
