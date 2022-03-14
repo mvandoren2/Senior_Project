@@ -1,5 +1,6 @@
 import { LightningElement,api,track } from 'lwc';
 import products from './productsList';
+import Id from '@salesforce/user/Id';
 
 export default class SalesRequestForm extends LightningElement {
     products = products;
@@ -118,11 +119,13 @@ export default class SalesRequestForm extends LightningElement {
         this.select_Time_3 = event.target.value;
     }
 
+    // grab current user id 
+    currentUserId = Id;
 
     //POST JSON ----------
     handleUploadAction(){
         let jsonData = {
-            "createdByMember": 21312312,
+            "createdByMember": this.currentUserId,
             "products": [
                 {
                         "external_product_ID": 1,

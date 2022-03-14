@@ -15,7 +15,6 @@ class dateTime(admin.ModelAdmin):
 admin.site.site_header = 'Pre-Sales Management Administration'
 admin.site.site_title = 'Pre-Sales Management Administration'
 admin.site.index_title = 'Welcome Pre-Sales Management Administrators'
-admin.site.register(StatusHistory, dateTime)
 admin.site.register(Product)
 admin.site.register(Proficiency)
 admin.site.register(UserRole)
