@@ -1,0 +1,25 @@
+img{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    margin: 20px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+.card{
+    margin-top: 10px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+}
+
+.userInfo{
+    display: inline-block;
+    min-width: 20%;
+    margin-top: 15px;
+}
+
+.assignBtn{
+    display: inline-block;
+    margin-left: 280px;
+}

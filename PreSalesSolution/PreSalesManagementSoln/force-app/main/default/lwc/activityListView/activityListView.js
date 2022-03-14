@@ -67,6 +67,10 @@ export default class ActivityListView extends LightningElement {
         this.template.querySelector('c-assign-team-modal').toggleShow(this.rowID)
     }
 
+    flipShowDecline = () => {
+        this.template.querySelector('c-status-change-modal').toggleShow(this.rowID)
+    }
+
     filters = []
     filteredData = [...this.data]
 
@@ -99,6 +103,9 @@ export default class ActivityListView extends LightningElement {
 
         if (evt.target.dataset.item == 'assign_request')
             this.flipShowAssign()
+
+        if(evt.target.dataset.item == 'decline_request')
+            this.flipShowDecline()    
     }
 
     
