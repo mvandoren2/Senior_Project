@@ -1,26 +1,5 @@
 from itertools import product
 from django.db import models
-   
-#-----------------------------------------------------
-#status table
-class Status(models.Model):
-   #status choices 
-   option_choice = [
-      ('Accept', "accept"),
-      ('Reschedule', "reschedule"),
-      ('Request', "request"),
-      ('Cancel', "cancel"),
-      ('Decline', 'decline'),
-      ('Expire', 'expire'),
-   ]
-   #status table
-   Status_ID = models.AutoField(primary_key=True)
-   status= models.CharField(max_length=50, choices = option_choice, default = 'Request')
-   class Meta: 
-      verbose_name ='Statu'
-   def __str__(self):       
-      return str(self.status)
-#----------------------------------------------
 
 class UserRole(models.Model):
    roles_ID = models.AutoField(primary_key=True)
@@ -70,6 +49,14 @@ class PresalesMember(models.Model):
       return str(self.presales_member_ID)
 
 class Activity(models.Model):
+   option_choice = [
+      ('Accept', "accept"),
+      ('Reschedule', "reschedule"),
+      ('Request', "request"),
+      ('Cancel', "cancel"),
+      ('Decline', 'decline'),
+      ('Expire', 'expire'),
+   ]
    activity_ID = models.AutoField(primary_key=True)
    activtyType = models.CharField(max_length=50)
    opportunity_ID = models.CharField(max_length=100)
@@ -82,7 +69,7 @@ class Activity(models.Model):
    selectedDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    products = models.ManyToManyField(Product)
    description = models.CharField(blank=True, null=True, max_length=500)
-   status = models.ForeignKey(Status, on_delete=models.CASCADE, blank=True, null=True)
+   status = models.CharField(max_length=50, choices = option_choice, default = 'Request')
    flag = models.BooleanField(default=False)
 
    class meta:
