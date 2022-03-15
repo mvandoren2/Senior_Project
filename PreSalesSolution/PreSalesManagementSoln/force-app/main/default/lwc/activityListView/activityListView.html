@@ -36,7 +36,13 @@
                                             slds-grid_vertical-align-center 
                                             slds-has-flexi-truncate"
                                             >
-                                <span class="slds-truncate" title={column.label}>{column.label}</span>
+                                <span   class="slds-truncate" 
+                                        data-item={column.fieldName}
+                                        onclick={handleSort}
+                                        title={column.label}
+                                        >
+                                    {column.label}
+                                </span>
                                 <span class="   slds-icon_container 
                                                 slds-icon-utility-arrowdown"
                                                 >

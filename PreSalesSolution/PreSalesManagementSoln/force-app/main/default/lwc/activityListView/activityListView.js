@@ -65,6 +65,40 @@ export default class ActivityListView extends LightningElement {
     filters = []
     filteredData = [...this.data]
 
+    sortAsc = true
+    sortedBy
+
+    sortBy = (field, reverse, primer) => {
+        const key = (x) => {
+            const val = Array.isArray(x[field]) ? x[field][0] : x[field]
+            
+            return primer ? primer(val) : val
+        };
+    
+        return function (a, b) {
+            a = key(a)
+            b = key(b)
+            return reverse * ((a > b) - (b > a))
+        };
+    }
+
+    handleSort = (evt) => {
+        let sortedBy = evt.target.dataset.item
+
+        if(sortedBy == 'description') return
+
+        if(this.sortedBy == sortedBy)
+            this.sortAsc = !this.sortAsc
+
+        else this.sortAsc = true
+
+        let cloneData = [...this.filteredData]
+        cloneData.sort(this.sortBy(sortedBy, this.sortAsc ? 1 : -1))
+        this.filteredData = cloneData
+
+        this.sortedBy = sortedBy
+    }
+
     handleFilter = (evt) => {
         const filterField = evt.target.dataset.item
 
