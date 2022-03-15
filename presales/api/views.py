@@ -136,4 +136,9 @@ def addMembersandDate(request):
         updateActivity.selectedDateTime = selectedDateTime
         updateActivity.save()
     
-    return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')  
+    return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+
+#Daniel program below
+@csrf_exempt
+def sendNotification():
+    pass
