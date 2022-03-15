@@ -1,67 +1,14 @@
 import getPreSalesTeamMembers from "@salesforce/apex/GetUsers.getPreSalesTeamMembers"
-import { wire } from "lwc"
-
-let appData = {
-    clients: [
-        {
-            accountId: 456,
-            name: 'James Pumphrey LLC'
-        },
-
-        {
-            accountId: 137,
-            name: 'Rick James BTC'
-        }
-    ],
-
-    opportunities: [
-        {
-            id: "234232",
-            client: 456,
-            title: 'Pumphrey-Product1-Product2',
-            salesTeam: ['Eddy', "Ol' Remus"]
-        },
-
-        {
-            id: "sdas",
-            client: 137,
-            title: 'James-opportunity'
-        }
-    ],
-
-    teamMembers: [
-        {
-            id: '231212',
-            name: 'Emily'
-        },
-
-        {
-            id: '43534',
-            name: 'Paul'
-        },
-
-        {
-            id: '2132131',
-            name: 'Hal'
-        },
-
-        {
-            id: '123123',
-            name: 'Frankie'
-        },
-
-        {
-            id: '54644342',
-            name: 'Mickey'
-        }
-    ],
-
-    requests: []
-}
+import OpportunityData from "@salesforce/apex/OpportunityData.OpportunityData"
+import Id from "@salesforce/user/Id"
 
 Array.prototype.toDisplayString = function() {
-    return this.map((str, i) => (i > 0 ? ' ' : '') + str.name).toString()
+    let name = Object.keys(this).includes('name') ? 'name' : 'Name'
+
+    return this.map((str, i) =>(str.name ? str.name : str.Name)).join(', ')
 }
+
+export const url = 'http://localhost:8080/api/'
 
 export class TableDataHandler {
     emptyActivity = {
@@ -77,9 +24,30 @@ export class TableDataHandler {
         status: ''
     }
 
-    fetchRequests = async () => {
-        return fetch('http://localhost:8080/api/get_activity/')
+    fetchRequests = () => {
+        return fetch(url + 'get_activity/')
             .then(res => res.json())
+    }
+
+    fetchCurrentUser = () => {
+        const userID = Id ? Id : '0055f0000041g1mAAA'
+        const urlString = url + 'get_member/' + userID + '/'
+
+        return fetch(urlString)
+            .then(res => res.json())
+    }
+
+    fetchOpportunities = async (requests) => {
+        const opportunity_IDs = requests.map(request => request.opportunity_ID)
+
+        let apexAccountData = await OpportunityData({opportunity_IDs: opportunity_IDs})
+
+        return apexAccountData.map(account => ({
+            Id : account.Opportunities[0].Id,
+            Name : account.Opportunities[0].Name,
+            AccountId : account.Id,
+            AccountName: account.Name
+        }))
     }
 
     //
@@ -98,7 +66,7 @@ export class TableDataHandler {
     }
     
     getMemberByID = (member_ID) => {
-        let member = appData.teamMembers.filter(member => member.id == member_ID)
+        let member = this.salesforceMembers.filter(member => member.Id == member_ID)
     
         return member == [] ? console.error('Team member ID not found') : member[0]
     }
@@ -110,33 +78,28 @@ export class TableDataHandler {
     }
     
     getOpportunity = (opportunity_ID) => {
-        let opportunity = appData.opportunities.filter(opportunity => opportunity.id == opportunity_ID)
+        let opportunity = this.opportunities.filter(opportunity => opportunity.Id == opportunity_ID)
     
         return opportunity == [] ? console.error('Opportunity not found') : opportunity[0]
     }
-    
-    getClient = (opportunity_ID) => {
-        const opportunity = this.getOpportunity(opportunity_ID)
-        
-        const client_ID = opportunity.client
-    
-        let client = appData.clients
-            .filter(client => client.accountId == client_ID)
-    
-        return client == [] ? console.error('Client not found') : client[0]
-    }
 
 
-    generateDisplayRow = (request) => {
+    generateDisplayRow =  (request) => {
         let newRow = Object.assign({}, this.emptyActivity)
+
+        const opportunity = this.getOpportunity(request.opportunity_ID)
+        let selectedDate = new Date(request.selectedDateTime)
         
         newRow.id = request.activity_ID
-        newRow.account = this.getClient(request.opportunity_ID).name
-        newRow.opportunity = this.getOpportunity(request.opportunity_ID).title
+        newRow.account = opportunity.AccountName
+        newRow.opportunity = opportunity.Name
         newRow.product = request.products.toDisplayString()
-        newRow.time = request.selectedDateTime
+        newRow.activity = request.activtyType
+        newRow.location = request.location
+        newRow.time =  selectedDate > new Date() ? this.dateStringUtil(selectedDate) : ''
         newRow.submittedBy = this.getTeamMembers(request).toDisplayString()
         newRow.description = request.description
+        newRow.status = request.status
     
         return newRow
     }
@@ -152,20 +115,20 @@ export class TableDataHandler {
         }
     }
 
-    getTableData = async () => {    
-        let rawData = await this.fetchRequests()
-        
-        let dislpayData 
-        
-        if (!rawData.length)
-            dislpayData = [this.emptyActivity]
-        
-        else {
-            dislpayData = rawData.map(request => this.generateDisplayRow(request))}
+    getTableData = async () => {
+        let [currentUser, salesforceMembers, rawData] = await Promise.all([this.fetchCurrentUser(), getPreSalesTeamMembers(), this.fetchRequests()])
+
+        if (!rawData.length) return this.getEmptyTableData()
+
+        this.salesforceMembers = salesforceMembers
+        this.opportunities = await this.fetchOpportunities(rawData);
+
+        let dislpayData = rawData.map(request => this.generateDisplayRow(request))
     
         return {
             dislpay: dislpayData, 
-            detailed: this.rawData
+            detailed: rawData,
+            user: currentUser
         }
     }
 }

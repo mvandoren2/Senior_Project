@@ -7,7 +7,7 @@
                         slds-table_bordered 
                         slds-table_resizable-cols 
                         slds-table_striped 
-                        slds-table_fixed-layout" 
+                        slds-table_fixed-layout " 
                 role="grid"
                 >
 
@@ -73,24 +73,22 @@
                 </tr>
 
                 <!-- filter search bars -->
-                <template if:false={format.small}>
-                    <tr class="slds-line-height_reset">
-                        <template for:each={columns} for:item="column">
-                            <th key={column.id}>
-                                <div>
-                                    <lightning-input    type="search" 
-                                                        class="filter_input" 
-                                                        label=" " 
-                                                        variant="label-hidden"
-                                                        data-item={column.fieldName}
-                                                        onchange={handleFilter}>
-                                    </lightning-input>
-                                </div>
-                            </th>
-                        </template>
-                        <th></th>
-                    </tr>
-                </template>
+                <tr class="slds-line-height_reset">
+                    <template for:each={columns} for:item="column">
+                        <th key={column.id}>
+                            <div>
+                                <lightning-input    type="search" 
+                                                    class="filter_input" 
+                                                    label=" " 
+                                                    variant="label-hidden"
+                                                    data-item={column.fieldName}
+                                                    onchange={handleFilter}>
+                                </lightning-input>
+                            </div>
+                        </th>
+                    </template>
+                    <th></th>
+                </tr>
             </thead>
 
             <!-- table body start -->
