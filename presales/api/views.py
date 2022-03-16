@@ -32,10 +32,10 @@ def getMember(request, id):
         return Response(status=204)
     
 #----------------------------------------------------------    
-@api_view(['GET']) 
-def getStatus(request):
-    serializer = StatusSerilizer(Status, many=True)
-    return Response(serializer.data)
+# @api_view(['GET']) 
+# def getStatus(request):
+#     serializer = StatusSerilizer(Status, many=True)
+#     return Response(serializer.data)
     
  #--------------------------------------------------------   
 

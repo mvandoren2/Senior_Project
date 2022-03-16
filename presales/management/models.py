@@ -52,6 +52,7 @@ class Activity(models.Model):
    option_choice = [
       ('Accept', "accept"),
       ('Reschedule', "reschedule"),
+      ('Scheduled', "scheduled"),
       ('Request', "request"),
       ('Cancel', "cancel"),
       ('Decline', 'decline'),
