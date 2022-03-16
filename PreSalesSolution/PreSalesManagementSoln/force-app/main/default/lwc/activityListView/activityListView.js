@@ -1,12 +1,11 @@
-import { LightningElement, track } from 'lwc';
-import { getTableColumns, TableFormatter } from './tableFormatter';
+import { LightningElement } from 'lwc';
+import { TableFormatter } from './tableFormatter';
 
 export default class ActivityListView extends LightningElement {
     constructor() {
         super()
 
-        this.tableDataObject.getTableFormat()
-            .then(data => this.fillTable(data))           
+        this.updateData()
     }
 
     
@@ -25,24 +24,16 @@ export default class ActivityListView extends LightningElement {
         small: this.formatNum === 3
     }
 
-    tableDataObject = new TableFormatter(this.profileNum)
+    tableFormatter = new TableFormatter()
 
-    tableData = this.tableDataObject.getEmptyTableFormat()
+    tableData = this.tableFormatter.getEmptyTableFormat()
     columns = this.tableData.columns
     actions = this.tableData.actions
     data = this.tableData.data.dislpay
 
-    get columns() {
-        return this.tableData.columns
-    }
-
-    get actions() {
-        return this.tableData.actions
-    }
-
-    get data() {
-        this.filteredData = [... this.tableData.data]
-        return this.filteredData
+    updateData = () => {
+        this.tableFormatter.getTableFormat()
+            .then(data => this.fillTable(data))
     }
 
     fillTable = (data) => {
@@ -73,6 +64,40 @@ export default class ActivityListView extends LightningElement {
 
     filters = []
     filteredData = [...this.data]
+
+    sortAsc = true
+    sortedBy
+
+    sortBy = (field, reverse, primer) => {
+        const key = (x) => {
+            const val = Array.isArray(x[field]) ? x[field][0] : x[field]
+            
+            return primer ? primer(val) : val
+        };
+    
+        return function (a, b) {
+            a = key(a)
+            b = key(b)
+            return reverse * ((a > b) - (b > a))
+        };
+    }
+
+    handleSort = (evt) => {
+        let sortedBy = evt.target.dataset.item
+
+        if(sortedBy == 'description') return
+
+        if(this.sortedBy == sortedBy)
+            this.sortAsc = !this.sortAsc
+
+        else this.sortAsc = true
+
+        let cloneData = [...this.filteredData]
+        cloneData.sort(this.sortBy(sortedBy, this.sortAsc ? 1 : -1))
+        this.filteredData = cloneData
+
+        this.sortedBy = sortedBy
+    }
 
     handleFilter = (evt) => {
         const filterField = evt.target.dataset.item
@@ -105,8 +130,6 @@ export default class ActivityListView extends LightningElement {
             this.flipShowAssign()
 
         if(evt.target.dataset.item == 'decline_request')
-            this.flipShowDecline()    
+            this.flipShowDecline()   
     }
-
-    
 }

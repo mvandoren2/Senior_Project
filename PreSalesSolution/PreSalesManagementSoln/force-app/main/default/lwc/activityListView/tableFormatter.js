@@ -1,11 +1,7 @@
 import { TableDataHandler, getTableData } from "./tableDataHandler.js"
 
 export class TableFormatter {
-    constructor(userProfileNum){
-        this.userProfileNum = userProfileNum
-    }
-
-    dataHandler = new TableDataHandler()
+    tableDataHandler = new TableDataHandler()
 
     fixCamelCase = (s) => {
         return s.replace(/([A-Z])/g, ' $1')
@@ -14,6 +10,8 @@ export class TableFormatter {
             })
     }
 
+
+    //Builds an array of column heading names from the key names of a request object 
     generateTableHeader = (tableData) => {
         let columns = Object.keys(tableData.dislpay[0]).map((column, i) => ({
             id: "column_" + i,
@@ -26,55 +24,52 @@ export class TableFormatter {
         return columns
     }
 
-    getRowActions = () => {
-        let actions
-        
-        switch (this.userProfileNum) {
-            case 1:
-                actions = [
-                    {id: 'action_' + 0, label: 'Assign Request', name: 'assign_request'},
-                    {id: 'action_' + 1, label: 'Decline Request', name: 'decline_request'}
-                ]
-        
-            break
-    
-            case 2: 
-                actions = [
-                    {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
-                    {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'}
-                ]
-        
-            break
-    
-            case 3: 
-                actions = [
-                    {id: 'action_' + 0, label: 'Request Date Change', name: 'date_change'},
-                    {id: 'action_' + 1, label: 'Cancel Activity', name: 'cancel'}
-                ]
-    
-            break
+    //Builds an array of action names based on the user's role
+    getRowActions = (userProfile) => {
+        const actions = {
+            'Pre Sales Manager': [
+                {id: 'action_' + 0, label: 'Assign Request', name: 'assign_request'},
+                {id: 'action_' + 1, label: 'Decline Request', name: 'decline_request'}
+            ],
+
+            'Pre Sales Member': [
+                {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
+                {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'}
+            ],
+
+            'Sales Representative': [
+                {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
+                {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'}
+            ],
+
+            '' : [
+                {id: 'action_0', label: ' ', name: 'loading_actions'}
+            ]
         }
 
-        return actions
+        return actions[userProfile]
     }
 
+    //Returns an empty table to render before the async method returns
     getEmptyTableFormat = () => {
-        let data = this.dataHandler.getEmptyTableData()
+        let data = this.tableDataHandler.getEmptyTableData()
 
         let columns = this.generateTableHeader(data)
 
-        let actions = this.getRowActions()
+        let actions = this.getRowActions('')
     
         return {columns: columns, actions: actions, data: data}
     }
 
     getTableFormat = async () => {    
         
-        let data = await this.dataHandler.getTableData()
+        let data = await this.tableDataHandler.getTableData()
+
+        let user = data.user
 
         let columns = this.generateTableHeader(data)
 
-        let actions = this.getRowActions()
+        let actions = this.getRowActions(user.user_role.name)
     
         return {columns: columns, actions: actions, data: data}
     }
