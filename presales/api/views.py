@@ -22,13 +22,17 @@ def getallMembers(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getMember(request, id):
-    try:
-        print(id)
-        member = PresalesMember.objects.filter(external_presales_member_ID=id)
-        serializer = MemberSerializer(member, many=True)
-        return Response(serializer.data[0])
-    except:
+def getMember(request, id, role):
+    if(id != "None" or role != "None"):
+        if(id != "None"):
+            members = PresalesMember.objects.filter(external_presales_member_ID=id)
+        elif(role != "None"):
+            members = PresalesMember.objects.filter(user_role__name=role)
+        serializer = MemberSerializer(members, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
+    else:
+        print("NULL")
         return Response(status=204)
     
 #----------------------------------------------------------    

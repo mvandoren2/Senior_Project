@@ -39,7 +39,7 @@ class PresalesMember(models.Model):
    presales_member_ID = models.AutoField(primary_key=True)
    external_presales_member_ID = models.CharField(max_length=50)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
-   proficiency = models.ManyToManyField(Proficiency)
+   proficiency = models.ManyToManyField(Proficiency, blank=True)
 
    class meta:
       verbose_name = 'Presales Member'
