@@ -34,6 +34,14 @@ def getMember(request, id, role):
     else:
         print("NULL")
         return Response(status=204)
+
+@api_view(['GET'])
+def getallProducts(request):
+    products = Product.objects.all()
+    if(not products):
+        products = {"Products": None}
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
     
 #----------------------------------------------------------    
 # @api_view(['GET']) 
