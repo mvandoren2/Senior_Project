@@ -22,18 +22,28 @@ def getallMembers(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getMember(request, id, role):
-    if(id != "None" or role != "None"):
-        if(id != "None"):
-            members = PresalesMember.objects.filter(external_presales_member_ID=id)
-        elif(role != "None"):
-            members = PresalesMember.objects.filter(user_role__name=role)
-        serializer = MemberSerializer(members, many=True)
-        print(serializer.data)
-        return Response(serializer.data)
+def getMember(request):
+    # if(request.GET.get('account', '')):
+    #     account = request.GET.get('account', '')
+    # if(request.GET.get('opportunity', '')):
+    #     opportunity = request.GET.get('opportunity', '')
+    id = request.GET.get('id')
+    role = request.GET.get('role')
+
+    print(id, role)
+
+    if(id and role):
+        members = PresalesMember.objects.filter(external_presales_member_ID=id, user_role__name=role)
+    elif(role):
+        members = PresalesMember.objects.filter(user_role__name=role)
+    elif(id):
+        members = PresalesMember.objects.filter(external_presales_member_ID=id)
     else:
-        print("NULL")
         return Response(status=204)
+
+    serializers = MemberSerializer(members, many=True)
+
+    return Response(serializers.data)
 
 @api_view(['GET'])
 def getallProducts(request):
