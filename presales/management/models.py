@@ -47,6 +47,17 @@ class PresalesMember(models.Model):
 
    def __str__(self):
       return str(self.presales_member_ID)
+   
+class ActivityType(models.Model):
+   type_ID = models.AutoField(primary_key=True)   
+   name = models.CharField(max_length=50)
+   
+   class meta:
+      verbose_name_plural = 'Activity Type'
+
+   def __str__(self):
+      return self.name
+   
 
 class Activity(models.Model):
    option_choice = [
@@ -58,10 +69,19 @@ class Activity(models.Model):
       ('Decline', 'decline'),
       ('Expire', 'expire'),
    ]
+   
+   Activity_level = [
+      ('Level 1', 'Level 1: PowerPoint'),
+      ('Level 2', 'Level 2: Demo'),
+      ('Level 3', 'Level 3: Requirements'),
+      ('Level 4', 'Level 4: Demo/Questions'),
+   ]
+ 
    activity_ID = models.AutoField(primary_key=True)
-   activtyType = models.CharField(max_length=50)
    opportunity_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50)
+   activty_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
+   activity_Level = models.CharField(max_length=50, choices = Activity_level, default = 'Level 1')
    createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(PresalesMember, blank=True)
    oneDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
