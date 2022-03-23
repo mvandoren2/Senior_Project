@@ -8,18 +8,97 @@ from .helper import *
 from .serializers import *
 import json
 
-@api_view(['GET'])
+#Need to fix this
+# - Needs to fix POST and fix patch
+@csrf_exempt
+@api_view(['POST', 'PATCH'])
 def getActivity(request):
-    activity = Activity.objects.all()
-    serializer = ActivitySerializer(activity, many=True)
+    if(request.method == 'POST'):
+        activity = json.loads(request.body)
+
+        date1 = activity['oneDateTime']
+        if(date1):
+            date1 = date1.split(".")[0] + "Z"
+
+        date2 = activity['twoDateTime']
+        if(date2):
+            date2 = date2.split(".")[0] + "Z"
+
+        date3 = activity['threeDateTime']
+        if(date3):
+            date3 = date3.split(".")[0] + "Z"
+
+        sdate = activity['selectedDateTime']
+        if(sdate):
+            sdate = sdate.split(".")[0] + "Z"
+
+        print(date1, date2, date3, sdate)
+        
+        #create a new activity
+        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], flag=activity['flag'])
+        newActivity.save()
+
+        #add presales_member_ID to the activity
+        member = activity['createdByMember']
+        if(type(member) != list):
+            member = [member]
+        member = searchMember(member)
+        member = member[0]
+        newActivity.createdByMember = PresalesMember.objects.get(presales_member_ID=member)
+        newActivity.save()
+
+        #add product_ID to the activity
+        products = activity['products']
+        arrP = searchProduct(products)
+        for p in arrP:
+            newActivity.products.add(p)
+
+        return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+    elif(request.method == 'PATCH'):
+        memberForm = json.loads(request.body)
+        updateActivity = Activity.objects.get(activity_ID=memberForm['activity_ID'])
+        
+        members = memberForm['members']
+
+        #remove members from the update activity if they do not exist in the memberForm
+        for m in updateActivity.members.all():
+            if(m.external_presales_member_ID not in members):
+                updateActivity.members.remove(m)
+
+        arrM = searchMember(members)
+        for m in arrM:
+            updateActivity.members.add(m)
+
+        #add a selectedDateTime to the activity from membersForm['selectedDateTime']
+        selectedDateTime = memberForm['selectedDateTime'].split(".")[0]
+        updateActivity.selectedDateTime = selectedDateTime
+        updateActivity.save()
+
+        return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['GET'])
+def getActivitys(request):
+    if(request.GET.get('opportunity_ID') or request.GET.get('account_ID') or request.GET.get('createdByMember') or request.GET.get('members') or request.GET.get('products') or request.GET.get('status') or request.GET.get('flag')):
+        print("Query", request.GET)
+        pass
+        return HttpResponse(json.dumps({'GET working!': 'Nothing to see here!'}), content_type='application/json')
+    else:
+        activities = Activity.objects.all()
+        serializer = ActivitySerializer(activities, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET'])
+def getActiveActvivitys(request):
+    #get all activities with the status of accapt, reschedule, schedule, and request
+    activities = Activity.objects.filter(status__in=['Accept', 'Reschedule', 'Schedule', 'Request'])
+    serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getallMembers(request):
-    members = PresalesMember.objects.all()
-    if(not members):
-        members = {"Members": None}
-    serializer = MemberSerializer(members, many=True)
+def getRequestActivitys(request):
+    activities = Activity.objects.filter(status__in=['Reschedule', 'Request'])
+    serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @csrf_exempt
@@ -65,13 +144,22 @@ def getMember(request, id):
     except:
         return Response(status=204)
 
-@api_view(['GET'])
-def getallProducts(request):
-    products = Product.objects.all()
-    if(not products):
-        products = {"Products": None}
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def getProducts(request):
+    if(request.method == 'GET'):
+        if(request.GET.get('name')):
+            products = Product.objects.filter(name=request.GET.get('name'))
+            serializers = ProductSerializer(products, many=True)
+            return Response(serializers.data)
+        else:
+            products = Product.objects.all()
+            serializers = ProductSerializer(products, many=True)
+            return Response(serializers.data)
+    elif(request.method == 'POST'):
+        product = json.loads(request.body)
+        searchProduct(product)
+        return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     
 #----------------------------------------------------------    
 # @api_view(['GET']) 
@@ -80,50 +168,6 @@ def getallProducts(request):
 #     return Response(serializer.data)
     
  #--------------------------------------------------------
-
-@csrf_exempt
-def addActivity(request):
-    if(request.method == 'POST'):
-        activity = json.loads(request.body)
-
-        date1 = activity['oneDateTime']
-        if(date1):
-            date1 = date1.split(".")[0] + "Z"
-
-        date2 = activity['twoDateTime']
-        if(date2):
-            date2 = date2.split(".")[0] + "Z"
-
-        date3 = activity['threeDateTime']
-        if(date3):
-            date3 = date3.split(".")[0] + "Z"
-
-        sdate = activity['selectedDateTime']
-        if(sdate):
-            sdate = sdate.split(".")[0] + "Z"
-
-        print(date1, date2, date3, sdate)
-        
-        #create a new activity
-        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], flag=activity['flag'])
-        newActivity.save()
-
-        #add presales_member_ID to the activity
-        member = activity['createdByMember']
-        if(type(member) != list):
-            member = [member]
-        member = searchMember(member)
-        member = member[0]
-        newActivity.createdByMember = PresalesMember.objects.get(presales_member_ID=member)
-        newActivity.save()
-
-        #add product_ID to the activity
-        products = activity['products']
-        arrP = searchProduct(products)
-        for p in arrP:
-            newActivity.products.add(p)
-
-    return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
 
 @csrf_exempt
 def addMembersandDate(request):

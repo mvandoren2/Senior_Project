@@ -60,7 +60,7 @@ class ActivityType(models.Model):
    
 
 class Activity(models.Model):
-   option_choice = [
+   status_choice = [
       ('Accept', "accept"),
       ('Reschedule', "reschedule"),
       ('Scheduled', "scheduled"),
@@ -68,6 +68,7 @@ class Activity(models.Model):
       ('Cancel', "cancel"),
       ('Decline', 'decline'),
       ('Expire', 'expire'),
+      ('Complete', 'complete'),
    ]
    
    Activity_level = [
@@ -76,10 +77,16 @@ class Activity(models.Model):
       ('Level 3', 'Level 3: Requirements'),
       ('Level 4', 'Level 4: Demo/Questions'),
    ]
+
+   location_choice = [
+      ('Remote', 'remote'),
+      ('Onsite', 'onsite'),
+   ]
  
    activity_ID = models.AutoField(primary_key=True)
    opportunity_ID = models.CharField(max_length=100)
-   location = models.CharField(max_length = 50)
+   account_ID = models.CharField(max_length=100)
+   location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
    activty_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
    activity_Level = models.CharField(max_length=50, choices = Activity_level, default = 'Level 1')
    createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
@@ -90,7 +97,7 @@ class Activity(models.Model):
    selectedDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    products = models.ManyToManyField(Product)
    description = models.CharField(blank=True, null=True, max_length=500)
-   status = models.CharField(max_length=50, choices = option_choice, default = 'Request')
+   status = models.CharField(max_length=50, choices = status_choice, default = 'Request')
    flag = models.BooleanField(default=False)
 
    class meta:
