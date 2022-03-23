@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse
 from management.models import *
+from .helper import *
 from .serializers import *
 import json
 
@@ -21,29 +22,48 @@ def getallMembers(request):
     serializer = MemberSerializer(members, many=True)
     return Response(serializer.data)
 
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def getMembers(request):
+    if(request.method == 'GET'):
+        # account = request.GET.get('account')
+        # opportunity = request.GET.get('opportunity')
+        role = request.GET.get('role')
+
+        if(role):
+            members = PresalesMember.objects.filter(user_role__name=role)
+        else:
+            members = PresalesMember.objects.all()
+
+        serializers = MemberSerializer(members, many=True)
+        return Response(serializers.data)
+
+    elif(request.method == 'POST'):
+        member = json.loads(request.body)
+
+        #get the external_presales_member_ID from member
+        memberId = member['external_presales_member_ID']
+
+        #make memberId into an int and in a list
+        memberId = [int(memberId)]
+
+        myMember = PresalesMember.objects.get(presales_member_ID=searchMember(memberId)[0])
+        myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
+        for prof in member['proficiency']:
+            myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['level']))
+        myMember.save()
+
+        return HttpResponse(json.dumps(member), content_type="application/json")
+
 @api_view(['GET'])
-def getMember(request):
-    # if(request.GET.get('account', '')):
-    #     account = request.GET.get('account', '')
-    # if(request.GET.get('opportunity', '')):
-    #     opportunity = request.GET.get('opportunity', '')
-    id = request.GET.get('id')
-    role = request.GET.get('role')
-
-    print(id, role)
-
-    if(id and role):
-        members = PresalesMember.objects.filter(external_presales_member_ID=id, user_role__name=role)
-    elif(role):
-        members = PresalesMember.objects.filter(user_role__name=role)
-    elif(id):
-        members = PresalesMember.objects.filter(external_presales_member_ID=id)
-    else:
+def getMember(request, id):
+    try:
+        print(id)
+        member = PresalesMember.objects.filter(external_presales_member_ID=id)
+        serializer = MemberSerializer(member, many=True)
+        return Response(serializer.data[0])
+    except:
         return Response(status=204)
-
-    serializers = MemberSerializer(members, many=True)
-
-    return Response(serializers.data)
 
 @api_view(['GET'])
 def getallProducts(request):
@@ -59,38 +79,7 @@ def getallProducts(request):
 #     serializer = StatusSerilizer(Status, many=True)
 #     return Response(serializer.data)
     
- #--------------------------------------------------------   
-
-def searchMember(members):
-    arrM = []
-    for m in members:
-        #filter by external_presales_member_ID and return the presales_member_ID
-        mem = PresalesMember.objects.filter(external_presales_member_ID=m)
-        if(mem):
-            arrM.append(mem[0].presales_member_ID)
-        else:
-            #save the external_presales_member_ID and return the presales_member_ID
-            newMem = PresalesMember(external_presales_member_ID=m)
-            newMem.save()
-            arrM.append(newMem.presales_member_ID)
-
-    return arrM
-
-def searchProduct(products):
-    arrP = []
-    for p in products:
-        #filter by external_presales_member_ID and return the presales_member_ID
-        prod = Product.objects.filter(external_product_ID=p['external_product_ID'])
-        if(prod):
-            arrP.append(prod[0].product_ID)
-        else:
-            #save the external_presales_member_ID and return the presales_member_ID
-            newProd = Product(external_product_ID=p['external_product_ID'], name=p['name'])
-            newProd.save()
-            arrP.append(newProd.product_ID)
-
-    return arrP
-                
+ #--------------------------------------------------------
 
 @csrf_exempt
 def addActivity(request):
