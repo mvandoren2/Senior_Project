@@ -3,9 +3,7 @@ import OpportunityData from "@salesforce/apex/OpportunityData.OpportunityData"
 import Id from "@salesforce/user/Id"
 
 Array.prototype.toDisplayString = function() {
-    let name = Object.keys(this).includes('name') ? 'name' : 'Name'
-
-    return this.map((str, i) =>(str.name ? str.name : str.Name)).join(', ')
+    return this.map((str) =>(str.name ? str.name : str.Name)).join(', ')
 }
 
 export const url = 'http://localhost:8080/api/'
@@ -31,7 +29,7 @@ export class TableDataHandler {
 
     fetchCurrentUser = () => {
         const userID = Id ? Id : '0055f0000041g1mAAA'
-        const urlString = url + 'get_member/' + userID + '/'
+        const urlString = url + 'get_member/' + userID + '/null/'
 
         return fetch(urlString)
             .then(res => res.json())
@@ -66,9 +64,9 @@ export class TableDataHandler {
     }
     
     getMemberByID = (member_ID) => {
-        let member = this.salesforceMembers.filter(member => member.Id == member_ID)
+        let member = this.salesforceMembers.filter(user => user.Id === member_ID)
     
-        return member == [] ? console.error('Team member ID not found') : member[0]
+        return member === [] ? console.error('Team member ID not found') : member[0]
     }
     
     getTeamMembers = (request) => {
@@ -78,13 +76,13 @@ export class TableDataHandler {
     }
     
     getOpportunity = (opportunity_ID) => {
-        let opportunity = this.opportunities.filter(opportunity => opportunity.Id == opportunity_ID)
+        let myOpportunity = this.opportunities.filter(opportunity => opportunity.Id === opportunity_ID)
     
-        return opportunity == [] ? console.error('Opportunity not found') : opportunity[0]
+        return myOpportunity === [] ? console.error('Opportunity not found') : myOpportunity[0]
     }
 
 
-    generateDisplayRow =  (request) => {
+    generateDisplayRow = (request) => {
         let newRow = Object.assign({}, this.emptyActivity)
 
         const opportunity = this.getOpportunity(request.opportunity_ID)
@@ -128,7 +126,7 @@ export class TableDataHandler {
         return {
             dislpay: dislpayData, 
             detailed: rawData,
-            user: currentUser
+            user: currentUser[0]
         }
     }
 }

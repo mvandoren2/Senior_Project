@@ -6,8 +6,7 @@
                         slds-table_cell-buffer 
                         slds-table_bordered 
                         slds-table_resizable-cols 
-                        slds-table_striped 
-                        slds-table_fixed-layout " 
+                        slds-table_striped " 
                 role="grid"
                 >
 
@@ -18,11 +17,9 @@
                     <!-- column headers -->
                     <template for:each={columns} for:item="column">
                         <th key={column.fieldName} 
-                            aria-label="Name" 
-                            aria-sort="none" 
-                            class=" slds-is-resizable 
-                                    slds-is-sortable 
-                                    slds-cell_action-mode" 
+                            aria-label={column.label} 
+                            aria-sort="descending" 
+                            class=" slds-is-resizable slds-is-sortable slds-is-sorted slds-is-sorted_desc slds-cell_action-mode " 
                             scope="col"
                             >
                             <a  class=" slds-th__action 
@@ -36,9 +33,11 @@
                                             slds-grid_vertical-align-center 
                                             slds-has-flexi-truncate"
                                             >
+
+                                <!--Column Label + Sorting-->
                                 <span   class="slds-truncate" 
                                         data-item={column.fieldName}
-                                        onclick={handleSort}
+                                        onclick={columnSortHandler.handleSort}
                                         title={column.label}
                                         >
                                     {column.label}
@@ -66,10 +65,7 @@
                                           tabindex="0"
                                           id={column.fieldName}
                                           />
-                                <span   class="slds-resizable__handle" 
-                                        onmousedown={calculateRowWidth}
-                                        ondrag={setNewWidth}
-                                        >
+                                <span class="slds-resizable__handle" >
                                   <span class="slds-resizable__divider"></span>
                                 </span>
                               </div>
@@ -88,7 +84,7 @@
                                                     label=" " 
                                                     variant="label-hidden"
                                                     data-item={column.fieldName}
-                                                    onchange={handleFilter}>
+                                                    onchange={tableFilterHandler.handleFilter}>
                                 </lightning-input>
                             </div>
                         </th>
@@ -99,7 +95,7 @@
 
             <!-- table body start -->
             <tbody>
-                <template for:each={filteredData} for:item="row">
+                <template for:each={displayedRows} for:item="row">
                     <tr key={row.id} data-item={row.id} class="slds-hint-parent">
                             
                             <!-- data -->
@@ -154,7 +150,7 @@
                                 <div>
                                     <lightning-button-menu alternative-text="Show menu">
                                         <template for:each={actions} for:item="action">
-                                            <lightning-menu-item key={action.id} label={action.label} data-item={action.name} onclick={handleMenuAction}></lightning-menu-item>
+                                            <lightning-menu-item key={action.id} label={action.label} data-item={action.name} onclick={rowActionHandler.handleMenuAction}></lightning-menu-item>
                                         </template>
                                     </lightning-button-menu>
                                 </div>

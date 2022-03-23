@@ -1,12 +1,12 @@
-import { TableDataHandler, getTableData } from "./tableDataHandler.js"
+import { TableDataHandler } from "./tableDataHandler.js"
 
 export class TableFormatter {
     tableDataHandler = new TableDataHandler()
 
     fixCamelCase = (s) => {
         return s.replace(/([A-Z])/g, ' $1')
-            .replace(/^./, s => { 
-                return s.toUpperCase(); 
+            .replace(/^./, str => { 
+                return str.toUpperCase(); 
             })
     }
 
@@ -52,25 +52,24 @@ export class TableFormatter {
 
     //Returns an empty table to render before the async method returns
     getEmptyTableFormat = () => {
-        let data = this.tableDataHandler.getEmptyTableData()
+        let row = this.tableDataHandler.getEmptyTableData()
 
-        let columns = this.generateTableHeader(data)
+        let columns = this.generateTableHeader(row)
 
         let actions = this.getRowActions('')
     
-        return {columns: columns, actions: actions, data: data}
+        return {columns: columns, actions: actions, rows: row}
     }
 
-    getTableFormat = async () => {    
-        
-        let data = await this.tableDataHandler.getTableData()
+    getTableFormat = async () => {
+        let rows = await this.tableDataHandler.getTableData()
 
-        let user = data.user
+        let user = rows.user
 
-        let columns = this.generateTableHeader(data)
+        let columns = this.generateTableHeader(rows)
 
         let actions = this.getRowActions(user.user_role.name)
     
-        return {columns: columns, actions: actions, data: data}
+        return {columns: columns, actions: actions, rows: rows}
     }
 }
