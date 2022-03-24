@@ -87,7 +87,7 @@ class Activity(models.Model):
    opportunity_ID = models.CharField(max_length=100)
    account_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
-   activty_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
+   activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
    activity_Level = models.CharField(max_length=50, choices = Activity_level, default = 'Level 1')
    createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(PresalesMember, blank=True)
