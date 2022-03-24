@@ -63,7 +63,7 @@ def getActivity(request):
         updateActivity = Activity.objects.get(activity_ID=activity_patch['activity_ID'])
 
         #check to see if the json contains a members
-        if('members' in activity_patch and activity_patch['members']):
+        if('members' in activity_patch):
             members = activity_patch['members']
 
             #remove members from the update activity if they do not exist in the memberForm
