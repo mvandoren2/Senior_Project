@@ -96,7 +96,6 @@ class Activity(models.Model):
    threeDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    selectedDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    products = models.ManyToManyField(Product)
-   description = models.CharField(blank=True, null=True, max_length=500)
    status = models.CharField(max_length=50, choices = status_choice, default = 'Request')
    flag = models.BooleanField(default=False)
 
@@ -105,3 +104,15 @@ class Activity(models.Model):
 
    def __str__(self):
       return str(self.activity_ID)
+
+class Note(models.Model):
+   note_ID = models.AutoField(primary_key=True)
+   activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+   user = models.ForeignKey(UserRole, on_delete=models.CASCADE)
+   note_text = models.CharField(max_length=500)
+
+   class meta:
+      verbose_name_plural = 'Notes'
+
+   def __str__(self):
+      return self.note_text
