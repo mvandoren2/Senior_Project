@@ -35,7 +35,7 @@ def getActivity(request):
         print(date1, date2, date3, sdate)
         
         #create a new activity
-        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], flag=activity['flag'])
+        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], account_ID = activity['account_ID'], location = activity['location'], activity_Level = activity['activity_Level'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], status = activity['status'], flag=activity['flag'])
         newActivity.save()
 
         #add presales_member_ID to the activity
@@ -52,6 +52,11 @@ def getActivity(request):
         arrP = searchProduct(products)
         for p in arrP:
             newActivity.products.add(p)
+
+        #add activity type
+        activity_type = searchActivityType(activity['activity_Type'])
+        newActivity.activty_Type = activity_type
+        newActivity.save()
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     elif(request.method == 'PATCH'):

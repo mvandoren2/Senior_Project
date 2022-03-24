@@ -29,3 +29,12 @@ def searchProduct(products):
             arrP.append(newProd.product_ID)
 
     return arrP
+
+def searchActivityType(activityType):
+    #check to see if the activity name is already in the database
+    act = ActivityType.objects.filter(type_ID=activityType)
+    if(act):
+        return act[0].type_ID
+    else:
+        print("Oopsie Woopsie! Uwu someone made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!")
+        
