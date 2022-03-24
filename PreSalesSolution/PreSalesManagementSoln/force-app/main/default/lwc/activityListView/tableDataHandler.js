@@ -36,8 +36,6 @@ export class TableDataHandler {
 
         let apexAccountData = await OpportunityData({opportunity_IDs: opportunity_IDs})
 
-        console.log(apexAccountData)
-
         let opportunities = []
 
         apexAccountData.forEach(account => {
