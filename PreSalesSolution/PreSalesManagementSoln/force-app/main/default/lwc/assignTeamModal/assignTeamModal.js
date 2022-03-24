@@ -18,6 +18,11 @@ export default class AssignTeamModal extends LightningElement {
             this.activity = row;
             this.handleAllWireFunction();
         }
+
+        else if(row === undefined) {
+            let reloadParentTable = new CustomEvent('reloadtablerows')
+            this.dispatchEvent(reloadParentTable)
+        }
     }
 
     @track boxClasses = 'slds-modal'

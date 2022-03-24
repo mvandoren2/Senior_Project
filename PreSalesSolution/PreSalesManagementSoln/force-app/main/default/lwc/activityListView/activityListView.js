@@ -8,7 +8,7 @@ export default class ActivityListView extends LightningElement {
     constructor() {
         super()
 
-        this.updateData()
+        this.loadTableRows()
     }
 
     tableFormatter = new TableFormatter()
@@ -21,13 +21,8 @@ export default class ActivityListView extends LightningElement {
     actions = this.tableFormat.actions
     rows = this.tableFormat.rows.dislpay
     displayedRows = [...this.rows]
-  
-    reloadTableRows = () => {
-        console.log('parent')
-        this.updateData()
-    }
 
-    updateData = () => {
+    loadTableRows = () => {
         this.tableFormatter.getTableFormat()
             .then(data => this.fillTable(data))
     }
