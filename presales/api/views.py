@@ -58,7 +58,54 @@ def getActivity(request):
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     elif(request.method == 'PATCH'):
-        activity = json.loads(request.body)
+        activity_patch = json.loads(request.body)
+
+        updateActivity = Activity.objects.get(activity_ID=activity_patch['activity_ID'])
+
+        #check to see if the json contains a members
+        if('members' in activity_patch and activity_patch['members']):
+            members = activity_patch['members']
+
+            #remove members from the update activity if they do not exist in the memberForm
+            for m in updateActivity.members.all():
+                if(m.external_presales_member_ID not in members):
+                    updateActivity.members.remove(m)
+
+            arrM = searchMember(members)
+            for m in arrM:
+                updateActivity.members.add(m)
+
+        if('description' in activity_patch):
+            updateActivity.description = activity_patch['description']
+            updateActivity.save()
+        
+        if('status' in activity_patch):
+            updateActivity.status = activity_patch['status']
+            updateActivity.save()
+
+        if('flag' in activity_patch):
+            updateActivity.flag = activity_patch['flag']
+            updateActivity.save()
+
+        if('oneDateTime' in activity_patch):
+            oneDateTime = activity_patch['oneDateTime'].split(".")[0]
+            updateActivity.oneDateTime = oneDateTime
+            updateActivity.save()
+
+        if('twoDateTime' in activity_patch):
+            twoDateTime = activity_patch['twoDateTime'].split(".")[0]
+            updateActivity.twoDateTime = twoDateTime
+            updateActivity.save()
+
+        if('threeDateTime' in activity_patch):
+            threeDateTime = activity_patch['threeDateTime'].split(".")[0]
+            updateActivity.threeDateTime = threeDateTime
+            updateActivity.save()
+
+        if('selectedDateTime' in activity_patch):
+            selectedDateTime = activity_patch['selectedDateTime'].split(".")[0]
+            updateActivity.selectedDateTime = selectedDateTime
+            updateActivity.save()
 
         return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
 
@@ -171,34 +218,11 @@ def getProducts(request):
 # def getStatus(request):
 #     serializer = StatusSerilizer(Status, many=True)
 #     return Response(serializer.data)
-    
- #--------------------------------------------------------
+#----------------------------------------------------------
 
-@csrf_exempt
-def addMembersandDate(request):
-    if(request.method == 'POST'):
-        memberForm = json.loads(request.body)
-        updateActivity = Activity.objects.get(activity_ID=memberForm['activity_ID'])
-        
-        members = memberForm['members']
-
-        #remove members from the update activity if they do not exist in the memberForm
-        for m in updateActivity.members.all():
-            if(m.external_presales_member_ID not in members):
-                updateActivity.members.remove(m)
-
-        arrM = searchMember(members)
-        for m in arrM:
-            updateActivity.members.add(m)
-
-        #add a selectedDateTime to the activity from membersForm['selectedDateTime']
-        selectedDateTime = memberForm['selectedDateTime'].split(".")[0]
-        updateActivity.selectedDateTime = selectedDateTime
-        updateActivity.save()
-    
-    return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
-
+#----------------------------------------------------------
 #Daniel program below
-@csrf_exempt
-def sendNotification():
-    pass
+# @csrf_exempt
+# def sendNotification():
+#     pass
+#----------------------------------------------------------
