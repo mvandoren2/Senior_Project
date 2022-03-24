@@ -6,8 +6,8 @@ urlpatterns = [
     path('activities/', views.getActivities),
     path('activity/active/', views.getActiveActvivities),
     path('activity/request/', views.getRequestActivities),
+    path('activity/activitytype/', views.getActivityType),
     path('products/', views.getProducts),
     path('member/<id>/', views.getMember),
     path('members/', views.getMembers),
-    path('get_activityType/', views.getActivityType),
 ]
