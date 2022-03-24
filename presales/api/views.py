@@ -177,6 +177,25 @@ def getProducts(request):
  #--------------------------------------------------------
 
 @csrf_exempt
+@api_view(['GET', 'POST'])
+def getActivityType(request):
+    if(request.method =='GET'):
+        if(request.GET.get('name')):
+            activity_Type = ActivityType.objects.filter(name=request.Get.get('name'))
+            serializer = ActivityTypeSerializer(activity_Type, many=True)
+            return Response(serializer.data)
+        else:
+            activity_Type = ActivityType.objects.all()
+            serializer = ActivityTypeSerializer(activity_Type, many=True)
+            return Response(serializer.data)
+    elif(request.method == 'POST'):
+        activity_Type = json.loads(request.body)
+        new_activity_Type = ActivityType(name=activity_Type['name'])
+        new_activity_Type.save()
+        return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+        
+    
+@csrf_exempt
 def addMembersandDate(request):
     if(request.method == 'POST'):
         memberForm = json.loads(request.body)

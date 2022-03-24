@@ -31,10 +31,16 @@ class MemberSerializer(serializers.ModelSerializer):
         model = PresalesMember
         fields = ('external_presales_member_ID', 'user_role', 'proficiency')
 
+class ActivityTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityType
+        fields = '__all__'	
+        
 class ActivitySerializer(serializers.ModelSerializer):
     members = MemberSerializer(read_only=True, many=True)
     products = ProductSerializer(read_only=True, many=True)
     createdByMember = MemberSerializer(read_only=True)
+    Activity_Type = ActivityTypeSerializer(read_only=True)
 
     class Meta:
         model = Activity
