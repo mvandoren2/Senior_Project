@@ -35,9 +35,9 @@ class Proficiency(models.Model):
    def __str__(self):
       return self.product.name + " " + str(self.level)
 
-class PresalesMember(models.Model):
-   presales_member_ID = models.AutoField(primary_key=True)
-   external_presales_member_ID = models.CharField(max_length=50)
+class Member(models.Model):
+   member_ID = models.AutoField(primary_key=True)
+   external_member_ID = models.CharField(max_length=50)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
    proficiency = models.ManyToManyField(Proficiency, blank=True)
 
@@ -46,7 +46,7 @@ class PresalesMember(models.Model):
       verbose_name_plural = 'Presales Members'
 
    def __str__(self):
-      return str(self.presales_member_ID)
+      return str(self.member_ID)
    
 class ActivityType(models.Model):
    type_ID = models.AutoField(primary_key=True)   
@@ -89,8 +89,8 @@ class Activity(models.Model):
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
    activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
    activity_Level = models.CharField(max_length=50, choices = Activity_level, default = 'Level 1')
-   createdByMember = models.ForeignKey(PresalesMember, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
-   members = models.ManyToManyField(PresalesMember, blank=True)
+   createdByMember = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
+   members = models.ManyToManyField(Member, blank=True)
    oneDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    twoDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    threeDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
@@ -108,7 +108,7 @@ class Activity(models.Model):
 class Note(models.Model):
    note_ID = models.AutoField(primary_key=True)
    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-   user = models.ForeignKey(UserRole, on_delete=models.CASCADE)
+   member = models.ForeignKey(Member, on_delete=models.CASCADE)
    note_text = models.CharField(max_length=500)
 
    class meta:

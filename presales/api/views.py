@@ -42,7 +42,7 @@ def getActivity(request):
             member = [member]
         member = searchMember(member)
         member = member[0]
-        newActivity.createdByMember = PresalesMember.objects.get(presales_member_ID=member)
+        newActivity.createdByMember = Member.objects.get(presales_member_ID=member)
         newActivity.save()
 
         #add product_ID to the activity
@@ -162,9 +162,9 @@ def getMembers(request):
         role = request.GET.get('role')
 
         if(role):
-            members = PresalesMember.objects.filter(user_role__name=role)
+            members = Member.objects.filter(user_role__name=role)
         else:
-            members = PresalesMember.objects.all()
+            members = Member.objects.all()
 
         serializers = MemberSerializer(members, many=True)
         return Response(serializers.data)
@@ -178,7 +178,7 @@ def getMembers(request):
         #make memberId into an int and in a list
         memberId = [int(memberId)]
 
-        myMember = PresalesMember.objects.get(presales_member_ID=searchMember(memberId)[0])
+        myMember = Member.objects.get(presales_member_ID=searchMember(memberId)[0])
         myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
         for prof in member['proficiency']:
             myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['level']))
@@ -190,7 +190,7 @@ def getMembers(request):
 def getMember(request, id):
     try:
         print(id)
-        member = PresalesMember.objects.filter(external_presales_member_ID=id)
+        member = Member.objects.filter(external_presales_member_ID=id)
         serializer = MemberSerializer(member, many=True)
         return Response(serializer.data[0])
     except:
@@ -212,6 +212,35 @@ def getProducts(request):
         product = json.loads(request.body)
         searchProduct(product)
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['PATCH', 'DELETE'])
+def getActivityNote(request, noteID):
+    if(request.method == 'DELETE'):
+        note = Note.objects.get(note_ID=noteID)
+        note.delete()
+        return HttpResponse(json.dumps({'DELETE working!': 'Nothing to see here!'}), content_type='application/json')
+    elif(request.method == 'PATCH'):
+        jForm = json.loads(request.body)
+        note = Note.objects.get(note_ID=noteID)
+        note.note_text = jForm['note_text']
+        note.save()
+        return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def getActivityNotes(request, activityID):
+    if(request.method == 'GET'):
+        notes = Note.objects.filter(activity=activityID)
+        serializers = NoteSerializer(notes, many=True)
+        return Response(serializers.data)
+    elif(request.method == 'POST'):
+        note = json.loads(request.body)
+        act = Activity.objects.get(activity_ID=activityID)
+        mem = Member.objects.get(member_ID=note['member'])
+        newNote = Note(member = mem, note_text = note['note_text'], activity = act)
+        newNote.save()
+        return HttpResponse(json.dumps(note), content_type="application/json")
 
 @csrf_exempt
 @api_view(['GET', 'POST'])

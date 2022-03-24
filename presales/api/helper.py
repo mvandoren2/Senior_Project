@@ -4,14 +4,14 @@ def searchMember(members):
     arrM = []
     for m in members:
         #filter by external_presales_member_ID and return the presales_member_ID
-        mem = PresalesMember.objects.filter(external_presales_member_ID=m)
+        mem = Member.objects.filter(external_member_ID=m)
         if(mem):
-            arrM.append(mem[0].presales_member_ID)
+            arrM.append(mem[0].member_ID)
         else:
             #save the external_presales_member_ID and return the presales_member_ID
-            newMem = PresalesMember(external_presales_member_ID=m)
+            newMem = Member(external_member_ID=m)
             newMem.save()
-            arrM.append(newMem.presales_member_ID)
+            arrM.append(newMem.member_ID)
 
     return arrM
 

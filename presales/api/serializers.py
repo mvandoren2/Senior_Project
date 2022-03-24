@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from management.models import *
 
+class MemberNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ('external_member_ID',)
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -28,7 +33,7 @@ class MemberSerializer(serializers.ModelSerializer):
     proficiency = ProficiencySerializer(many=True)
 
     class Meta:
-        model = PresalesMember
+        model = Member
         fields = ('external_presales_member_ID', 'user_role', 'proficiency')
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
@@ -44,4 +49,11 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
+        fields = '__all__'
+
+class NoteSerializer(serializers.ModelSerializer):
+    member = MemberNameSerializer(read_only=True)
+
+    class Meta:
+        model = Note
         fields = '__all__'
