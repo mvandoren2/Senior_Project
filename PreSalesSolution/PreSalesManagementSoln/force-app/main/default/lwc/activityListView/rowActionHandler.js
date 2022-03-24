@@ -9,17 +9,19 @@ export class RowActionHandler {
     }
 
     flipShowAssign = () => {
-        this.parent.template.querySelector('c-assign-team-modal').toggleShow(this.rowID)
+        this.parent.template.querySelector('c-assign-team-modal').toggleShow(this.row)
     }
 
     flipShowDecline = () => {
-        this.parent.template.querySelector('c-status-change-modal').toggleShow(this.rowID)
+        this.parent.template.querySelector('c-status-change-modal').toggleShow(this.row)
     }
 
     handleMenuAction = (evt) => {
         const parentElement = evt.target.closest('tr')
 
-        this.rowID = parentElement.dataset.item
+        const rowId = parseInt(parentElement.dataset.item, 10)
+
+        this.row = this.parent.getRowById(rowId)
 
         if (evt.target.dataset.item === 'assign_request')
             this.flipShowAssign()

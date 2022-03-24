@@ -19,7 +19,7 @@ export class TableDataHandler {
     }
 
     fetchRequests = () => {
-        return fetch(url + 'get_activity/')
+        return fetch(url + 'activities/')
             .then(res => res.json())
     }
 
