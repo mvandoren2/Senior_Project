@@ -22,9 +22,18 @@ export default class ActivityListView extends LightningElement {
     rows = this.tableFormat.rows.dislpay
     displayedRows = [...this.rows]
   
+    reloadTableRows = () => {
+        console.log('parent')
+        this.updateData()
+    }
+
     updateData = () => {
         this.tableFormatter.getTableFormat()
             .then(data => this.fillTable(data))
+    }
+
+    getRowById = (rowId) => {
+        return this.tableFormat.rows.detailed.filter(row => row.activity_ID === rowId)[0]
     }
 
     fillTable = (data) => {

@@ -24,8 +24,8 @@
                         ></lightning-input>
                     </div>
 
-                    <lightning-tabset>
-                        <lightning-tab label="Unassigned" title="2nd tab extended title">
+                    <lightning-tabset active-tab-value={modalTab}>
+                        <lightning-tab label="Unassigned" title="2nd tab extended title" value="Unassigned">
                             <template if:true={filteredUnAssignedUsersInfo}>
                                 <template for:each={filteredUnAssignedUsersInfo} for:item="user">
                                     <ul key={user.Id}>
@@ -34,12 +34,14 @@
                                                 <img src={user.FullPhotoUrl} alt="Image">
                                                 <div class="userInfo">
                                                     <span style="font-weight: bold; font-size: 15px">{user.Name}</span>
-                                                    <template for:each={user.proficiency} for:item="inner">
-                                                        <li key={inner.Id}>
-                                                            {inner.product.name}:
-                                                            {inner.level}       
-                                                        </li>
-                                                    </template>
+                                                    <ul>
+                                                        <template for:each={user.proficiency} for:item="inner">
+                                                            <li key={inner.product.name}>
+                                                                {inner.product.name}:
+                                                                {inner.level}       
+                                                            </li>
+                                                        </template>
+                                                    </ul>
                                                 </div>
                                                 <lightning-button data-item = {user.Id} 
                                                                     variant="brand"
@@ -53,7 +55,7 @@
                                 </template>
                             </template>              
                         </lightning-tab>
-                        <lightning-tab label="Assigned">
+                        <lightning-tab label="Assigned" value="Assigned">
                             <template if:true={filteredSelectedUsersInfo}>
                                 <template for:each={filteredSelectedUsersInfo} for:item="user">
                                     <ul key={user.Id}>
@@ -63,7 +65,7 @@
                                                 <div class="userInfo">
                                                     <span style="font-weight: bold; font-size: 15px">{user.Name}</span>
                                                     <template for:each={user.proficiency} for:item="inner">
-                                                        <li key={inner.Id}>
+                                                        <li key={inner.product.name}>
                                                             {inner.product.name}:
                                                             {inner.level}       
                                                         </li>
