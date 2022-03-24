@@ -36,12 +36,20 @@ export class TableDataHandler {
 
         let apexAccountData = await OpportunityData({opportunity_IDs: opportunity_IDs})
 
-        return apexAccountData.map(account => ({
-            Id : account.Opportunities[0].Id,
-            Name : account.Opportunities[0].Name,
-            AccountId : account.Id,
-            AccountName: account.Name
-        }))
+        let opportunities = []
+
+        apexAccountData.forEach(account => {
+            account.Opportunities.forEach(opportunity => {
+                opportunities.push({
+                    Id : opportunity.Id,
+                    Name : opportunity.Name,
+                    AccountId : account.Id,
+                    AccountName: account.Name
+                })
+            })
+        })
+
+        return opportunities
     }
 
     //
