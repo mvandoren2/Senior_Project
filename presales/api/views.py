@@ -31,8 +31,6 @@ def getActivity(request):
         sdate = activity['selectedDateTime']
         if(sdate):
             sdate = sdate.split(".")[0] + "Z"
-
-        print(date1, date2, date3, sdate)
         
         #create a new activity
         newActivity = Activity(opportunity_ID=activity['opportunity_ID'], account_ID = activity['account_ID'], location = activity['location'], activity_Level = activity['activity_Level'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], status = activity['status'], flag=activity['flag'])
@@ -60,7 +58,7 @@ def getActivity(request):
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     elif(request.method == 'PATCH'):
-        
+        activity = json.loads(request.body)
 
         return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
 
