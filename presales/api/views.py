@@ -55,48 +55,50 @@ def getActivity(request):
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     elif(request.method == 'PATCH'):
-        memberForm = json.loads(request.body)
-        updateActivity = Activity.objects.get(activity_ID=memberForm['activity_ID'])
         
-        members = memberForm['members']
-
-        #remove members from the update activity if they do not exist in the memberForm
-        for m in updateActivity.members.all():
-            if(m.external_presales_member_ID not in members):
-                updateActivity.members.remove(m)
-
-        arrM = searchMember(members)
-        for m in arrM:
-            updateActivity.members.add(m)
-
-        #add a selectedDateTime to the activity from membersForm['selectedDateTime']
-        selectedDateTime = memberForm['selectedDateTime'].split(".")[0]
-        updateActivity.selectedDateTime = selectedDateTime
-        updateActivity.save()
 
         return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
 
 @csrf_exempt
 @api_view(['GET'])
-def getActivitys(request):
+def getActivities(request):
     if(request.GET.get('opportunity_ID') or request.GET.get('account_ID') or request.GET.get('createdByMember') or request.GET.get('members') or request.GET.get('products') or request.GET.get('status') or request.GET.get('flag')):
-        print("Query", request.GET)
-        pass
-        return HttpResponse(json.dumps({'GET working!': 'Nothing to see here!'}), content_type='application/json')
+        #query whatever is passed in
+        query = Activity.objects.all()
+        new_query = Activity.objects.none()
+
+        if(request.GET.get('opportunity_ID')):
+            new_query |= query.filter(opportunity_ID=request.GET.get('opportunity_ID'))
+        if(request.GET.get('account_ID')):
+            new_query |= query.filter(account_ID=request.GET.get('account_ID'))
+        if(request.GET.get('createdByMember')):
+            new_query |= query.filter(createdByMember=request.GET.get('createdByMember'))
+        if(request.GET.get('members')):
+            new_query |= query.filter(members=request.GET.get('members'))
+        if(request.GET.get('products')):
+            new_query |= query.filter(products=request.GET.get('products'))
+        if(request.GET.get('status')):
+            new_query |= query.filter(status=request.GET.get('status'))
+        if(request.GET.get('flag')):
+            new_query |= query.filter(flag=request.GET.get('flag'))
+
+        #serialize the query
+        serializer = ActivitySerializer(new_query, many=True)
+        return Response(serializer.data)
     else:
         activities = Activity.objects.all()
         serializer = ActivitySerializer(activities, many=True)
         return Response(serializer.data)
 
 @api_view(['GET'])
-def getActiveActvivitys(request):
+def getActiveActvivities(request):
     #get all activities with the status of accapt, reschedule, schedule, and request
     activities = Activity.objects.filter(status__in=['Accept', 'Reschedule', 'Schedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getRequestActivitys(request):
+def getRequestActivities(request):
     activities = Activity.objects.filter(status__in=['Reschedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
