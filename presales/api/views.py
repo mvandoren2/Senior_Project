@@ -212,13 +212,6 @@ def getProducts(request):
         product = json.loads(request.body)
         searchProduct(product)
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
-    
-#----------------------------------------------------------    
-# @api_view(['GET']) 
-# def getStatus(request):
-#     serializer = StatusSerilizer(Status, many=True)
-#     return Response(serializer.data)
-#----------------------------------------------------------
 
 #----------------------------------------------------------
 #Daniel program below

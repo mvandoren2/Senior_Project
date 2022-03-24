@@ -9,4 +9,5 @@ urlpatterns = [
     path('products/', views.getProducts),
     path('member/<id>/', views.getMember),
     path('members/', views.getMembers),
+    path('get_activityType/', views.getActivityType),
 ]
