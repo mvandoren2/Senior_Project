@@ -1,173 +1,105 @@
-<!-- sldsValidatorIgnore -->
 <template>
-    <!--Title of the Form -->  
-    <lightning-card title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
-    
-        <!--opening the Opportunity api object, to retieve ID-->
-        <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity"
-            onsuccess={handleSuccess} onsubmit ={handleSubmit}>
-        
-            <!--Opportuntiy ID... auto fill-->
-            <div class="slds-m-around_medium">   
-                <div class="acc-container">
-                    <div class="sld-grid">
-                        <div class="slds-col slds-size_1-of-2">
-                            <strong>Opporunity ID :</strong> {recordId}
-                        </div>
-                    </div>
-                </div>
-            </div> 
-
-            <!--Check box...for unknown reason -->
+    <lightning-record-view-form record-id={opportunityId} object-api-name="Opportunity"></lightning-record-view-form>
+        <lightning-card title="Request a Presales Activity" >
+            <div class="slds-var-p-around_medium">
             
-            <div class="slds-clearfix">
-                <div class="slds-align_absolute-center">  
-                    <label for = "checkbox"> Unexpected Event</label>                            
-                    <lightning-input label="checkbox" variant="label-hidden" type="checkbox"> </lightning-input> 
-                </div>
-            </div>
-            
-    
-            <!--Drop down Menu...select Presales Activities -->
-            <div class="slds-m-around_medium">
-                <div>
-                    <lightning-combobox 
-                        name="Available"
-                        label="Pre-Sales Activities"
-                        value={value}
-                        placeholder="Select Progress"
-                        options={options}                            
-                        onchange={handleChange} >
-                    </lightning-combobox>
-                </div>
-            </div>
-
             <!--Search Products..add and remove -->
-            <div class="slds-m-around_medium search-table search-wrapper">
-                <label for="search">Search Products</label>
-                <lightning-input class="search" label=" " type="search" id="search" onchange={searchEvt}></lightning-input>
-                <ul class="slds-m-around_medium">
+            <div class="search-table search-wrapper">
+                <abbr title="required" class="slds-required">*</abbr>
+                <label for="date1" class="slds-text-title" >Product(s)</label>
+                <lightning-input class="search" label="Product" type="search" id="search" variant="label-hidden" onchange={productSelector.searchEvt} ></lightning-input>
+                <ul class="slds-var-m-around_medium">
                     <template for:each={filteredProducts} for:item="product">
-                        <li key={product.id}>
+                        <li key={product.external_product_ID}>
                             {product.name}
-                            <lightning-button value={product} variant="success" label="Add" title="Successful action" onclick={addProd} class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button   value={product} 
+                                                variant="success" 
+                                                label="Add" 
+                                                title="Successful action" 
+                                                onclick={productSelector.addProd} 
+                                                class="slds-var-m-left_x-small">
+                            </lightning-button>
                         </li>
                     </template>
-                    <template for:each={cart} for:item="prod">
-                        <li key={prod.id}>
+
+                    <template for:each={selectedProducts} for:item="prod">
+                        <li key={prod.external_product_ID}>
                             {prod.name}
-                            <lightning-button value={prod} variant="destructive" label="Remove" title="Destructive action" onclick={removeProd} class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button   value={prod} 
+                                                variant="destructive" 
+                                                label="Remove" 
+                                                title="Destructive action" 
+                                                onclick={productSelector.removeProd} 
+                                                class="slds-var-m-left_x-small">
+                            </lightning-button>
                         </li>
                     </template>
                 </ul>
             </div>
-    
-            <!--Date and Time Request 01-->
-            <div>
-                <div class="slds-clearfix"> 
-                    <div class="slds-align_absolute-center">
-                        <p> <strong>Date/Time Option 1:</strong></p>
-                    </div>
-                </div>
-                <div style="display: table-row">
-                    <div style="width: 100xp; display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_1" label="Date_1" variant="label-hidden" name="DATE_START"
-                                    
-                                    min=" " max=" " onchange={dateInput_1}> 
-                                </lightning-input>   
-                            </div>   
-                        </div>       
-                    </div>
-                    <div style="display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p> Time Request: </p>
-                                <lightning-input type="time" id="time_1" label="Time_2" variant="label-hidden" name="appt" onchange={timeInput_1}>
-                                </lightning-input>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!--Date and Time Request 02-->
-                <div class="slds-clearfix"> 
-                    <div class="slds-align_absolute-center">
-                        <p><strong> Date/Time Option 2:</strong> </p>
-                    </div>
-                </div>
-                <div style="display: table-row">
-                    <div style="width: 100xp; display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_2" label="Date_2" variant="label-hidden" name="DATE_START"
-                                    
-                                    min=" " max=" " onchange={dateInput_2}> 
-                                </lightning-input>
-                            </div>
-                        </div>       
-                    </div>
-                    <div style="display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p>Time Request:</p>
-                                <lightning-input type="time" id="time_2" label="Time_2" variant="label-hidden" name="appt"  onchange={timeInput_2}>
-                                </lightning-input>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="slds-grid slds-gutters_x-small">
+            
+                <lightning-combobox name="activity_type" 
+                                    label="Activity Type" 
+                                    options={activityTypes}
+                                    class="slds-col slds-size_2-of-3"
+                                    onchange={selectActivityType} 
+                                    required >
+                </lightning-combobox>
 
-                <!--Date and Time Request 02-->
-                <div class="slds-clearfix"> 
-                    <div class="slds-align_absolute-center">
-                        <p><strong>Date/Time Option 3:</strong></p>
-                    </div>
-                </div>
-                <div style="display: table-row">
-                    <div style="width: 100xp; display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p> Date Requested: </p>
-                                <lightning-input type="date" id="date_3" label="Date_3" variant="label-hidden" name="DATE_START"
-                                    
-                                    min=" " max=" " onchange={dateInput_3}> 
-                                </lightning-input>
-                            </div>
-                        </div>       
-                    </div>
-                    <div style="display: table-cell;">
-                        <div class="slds-grid slds-p-around_small">
-                            <div class="slds-p-around_small">
-                                <p> Time Request: </p>
-                                <lightning-input type="time" id="time_3" label="Time_3" variant="label-hidden" name="appt" onchange={timeInput_3}>
-                                </lightning-input>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <lightning-combobox name="activity_level" 
+                                    label="Activity Level" 
+                                    placeholder="Select activity level" 
+                                    options={activityLevels}
+                                    class="slds-col slds-size_1-of-3" 
+                                    onchange={selectActivityLevel} 
+                                    required >
+                </lightning-combobox>
+
             </div>
+
+            <lightning-combobox name="location" 
+                                label="Location" 
+                                value={defaultLocation} 
+                                options={locationOptions} 
+                                class="slds-var-p-top_small slds-var-p-bottom_small" 
+                                onchange={setLocation} 
+                                required >
+            </lightning-combobox>
+
+            <abbr title="required" class="slds-required">*</abbr>
+            <label for="date1" class="slds-text-title" >Date</label>
+            <lightning-input type="datetime" label=" " data-item="date1" variant="label-hidden" onchange={dateInputHandler} required></lightning-input>
+
+            <template if:false={alternateDates}>
+                <lightning-button variant="base" label="Add Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates}></lightning-button>
+            </template>
+
+            <template if:true={alternateDates}>
+                <lightning-input type="datetime" label=" " data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                <lightning-input type="datetime" label=" " data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                <lightning-button variant="base" label="Hide Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates} ></lightning-button>
+            </template>
 
             <!--Text Description-->
-            <div>
-                <div class="slds-form-element">
-                    <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
-                    <div class="slds-form-element__control">
-                        <lightning-textarea id="textarea" label="description" variant="label-hidden" class="slds-textarea" onchange ={textDescription} style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
-                    </div>
-                </div>
-            </div>
+            
+            <lightning-textarea id="textarea" 
+                                label="Notes" 
+                                onchange ={updateNotes} >
+            </lightning-textarea>
+            
+            <lightning-input type="checkbox" label="This is an unexpected event" class="slds-var-p-top_small" onchange={setFlag}></lightning-input>
+                    
 
             <!--Submit button class="button"-->
-            <div class="button">
-                <lightning-button variant="submit" label="Submit" type = "button" class="slds-m-left_small" disabled ={disableButton} title="Submit" onclick={handleUploadAction} ></lightning-button>
-            </div> 
-
-        </lightning-record-edit-form>
-    </lightning-card> 
-
-
+            <lightning-button   variant="submit" 
+                                label="Submit" 
+                                type="submit" 
+                                disabled={isSubmitDisabled} 
+                                title="Submit"
+                                class="slds-var-p-top_small slds-align_absolute-center"
+                                onclick={handleUploadAction} >
+            </lightning-button>
+        </div>
+    </lightning-card>
 </template>

@@ -1,36 +1,87 @@
-const products = [
+import SalesRequestForm from "./salesRequestForm";
+
+export const products = [
     {
-        "id": 1,
+        'external_product_ID': 1,
         "name": "Watch"
     },
     {
-        "id": 2,
+        'external_product_ID': 2,
         "name": "Laptop"
     },
     {
-        "id": 3,
+        'external_product_ID': 3,
         "name": "Phone"
     },  
     {
-        "id": 4,
+        'external_product_ID': 4,
         "name": "Tablet"
     },  
     {
-        "id": 5,
+        'external_product_ID': 5,
         "name": "TV"
     },
     {
-        "id": 6,
+        'external_product_ID': 6,
         "name": "Xbox Series X"
     },
     {
-        "id": 7,
+        'external_product_ID': 7,
         "name": "Xbox Series S"
     },
     {
-        "id": 8,
+        'external_product_ID': 8,
         "name": "Playstation 5"
     }
 ]
 
-export default products;
+export class ProductSelector {
+    constructor (parentObj) {
+        this.parent = parentObj
+
+        if(!(this.parent instanceof SalesRequestForm))
+            throw new Error('ProductSelector was invoked by an invalid parent')
+    }
+
+    products = products
+
+    //search for products in the text bar
+    searchEvt = (evt) => {
+        const value = evt.target.value;
+        if (value === '') {
+            this.parent.filteredProducts = [];
+
+        } else {
+            const lValue = value.toLowerCase();
+            this.parent.filteredProducts = this.products.filter(item => item.name.toLowerCase().includes(lValue));
+        }
+    }
+
+    //event button to add to cart
+    addProd = (evt) => {
+        const prod = evt.target.value;
+        if (this.parent.selectedProducts.includes(prod))
+            return;
+        
+        this.parent.selectedProducts.push(prod);
+        this.products = this.products.filter(item => item.id !== prod.id);
+        
+        this.parent.template.querySelector(".search").value = '';
+        this.searchEvt({target:{value: ''}})
+
+        this.parent.setDisableButton()
+    }
+
+    //event button to remove from cart
+    removeProd = (evt) => {
+        const prod = evt.target.value;
+
+        this.products.push(prod);
+        this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item.id !== prod.id);
+
+        this.parent.template.querySelector(".search").value = '';
+        this.searchEvt({target:{value: ''}})
+
+        this.parent.setDisableButton()
+    }
+}

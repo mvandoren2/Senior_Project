@@ -1,162 +1,135 @@
-import { LightningElement,api,track } from 'lwc';
-import products from './productsList';
+import { LightningElement,api } from 'lwc';
 import Id from '@salesforce/user/Id';
+import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
+import { ProductSelector } from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
-    products = products;
-    filteredProducts = [];
-    cart = [];
-    clickedButtonLabel;
-    
-
-    //check
-    @api recordId;
-
-
-    //search for products in the text bar
-    searchEvt = (evt) => {
-        const value = evt.target.value;
-        if (value === '') {
-            this.filteredProducts = [];
-        } else {
-            const lValue = value.toLowerCase();
-            this.filteredProducts = this.products.filter(item => item.name.toLowerCase().includes(lValue));
-        }
+    connectedCallback () {
+        this.getAccountId()
     }
 
-    //event button to add to cart
-    addProd = (evt) => {
-        const prod = evt.target.value;
-        if (this.cart.includes(prod)) {
-            return;
-        }
-        this.cart.push(prod);
-        this.products = this.products.filter(item => item.id !== prod.id);
-        this.searchEvt({ target: { value: '' } });
-        //document.getElementById('search').value = '' 
-        this.template.querySelector(".search").value = '';
+    @api opportunityId;
+
+    getAccountId = async () => {
+        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXpAAI'
+
+        this.account = await OpportunityData({opportunity_IDs: [opportunity_Id]})
+
+        this.accountId = this.account[0].Id    
     }
 
-    //event button to remove from cart
-    removeProd = (evt) => {
-        const prod = evt.target.value;
-        this.products.push(prod);
-        this.cart = this.cart.filter(item => item.id !== prod.id);
-        this.searchEvt({ target: { value: '' } });
-    }
-
-    //Dropdown menu for Pre-sales activities
-
-    value = ' ';
-    get options() 
-    {
-        return [
-            { label: 'Demonstration', value: 'Demo' },
-            { label: 'Guided lab', value: 'Lab' },
-            { label: 'Sandbox', value: 'SandBox' },
-            { label: 'Consult', value: 'Consult' },
-            { label: 'Host Sale Support', value: 'Support' },
-            { label: 'Shadow', value: 'Shadow' },
-            { label: 'Proposal Request', value: 'Proposal' },
-        ];
-     
-    }
+    activityTypes = [
+            { label: 'Demonstration', value: 1 },
+            { label: 'Guided lab', value: 2 },
+            { label: 'Sandbox', value: 3 },
+            { label: 'Consult', value: 4 },
+            { label: 'Host Sale Support', value: 5 },
+            { label: 'Shadow', value: 6 },
+            { label: 'Proposal Request', value: 7 },
+    ];
    
-    handleChange(event) {
-        
-        this.value = event.detail.value;
+    selectActivityType(event) {        
+        this.activityType = event.detail.value;
+
+        this.setDisableButton()
+    }
+
+    activityLevel = '';
+
+    activityLevels = [
+            { label: 'Level 1', value: 'Level 1' },
+            { label: 'Level 2', value: 'Level 2' },
+            { label: 'Level 3', value: 'Level 3' },
+            { label: 'Level 4', value: 'Level 4' },
+    ];
+   
+    selectActivityLevel(event) {        
+        this.activityLevel = event.detail.value;
+
+        this.setDisableButton()
+    }
+
+    selectedProducts = [];
+    filteredProducts = [];
     
+    productSelector = new ProductSelector(this)
+
+    locationOptions = [
+        {label: 'On Site', value: 'Onsite'},
+        {label: 'Remote', value: 'Remote'}
+    ]
+
+    location = this.locationOptions[0]
+
+    setLocation = (evt) => {
+        this.location = evt.target.value
     }
 
-    handleClick(event) {
-        this.clickedButtonLabel = event.target.label;
-    }
-    //for the new submit button
-    handleSubmit(event) 
-    {
-        console.log('onsubmit event recordEditForm'+ event.detail.fields);
-    }
-    handleSuccess(event) 
-    {
-        console.log('onsuccess event recordEditForm', event.detail.id);
-    }
-    @track description;
-    textDescription(event){
-        console.log(this.description)
-        this.description = event.target.value;
-    }
-    get disableButton(){
-       return !(this.description 
-                && this.cart.push()
-                && this.value !== ' '
-                && this.myDate_1 
-                && this.select_Time_1)
-    }
-      
+    dateInputHandler = (evt) => {
+        let name = evt.target.dataset.item
 
-    @track myDate_1 = 0;
-    dateInput_1(event){
-        this.myDate_1 = event.target.value;
-    }
-    @track select_Time_1 = 0;
-    timeInput_1(event){
-        this.select_Time_1 = event.target.value;
-    }
-    @track myDate_2 = 0;
-    dateInput_2(event){
-        this.myDate_2 = event.target.value;
-    }
-    @track select_Time_2 = 0;
-    timeInput_2(event){
-        this.select_Time_2 = event.target.value;
-    }
-    @track myDate_3 = 0;
-    dateInput_3(event){
-        this.myDate_3 = event.target.value;
-    }
-    @track select_Time_3 = 0;
-    timeInput_3(event){
-        this.select_Time_3 = event.target.value;
+        this[name] = evt.target.value
+
+        this.setDisableButton()
     }
 
-    // grab current user id 
-    currentUserId = Id;
+    alternateDates = false 
+
+    showAlternateDates = () => {
+        this.alternateDates = !this.alternateDates
+    }
+
+    notes = '';
+
+    updateNotes = (evt) => {
+        this.notes = evt.target.value;
+    }
+
+
+    isSubmitDisabled = true
+
+    setDisableButton() {
+        this.isSubmitDisabled = !(
+            this.selectedProducts.length &&
+            this.activityType !== '' &&
+            this.date1
+        )
+    }
+
+    unexpectedFlag = false
+
+    setFlag = () => {
+        this.unexpectedFlag = !this.unexpectedFlag
+    }
 
     //POST JSON ----------
     handleUploadAction(){
+        let memberId = Id ? Id : '0055f0000041g1mAAA'
+        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXpAAI'
+
         let jsonData = {
-            "createdByMember": this.currentUserId,
-            "products": [
-                {
-                        "external_product_ID": 1,
-                        "name": "Coffee"
-                    },
-                    {
-                        "external_product_ID": 2,
-                        "name": "Icecream"
-                    }
-                ],
-                "opportunity_ID": 234232,
-                "oneDateTime": this.myDate_1+"T"+this.select_Time_1,
-                "twoDateTime": this.myDate_2+"T"+this.select_Time_2,
-                "threeDateTime": this.myDate_3+"T"+this.select_Time_3,
-                "selectedDateTime": null,
-                "description": this.description,
-                "flag": false
+            "createdByMember": memberId,
+            "opportunity_ID": opportunity_Id,
+            "account_ID": this.accountId,
+            "products": this.selectedProducts,
+            "activity_Type": this.activityType,
+            "activity_Level": this.activityLevel,
+            "location": this.location,
+            "oneDateTime": this.date1,
+            "twoDateTime": this.date2 ? this.date2 : null,
+            "threeDateTime": this.date3 ? this.date3 : null,
+            "selectedDateTime": null,
+            "notes": this.notes,
+            "status": "Request",
+            "flag": this.unexpectedFlag
         }
-        fetch('http://localhost:8080/api/add_activity/', {
+        fetch('http://localhost:8080/api/activity/', {
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(jsonData),
-            })
-            .then(response => response.json())   
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
+                body: JSON.stringify(jsonData)
+
+            }).catch((error) => {
                 console.error('Error:', error);
-            }); 
-            console.log(jsonData)
+            });
     }
 }
-
