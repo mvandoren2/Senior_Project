@@ -71,7 +71,7 @@ class Activity(models.Model):
       ('Complete', 'complete'),
    ]
    
-   Activity_level = [
+   activity_Levels = [
       ('Level 1', 'Level 1: PowerPoint'),
       ('Level 2', 'Level 2: Demo'),
       ('Level 3', 'Level 3: Requirements'),
@@ -87,11 +87,11 @@ class Activity(models.Model):
    opportunity_ID = models.CharField(max_length=100)
    account_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
-   activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, blank=True, null=True)    
-   activity_Level = models.CharField(max_length=50, choices = Activity_level, default = 'Level 1')
+   activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE)    
+   activity_Level = models.CharField(max_length=50, choices = activity_Levels, default = 'Level 1')
    createdByMember = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(Member, blank=True)
-   oneDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
+   oneDateTime = models.DateTimeField(help_text = "Year-Month-Day Hour:Minute:Second")
    twoDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    threeDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    selectedDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")

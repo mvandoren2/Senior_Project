@@ -1,4 +1,6 @@
 
+from asyncio.windows_events import NULL
+from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,24 +18,25 @@ def getActivity(request):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
 
-        date1 = activity['oneDateTime']
-        if(date1):
-            date1 = date1.split(".")[0] + "Z"
+        #add activity type
+        activity_type_ID = searchActivityType(activity['activity_Type'])
 
-        date2 = activity['twoDateTime']
-        if(date2):
-            date2 = date2.split(".")[0] + "Z"
+        request_activity_Type = ActivityType.objects.get(type_ID=activity_type_ID)        
 
-        date3 = activity['threeDateTime']
-        if(date3):
-            date3 = date3.split(".")[0] + "Z"
-
-        sdate = activity['selectedDateTime']
-        if(sdate):
-            sdate = sdate.split(".")[0] + "Z"
+        date1 = datetime.fromisoformat(activity['oneDateTime'].split('.')[0] + '+00:00')
         
         #create a new activity
-        newActivity = Activity(opportunity_ID=activity['opportunity_ID'], account_ID = activity['account_ID'], location = activity['location'], activity_Level = activity['activity_Level'], oneDateTime=date1, twoDateTime=date2, threeDateTime=date3, selectedDateTime=sdate, description=activity['description'], status = activity['status'], flag=activity['flag'])
+        newActivity = Activity(
+            opportunity_ID=activity['opportunity_ID'], 
+            account_ID = activity['account_ID'], 
+            location = activity['location'], 
+            activity_Type = request_activity_Type,
+            activity_Level = activity['activity_Level'], 
+            oneDateTime=date1,
+            status = activity['status'], 
+            flag=activity['flag']
+        )
+
         newActivity.save()
 
         #add presales_member_ID to the activity
@@ -51,9 +54,19 @@ def getActivity(request):
         for p in arrP:
             newActivity.products.add(p)
 
-        #add activity type
-        activity_type = searchActivityType(activity['activity_Type'])
-        newActivity.activty_Type = activity_type
+        newActivity.save()
+
+        #set selectedDateTime if necessary
+        if((not activity['twoDateTime']) and (not activity['twoDateTime'])):
+            newActivity.selectedDateTime = date1
+
+        else:
+            if(activity['twoDateTime']):
+                newActivity.twoDateTime = activity['twoDateTime']
+
+            if(activity['threeDateTime']):
+                newActivity.threeDateTime = activity['threeDateTime']
+
         newActivity.save()
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
@@ -112,9 +125,10 @@ def getActivity(request):
 @csrf_exempt
 @api_view(['GET'])
 def getActivities(request):
+    query = Activity.objects.all()
+    
     if(request.GET.get('opportunity_ID') or request.GET.get('account_ID') or request.GET.get('createdByMember') or request.GET.get('members') or request.GET.get('products') or request.GET.get('status') or request.GET.get('flag')):
         #query whatever is passed in
-        query = Activity.objects.all()
         new_query = Activity.objects.none()
 
         if(request.GET.get('opportunity_ID')):
@@ -136,8 +150,8 @@ def getActivities(request):
         serializer = ActivitySerializer(new_query, many=True)
         return Response(serializer.data)
     else:
-        activities = Activity.objects.all()
-        serializer = ActivitySerializer(activities, many=True)
+        serializer = ActivitySerializer(query, many=True)
+
         return Response(serializer.data)
 
 @api_view(['GET'])

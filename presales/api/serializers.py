@@ -39,13 +39,13 @@ class MemberSerializer(serializers.ModelSerializer):
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityType
-        fields = '__all__'	
+        fields = '__all__'
         
 class ActivitySerializer(serializers.ModelSerializer):
     members = MemberSerializer(read_only=True, many=True)
     products = ProductSerializer(read_only=True, many=True)
     createdByMember = MemberSerializer(read_only=True)
-    Activity_Type = ActivityTypeSerializer(read_only=True)
+    activity_Type = ActivityTypeSerializer(read_only=True)
 
     class Meta:
         model = Activity
