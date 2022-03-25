@@ -4,16 +4,6 @@ import Id from "@salesforce/user/Id"
 
 export const url = 'http://localhost:8080/api/'
 
-const activityTypes = [
-    { label: 'Demonstration', value: 1 },
-    { label: 'Guided lab', value: 2 },
-    { label: 'Sandbox', value: 3 },
-    { label: 'Consult', value: 4 },
-    { label: 'Host Sale Support', value: 5 },
-    { label: 'Shadow', value: 6 },
-    { label: 'Proposal Request', value: 7 },
-];
-
 export class TableDataHandler {
     emptyActivity = {
         id: '',
@@ -68,13 +58,24 @@ export class TableDataHandler {
 
     //builds a formatted string from a JS Date object
     dateStringUtil = (date) => {
-        const days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat']
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
-        const pm = date.getHours() > 11
-    
-        return days[date.getDay()] + ' ' + 
-            months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear() + ' ' +
-            ' @ ' + date.getHours() % 12 + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + (pm ? 'PM' : 'AM')
+        let dateString = 'Optional'
+        
+        const dateDisplayOptions = {
+            weekday:'short', 
+            month:"numeric", 
+            day:'numeric', 
+            year:'2-digit', 
+            hour:'numeric', 
+            minute:'2-digit', 
+            hourCycle:'h12'
+        }
+
+        if(date !== null) {
+            dateString = new Date(date)
+            dateString = dateString > new Date() ? dateString.toLocaleString('en-US', dateDisplayOptions) : 'Requested date passed'
+        }
+
+        return dateString
     }
     
     getMemberByID = (member_ID) => {
@@ -100,15 +101,16 @@ export class TableDataHandler {
         let newRow = Object.assign({}, this.emptyActivity)
 
         const opportunity = this.getOpportunity(request.opportunity_ID)
-        let selectedDate = new Date(request.selectedDateTime)
-        
+
+        const selectedDate = this.dateStringUtil(request.selectedDateTime)
+                    
         newRow.id = request.activity_ID
         newRow.account = opportunity.AccountName
         newRow.opportunity = opportunity.Name
         newRow.product = request.products.map((str) =>(str.name ? str.name : str.Name)).join(', ')
-        newRow.activity = activityTypes[request.activity_Type ? request.activity_Type : 1].label + ' ' + request.activity_Level
+        newRow.activity = request.activity_Type.name + ' ' + request.activity_Level
         newRow.location = request.location
-        newRow.date =  selectedDate > new Date() ? this.dateStringUtil(selectedDate) : ''
+        newRow.date =  selectedDate
         newRow.submittedBy = this.getMemberByID(request.createdByMember.external_member_ID).Name
         newRow.presalesTeam = this.getTeamMembers(request).map((str) =>(str.name ? str.name : str.Name)).join(', ')
         newRow.status = request.status
