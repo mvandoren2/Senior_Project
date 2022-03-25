@@ -4,6 +4,16 @@ import Id from "@salesforce/user/Id"
 
 export const url = 'http://localhost:8080/api/'
 
+const activityTypes = [
+    { label: 'Demonstration', value: 1 },
+    { label: 'Guided lab', value: 2 },
+    { label: 'Sandbox', value: 3 },
+    { label: 'Consult', value: 4 },
+    { label: 'Host Sale Support', value: 5 },
+    { label: 'Shadow', value: 6 },
+    { label: 'Proposal Request', value: 7 },
+];
+
 export class TableDataHandler {
     emptyActivity = {
         id: '',
@@ -11,10 +21,10 @@ export class TableDataHandler {
         opportunity: '',
         product: '',
         activity: '',
-        time: '',
+        date: '',
         location: '',
         submittedBy: '',
-        description: '',
+        presalesTeam: '',
         status: ''
     }
 
@@ -75,7 +85,7 @@ export class TableDataHandler {
     
     getTeamMembers = (request) => {
         return request.members
-            .map(member => this.getMemberByID(member.external_presales_member_ID))
+            .map(member => this.getMemberByID(member.external_member_ID))
             .filter(member => member)
     }
     
@@ -96,11 +106,11 @@ export class TableDataHandler {
         newRow.account = opportunity.AccountName
         newRow.opportunity = opportunity.Name
         newRow.product = request.products.map((str) =>(str.name ? str.name : str.Name)).join(', ')
-        newRow.activity = request.activtyType
+        newRow.activity = activityTypes[request.activity_Type ? request.activity_Type : 1].label + ' ' + request.activity_Level
         newRow.location = request.location
-        newRow.time =  selectedDate > new Date() ? this.dateStringUtil(selectedDate) : ''
-        newRow.submittedBy = this.getTeamMembers(request).map((str) =>(str.name ? str.name : str.Name)).join(', ')
-        newRow.description = request.description
+        newRow.date =  selectedDate > new Date() ? this.dateStringUtil(selectedDate) : ''
+        newRow.submittedBy = this.getMemberByID(request.createdByMember.external_member_ID).Name
+        newRow.presalesTeam = this.getTeamMembers(request).map((str) =>(str.name ? str.name : str.Name)).join(', ')
         newRow.status = request.status
     
         return newRow
