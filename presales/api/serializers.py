@@ -34,7 +34,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        fields = ('external_presales_member_ID', 'user_role', 'proficiency')
+        fields = ('external_member_ID', 'user_role', 'proficiency')
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:

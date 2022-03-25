@@ -42,8 +42,8 @@ class Member(models.Model):
    proficiency = models.ManyToManyField(Proficiency, blank=True)
 
    class meta:
-      verbose_name = 'Presales Member'
-      verbose_name_plural = 'Presales Members'
+      verbose_name = 'Member'
+      verbose_name_plural = 'Members'
 
    def __str__(self):
       return str(self.member_ID)

@@ -42,7 +42,7 @@ def getActivity(request):
             member = [member]
         member = searchMember(member)
         member = member[0]
-        newActivity.createdByMember = Member.objects.get(presales_member_ID=member)
+        newActivity.createdByMember = Member.objects.get(member_ID=member)
         newActivity.save()
 
         #add product_ID to the activity
@@ -68,7 +68,7 @@ def getActivity(request):
 
             #remove members from the update activity if they do not exist in the memberForm
             for m in updateActivity.members.all():
-                if(m.external_presales_member_ID not in members):
+                if(m.external_member_ID not in members):
                     updateActivity.members.remove(m)
 
             arrM = searchMember(members)
@@ -173,12 +173,12 @@ def getMembers(request):
         member = json.loads(request.body)
 
         #get the external_presales_member_ID from member
-        memberId = member['external_presales_member_ID']
+        memberId = member['external_member_ID']
 
         #make memberId into an int and in a list
         memberId = [int(memberId)]
 
-        myMember = Member.objects.get(presales_member_ID=searchMember(memberId)[0])
+        myMember = Member.objects.get(member_ID=searchMember(memberId)[0])
         myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
         for prof in member['proficiency']:
             myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['level']))
@@ -190,7 +190,7 @@ def getMembers(request):
 def getMember(request, id):
     try:
         print(id)
-        member = Member.objects.filter(external_presales_member_ID=id)
+        member = Member.objects.filter(external_member_ID=id)
         serializer = MemberSerializer(member, many=True)
         return Response(serializer.data[0])
     except:
