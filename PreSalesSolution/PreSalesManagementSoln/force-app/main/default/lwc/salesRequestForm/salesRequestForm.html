@@ -37,12 +37,13 @@
                 </ul>
             </div>
 
-            <div class="slds-grid slds-gutters_x-small">
+            <div class="slds-grid slds-gutters_xx-small">
             
                 <lightning-combobox name="activity_type" 
-                                    label="Activity Type" 
+                                    label="Activity Type"
+                                    placeholder="Select activity type" 
                                     options={activityTypes}
-                                    class="slds-col slds-size_2-of-3"
+                                    class="slds-col slds-size_3-of-5"
                                     onchange={selectActivityType} 
                                     required >
                 </lightning-combobox>
@@ -51,7 +52,7 @@
                                     label="Activity Level" 
                                     placeholder="Select activity level" 
                                     options={activityLevels}
-                                    class="slds-col slds-size_1-of-3" 
+                                    class="slds-col slds-size_2-of-5" 
                                     onchange={selectActivityLevel} 
                                     required >
                 </lightning-combobox>
@@ -60,11 +61,10 @@
 
             <lightning-combobox name="location" 
                                 label="Location" 
-                                value={defaultLocation} 
+                                value={location} 
                                 options={locationOptions} 
                                 class="slds-var-p-top_small slds-var-p-bottom_small" 
-                                onchange={setLocation} 
-                                required >
+                                onchange={setLocation} >
             </lightning-combobox>
 
             <abbr title="required" class="slds-required">*</abbr>

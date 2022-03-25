@@ -1,0 +1,162 @@
+<!-- sldsValidatorIgnore -->
+<template>
+    <!--Title of the Form -->  
+    <lightning-card title="MY OPPORTUNITY" icon-name="action:new_opportunity">     
+    
+        <!--opening the Opportunity api object, to retieve ID-->
+        <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity"
+            onsuccess={handleSuccess} onsubmit ={handleSubmit}> 
+
+            <!--Check box...for unknown reason -->
+            
+            <div class="slds-clearfix">
+                <div class="slds-align_absolute-center">  
+                    <label for = "checkbox"> Unexpected Event</label>                            
+                    <lightning-input label="checkbox" variant="label-hidden" type="checkbox"> </lightning-input> 
+                </div>
+            </div>
+            
+    
+            <!--Drop down Menu...select Presales Activities -->
+            <div class="slds-m-around_medium">
+                <div>
+                    <lightning-combobox 
+                        name="Available"
+                        label="Pre-Sales Activities"
+                        value={value}
+                        placeholder="Select Progress"
+                        options={options}                            
+                        onchange={handleChange} >
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <!--Search Products..add and remove -->
+            <div class="slds-m-around_medium search-table search-wrapper">
+                <label for="search">Search Products</label>
+                <lightning-input class="search" label=" " type="search" id="search" onchange={searchEvt}></lightning-input>
+                <ul class="slds-m-around_medium">
+                    <template for:each={filteredProducts} for:item="product">
+                        <li key={product.id}>
+                            {product.name}
+                            <lightning-button value={product} variant="success" label="Add" title="Successful action" onclick={addProd} class="slds-m-left_x-small"></lightning-button>
+                        </li>
+                    </template>
+                    <template for:each={cart} for:item="prod">
+                        <li key={prod.id}>
+                            {prod.name}
+                            <lightning-button value={prod} variant="destructive" label="Remove" title="Destructive action" onclick={removeProd} class="slds-m-left_x-small"></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+    
+            <!--Date and Time Request 01-->
+            <div>
+                <div class="slds-clearfix"> 
+                    <div class="slds-align_absolute-center">
+                        <p> <strong>Date/Time Option 1:</strong></p>
+                    </div>
+                </div>
+                <div style="display: table-row">
+                    <div style="width: 100xp; display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p> Date Requested: </p>
+                                <lightning-input type="date" id="date_1" label="Date_1" variant="label-hidden" name="DATE_START"
+                                    
+                                    min=" " max=" " onchange={dateInput_1}> 
+                                </lightning-input>   
+                            </div>   
+                        </div>       
+                    </div>
+                    <div style="display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p> Time Request: </p>
+                                <lightning-input type="time" id="time_1" label="Time_2" variant="label-hidden" name="appt" onchange={timeInput_1}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Date and Time Request 02-->
+                <div class="slds-clearfix"> 
+                    <div class="slds-align_absolute-center">
+                        <p><strong> Date/Time Option 2:</strong> </p>
+                    </div>
+                </div>
+                <div style="display: table-row">
+                    <div style="width: 100xp; display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p> Date Requested: </p>
+                                <lightning-input type="date" id="date_2" label="Date_2" variant="label-hidden" name="DATE_START"
+                                    
+                                    min=" " max=" " onchange={dateInput_2}> 
+                                </lightning-input>
+                            </div>
+                        </div>       
+                    </div>
+                    <div style="display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p>Time Request:</p>
+                                <lightning-input type="time" id="time_2" label="Time_2" variant="label-hidden" name="appt"  onchange={timeInput_2}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Date and Time Request 02-->
+                <div class="slds-clearfix"> 
+                    <div class="slds-align_absolute-center">
+                        <p><strong>Date/Time Option 3:</strong></p>
+                    </div>
+                </div>
+                <div style="display: table-row">
+                    <div style="width: 100xp; display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p> Date Requested: </p>
+                                <lightning-input type="date" id="date_3" label="Date_3" variant="label-hidden" name="DATE_START"
+                                    
+                                    min=" " max=" " onchange={dateInput_3}> 
+                                </lightning-input>
+                            </div>
+                        </div>       
+                    </div>
+                    <div style="display: table-cell;">
+                        <div class="slds-grid slds-p-around_small">
+                            <div class="slds-p-around_small">
+                                <p> Time Request: </p>
+                                <lightning-input type="time" id="time_3" label="Time_3" variant="label-hidden" name="appt" onchange={timeInput_3}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Text Description-->
+            <div>
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="textarea-id-01"><b>Request Description</b></label>
+                    <div class="slds-form-element__control">
+                        <lightning-textarea id="textarea" label="description" variant="label-hidden" class="slds-textarea" onchange ={textDescription} style="resize:none" placeholder="Write your description here...."></lightning-textarea> 
+                    </div>
+                </div>
+            </div>
+
+            <!--Submit button class="button"-->
+            <div class="button">
+                <lightning-button variant="submit" label="Submit" type = "button" class="slds-m-left_small" disabled ={disableButton} title="Submit" onclick={handleUploadAction} ></lightning-button>
+            </div> 
+
+        </lightning-record-edit-form>
+    </lightning-card> 
+
+
+</template>

@@ -19,13 +19,13 @@ export default class SalesRequestForm extends LightningElement {
     }
 
     activityTypes = [
-            { label: 'Demonstration', value: 1 },
-            { label: 'Guided lab', value: 2 },
-            { label: 'Sandbox', value: 3 },
-            { label: 'Consult', value: 4 },
-            { label: 'Host Sale Support', value: 5 },
-            { label: 'Shadow', value: 6 },
-            { label: 'Proposal Request', value: 7 },
+            { label: 'Demonstration', value: '1' },
+            { label: 'Guided lab', value: '2' },
+            { label: 'Sandbox', value: '3' },
+            { label: 'Consult', value: '4' },
+            { label: 'Host Sale Support', value: '5' },
+            { label: 'Shadow', value: '6' },
+            { label: 'Proposal Request', value: '7' },
     ];
    
     selectActivityType(event) {        
@@ -59,7 +59,7 @@ export default class SalesRequestForm extends LightningElement {
         {label: 'Remote', value: 'Remote'}
     ]
 
-    location = this.locationOptions[0]
+    location = this.locationOptions[0].value
 
     setLocation = (evt) => {
         this.location = evt.target.value
@@ -85,6 +85,12 @@ export default class SalesRequestForm extends LightningElement {
         this.notes = evt.target.value;
     }
 
+    unexpectedFlag = false
+
+    setFlag = () => {
+        this.unexpectedFlag = !this.unexpectedFlag
+    }
+
 
     isSubmitDisabled = true
 
@@ -92,14 +98,9 @@ export default class SalesRequestForm extends LightningElement {
         this.isSubmitDisabled = !(
             this.selectedProducts.length &&
             this.activityType !== '' &&
+            this.activityLevel !== '' &&
             this.date1
         )
-    }
-
-    unexpectedFlag = false
-
-    setFlag = () => {
-        this.unexpectedFlag = !this.unexpectedFlag
     }
 
     //POST JSON ----------
@@ -112,14 +113,12 @@ export default class SalesRequestForm extends LightningElement {
             "opportunity_ID": opportunity_Id,
             "account_ID": this.accountId,
             "products": this.selectedProducts,
-            "activity_Type": this.activityType,
+            "activity_Type": parseInt(this.activityType, 10),
             "activity_Level": this.activityLevel,
             "location": this.location,
             "oneDateTime": this.date1,
             "twoDateTime": this.date2 ? this.date2 : null,
             "threeDateTime": this.date3 ? this.date3 : null,
-            "selectedDateTime": null,
-            "notes": this.notes,
             "status": "Request",
             "flag": this.unexpectedFlag
         }
