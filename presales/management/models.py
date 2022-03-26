@@ -91,6 +91,7 @@ class Activity(models.Model):
    activity_Level = models.CharField(max_length=50, choices = activity_Levels, default = 'Level 1')
    createdByMember = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(Member, blank=True)
+   leadMember =  models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='leadMember')
    oneDateTime = models.DateTimeField(help_text = "Year-Month-Day Hour:Minute:Second")
    twoDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    threeDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")

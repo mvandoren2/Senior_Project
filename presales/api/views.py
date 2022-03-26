@@ -1,6 +1,7 @@
 
 from asyncio.windows_events import NULL
 from datetime import datetime
+from re import L
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -14,7 +15,7 @@ import json
 # - Needs to fix POST and fix patch
 @csrf_exempt
 @api_view(['POST', 'PATCH'])
-def getActivity(request):
+def getActivity(request, activityID):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
 
@@ -73,7 +74,7 @@ def getActivity(request):
     elif(request.method == 'PATCH'):
         activity_patch = json.loads(request.body)
 
-        updateActivity = Activity.objects.get(activity_ID=activity_patch['activity_ID'])
+        updateActivity = Activity.objects.get(activity_ID=(activity_patch['activity_ID'], activityID)[activityID])
 
         #check to see if the json contains a members
         if('members' in activity_patch):
@@ -87,6 +88,11 @@ def getActivity(request):
             arrM = searchMember(members)
             for m in arrM:
                 updateActivity.members.add(m)
+
+        if('leadMember' in activity_patch):
+            updateActivity.leadMember = activity_patch['leadMember']
+            updateActivity.save()
+
 
         if('description' in activity_patch):
             updateActivity.description = activity_patch['description']
