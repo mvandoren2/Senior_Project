@@ -30,7 +30,7 @@
                                                                 </lightning-button-icon>
 
                                             <img src={user.FullPhotoUrl} alt="Image" class="assignedImg">
-                                            {user.Name} hello
+                                            {user.Name}
                                             <input data-item={user.Id} type="checkbox" name="selectedMember" value="member" class="checkbox" onclick={handleCheckbox}>
                                                 <template for:each={user.proficiency} for:item="inner">
                                                     <li key={inner.product.name} class="helpText">

@@ -167,7 +167,7 @@ export default class AssignTeamModal extends LightningElement {
     //push the data to backend
     pushData(){
 
-            activity_ID = this.activity.activity_ID;
+            let activity_ID = this.activity.activity_ID;
     
             //create a json to push
             let pushingData = {
