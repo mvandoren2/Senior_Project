@@ -88,7 +88,7 @@ def getActivity(request, activityID):
     elif(request.method == 'PATCH'):
         activity_patch = json.loads(request.body)
 
-        updateActivity = Activity.objects.get(activity_ID=(activity_patch['activity_ID'], activityID)[activityID])
+        updateActivity = Activity.objects.get(activity_ID=activityID)
 
         #check to see if the json contains a members
         if('members' in activity_patch):
