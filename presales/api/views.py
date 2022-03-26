@@ -14,8 +14,8 @@ import json
 #Need to fix this
 # - Needs to fix POST and fix patch
 @csrf_exempt
-@api_view(['POST', 'PATCH'])
-def getActivity(request, activityID):
+@api_view(['POST'])
+def addActivity(request):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
 
@@ -71,6 +71,20 @@ def getActivity(request, activityID):
         newActivity.save()
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['GET', 'PATCH'])    
+def getActivity(request, activityID):
+    if(request.method == 'GET'):
+        try:
+            activity = Activity.objects.filter(activity_ID=activityID)
+            serializer = ActivitySerializer(activity, many=True)
+
+            return Response(serializer.data[0])
+        
+        except:
+            return Response(status=204)
+
     elif(request.method == 'PATCH'):
         activity_patch = json.loads(request.body)
 
@@ -93,8 +107,7 @@ def getActivity(request, activityID):
             updateActivity.leadMember = activity_patch['leadMember']
             updateActivity.save()
 
-
-        if('description' in activity_patch):
+        if('notes' in activity_patch):
             updateActivity.description = activity_patch['description']
             updateActivity.save()
         
