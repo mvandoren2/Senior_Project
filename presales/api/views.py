@@ -115,10 +115,6 @@ def getActivity(request, activityID):
             updateActivity.leadMember = activity_patch['leadMember']
             updateActivity.save()
 
-        if('notes' in activity_patch):
-            updateActivity.description = activity_patch['description']
-            updateActivity.save()
-        
         if('status' in activity_patch):
             updateActivity.status = activity_patch['status']
             updateActivity.save()
@@ -188,9 +184,22 @@ def getActiveActvivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
+
+@api_view(['GET'])
+def getAcceptedActivities(request):
+    activities = Activity.objects.filter(status__in=['Accept', 'Scheduled'])
+    serializer = ActivitySerializer(activities, many=True)
+    return Response(serializer.data)
+
 @api_view(['GET'])
 def getRequestActivities(request):
     activities = Activity.objects.filter(status__in=['Reschedule', 'Request'])
+    serializer = ActivitySerializer(activities, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def getPastActivities(request):
+    activities = Activity.objects.filter(status__in=['Cancel', 'Expire', 'Complete'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
@@ -214,7 +223,7 @@ def getMembers(request):
         member = json.loads(request.body)
 
         #get the external_presales_member_ID from member
-        memberId = member['external_member_ID']
+        memberId = member['member_ID']
 
         #make memberId into an int and in a list
         memberId = [int(memberId)]
@@ -222,7 +231,7 @@ def getMembers(request):
         myMember = Member.objects.get(member_ID=searchMember(memberId)[0])
         myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
         for prof in member['proficiency']:
-            myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['level']))
+            myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['product']['level']))
         myMember.save()
 
         return HttpResponse(json.dumps(member), content_type="application/json")
@@ -277,8 +286,10 @@ def getActivityNotes(request, activityID):
         return Response(serializers.data)
     elif(request.method == 'POST'):
         note = json.loads(request.body)
+        memberID = searchMember([note['member']])[0]
+
         act = Activity.objects.get(activity_ID=activityID)
-        mem = Member.objects.get(member_ID=note['member'])
+        mem = Member.objects.get(member_ID=memberID)
         newNote = Note(member = mem, note_text = note['note_text'], activity = act)
         newNote.save()
         return HttpResponse(json.dumps(note), content_type="application/json")

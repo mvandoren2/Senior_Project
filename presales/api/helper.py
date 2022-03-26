@@ -24,7 +24,7 @@ def searchProduct(products):
             arrP.append(prod[0].product_ID)
         else:
             #save the external_presales_member_ID and return the presales_member_ID
-            newProd = Product(external_product_ID=p['external_product_ID'], name=p['name'])
+            newProd = Product(external_product_ID=p['product_ID'], name=p['name'])
             newProd.save()
             arrP.append(newProd.product_ID)
 
