@@ -1,5 +1,6 @@
 from datetime import datetime
 from re import L
+from turtle import up
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -67,6 +68,15 @@ def addActivity(request):
                 newActivity.threeDateTime = activity['threeDateTime']
 
         newActivity.save()
+
+        if('notes' in activity):
+            newNote = Note(
+                activity=newActivity,
+                member=newActivity.createdByMember,
+                note_text=activity['notes']
+            )
+
+            newNote.save()
 
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
 
