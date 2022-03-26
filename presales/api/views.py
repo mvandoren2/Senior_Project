@@ -1,5 +1,3 @@
-
-from asyncio.windows_events import NULL
 from datetime import datetime
 from re import L
 from django.views.decorators.csrf import csrf_exempt
