@@ -12,7 +12,7 @@ export default class AssignTeamModal extends LightningElement {
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
 
         this.isShowing = !this.isShowing
-        
+
         //execute the function only once
         if(row !== undefined && row !== this.activity) {
             this.activity = row;
@@ -37,6 +37,8 @@ export default class AssignTeamModal extends LightningElement {
     @track filteredSelectedUsersInfo;
     @track filteredUnAssignedUsersInfo;
     selectedUsersId = [];
+    @track leadMember = [];
+    @track leadMemberId = "";
 
     //fetch all members and selected members from djangodb
     membersFetched = false;
@@ -45,7 +47,7 @@ export default class AssignTeamModal extends LightningElement {
         this.djangoUsers = members;
 
         //save the id of all the members in the db
-        this.djangoUserID = this.djangoUsers.map(user => user.external_presales_member_ID)
+        this.djangoUserID = this.djangoUsers.map(user => user.external_member_ID)
                     
         this.membersFetched = true;
     }
@@ -70,7 +72,7 @@ export default class AssignTeamModal extends LightningElement {
         if(!this.membersFetched) await this.handleAllFetch();
 
         //fetch data of selected users and save their id to arrays
-        this.selectedUsersId = this.activity.members.map(member => member.external_presales_member_ID)
+        this.selectedUsersId = this.activity.members.map(member => member.external_member_ID)
         this.djangoActivityUsersId = [...this.selectedUsersId]
 
         //get the users from salesforce, compare the ids to all members and if match save to any array
@@ -81,17 +83,26 @@ export default class AssignTeamModal extends LightningElement {
         //add proficiency field to all users
 
         commonUsersInfo.forEach((user, i) => {
-            let djangoUser = this.djangoUsers.filter(dUser => dUser.external_presales_member_ID === user.Id)[0]
+            let djangoUser = this.djangoUsers.filter(dUser => dUser.external_member_ID === user.Id)[0]
 
             let commonUser = Object.create(user)
                 
             commonUser.proficiency = djangoUser.proficiency
+            commonUser.role = djangoUser.user_role
 
             this.commonUsersInfo[i] = commonUser
         })
 
         //get the users from salesforce, compare the ids to selected members and if match save to any array
         this.selectedUsersInfo = this.commonUsersInfo.filter(user => this.djangoActivityUsersId.includes(user.Id))
+
+
+        this.selectedUsersInfo.forEach((user, i) => {
+            if(this.selectedUsersInfo[i].role.name === "Lead Member"){
+                this.leadMemberId = this.selectedUsersInfo[i].Id;
+                this.leadMember.push(this.selectedUsersInfo[i]);
+            }
+        })
 
         //get all the unassigned users by filtering selcted and all
         this.unAssignedUsersInfo = this.commonUsersInfo.filter(val => !this.selectedUsersInfo.includes(val));
@@ -109,49 +120,79 @@ export default class AssignTeamModal extends LightningElement {
     }
 
     //onclick change the button label and save the data to selected array
-    handleClick(evt) {
+    handleAssign(evt) {
         if(evt.target.label === "Assign"){
-            evt.target.label = "UnAssign";
             this.selectedUsersId.push(evt.target.dataset.item);
-        } else {
-            evt.target.label = "Assign"
+            let index;
 
-           //remove the unassigned user
-           const index = this.selectedUsersId.indexOf(evt.target.dataset.item);
-           if(index > -1){
-               this.selectedUsersId.splice(index, 1);
-           }
+            for(let i=0; i < this.filteredUnAssignedUsersInfo.length; i++){
+                if(this.filteredUnAssignedUsersInfo[i].Id == evt.target.dataset.item){
+                    this.selectedUsersInfo.push(this.filteredUnAssignedUsersInfo[i]);
+                    index = i;
+                }
+            }
+
+            if(index > -1){
+                this.filteredUnAssignedUsersInfo.splice(index, 1);
+            }
+            
         }
+    }
+
+    handleRemove(evt){
+        let index;
+        for(let i=0; i < this.selectedUsersInfo.length; i++){
+            if(this.selectedUsersInfo[i].Id == evt.target.dataset.item){
+                this.filteredUnAssignedUsersInfo.push(this.selectedUsersInfo[i]);
+                index = i;
+            }
+        }
+
+        if(index > -1){
+            this.selectedUsersInfo.splice(index, 1);
+        }
+
+        //remove the unassigned user
+        const anotherIndex = this.selectedUsersId.indexOf(evt.target.dataset.item);
+        if(index > -1){
+            this.selectedUsersId.splice(index, 1);
+        }
+    }
+
+    handleCheckbox(evt){
+        this.leadMemberId = evt.target.dataset.item;
+        console.log(this.leadMemberId);
     }
 
     //push the data to backend
     pushData(){
-        //create a json to push
-        let pushingData = {
-            'activity_ID': this.activity.activity_ID,
-            'members': this.selectedUsersId
-        };
-        fetch('http://localhost:8080/api/activity/', {
-            method: 'PATCH', 
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(pushingData),
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
 
+            activity_ID = this.activity.activity_ID;
+    
+            //create a json to push
+            let pushingData = {
+                'members': this.selectedUsersId
+            };
+
+            fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
+                method: 'PATCH', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pushingData),
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
 
     //save button action
     pushDataAndToggle(){
         this.pushData();
-        this.toggleAndReload();
+        this.toggleShow();
     }
 
-    //closing the modal
-    toggleAndReload(){
+    closeModal(){
         this.toggleShow();
     }
 }

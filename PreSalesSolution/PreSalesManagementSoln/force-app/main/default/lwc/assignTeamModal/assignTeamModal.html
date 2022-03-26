@@ -7,7 +7,7 @@
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
                             title="Close" 
-                            onclick={toggleAndReload}>
+                            onclick={closeModal}>
                         <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
                         <span class="slds-assistive-text">Close</span>
                     </button>
@@ -16,79 +16,73 @@
 
                    <!-- Modal/Popup Box LWC body starts here -->
                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <div onchange={searchUsers}>
-                        <lightning-input
-                            name="enter-search"
-                            label="Search with Name/Proficency Level"
-                            type="search"
-                        ></lightning-input>
-                    </div>
+                        <h1>Team</h1>
+                        <template if:true={selectedUsersInfo}>
+                            <template for:each={selectedUsersInfo} for:item="user">
+                                <ul class="selectedUlList" key={user.Id}>
+                                    <li class="selectedLiList">
+                                        <div class="smallCard">
+                                            <lightning-button-icon data-item={user.Id} 
+                                                                   icon-name="utility:close"
+                                                                   variant="bare" alternative-text="remove user" 
+                                                                   class="slds-m-left_xx-small my-round-button" 
+                                                                   title="remove user" onclick={handleRemove}>
+                                                                </lightning-button-icon>
 
-                    <lightning-tabset active-tab-value={modalTab}>
-                        <lightning-tab label="Unassigned" title="2nd tab extended title" value="Unassigned">
-                            <template if:true={filteredUnAssignedUsersInfo}>
-                                <template for:each={filteredUnAssignedUsersInfo} for:item="user">
-                                    <ul key={user.Id}>
-                                        <li> 
-                                            <div class="card">
-                                                <img src={user.FullPhotoUrl} alt="Image">
-                                                <div class="userInfo">
-                                                    <span style="font-weight: bold; font-size: 15px">{user.Name}</span>
-                                                    <ul>
-                                                        <template for:each={user.proficiency} for:item="inner">
-                                                            <li key={inner.product.name}>
-                                                                {inner.product.name}:
-                                                                {inner.level}       
-                                                            </li>
-                                                        </template>
-                                                    </ul>
-                                                </div>
-                                                <lightning-button data-item = {user.Id} 
-                                                                    variant="brand"
-                                                                    label="Assign" title="Assign/UnAssign" 
-                                                                    onclick={handleClick} 
-                                                                    class="slds-m-left_x-small assignBtn">
-                                                </lightning-button>       
-                                            </div>             
-                                        </li>
-                                    </ul>
-                                </template>
-                            </template>              
-                        </lightning-tab>
-                        <lightning-tab label="Assigned" value="Assigned">
-                            <template if:true={filteredSelectedUsersInfo}>
-                                <template for:each={filteredSelectedUsersInfo} for:item="user">
-                                    <ul key={user.Id}>
-                                        <li> 
-                                            <div class="card">
-                                                <img src={user.FullPhotoUrl} alt="Image">
-                                                <div class="userInfo">
-                                                    <span style="font-weight: bold; font-size: 15px">{user.Name}</span>
+                                            <img src={user.FullPhotoUrl} alt="Image" class="assignedImg">
+                                            {user.Name} hello
+                                            <input data-item={user.Id} type="checkbox" name="selectedMember" value="member" class="checkbox" onclick={handleCheckbox}>
+                                                <template for:each={user.proficiency} for:item="inner">
+                                                    <li key={inner.product.name} class="helpText">
+                                                        Proficiency:<br>
+                                                        {inner.product.name}:
+                                                        {inner.level}  
+                                                    </li>
+                                                </template>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </template>
+                        </template>
+                        <div onchange={searchUsers}>
+                            <lightning-input
+                                name="enter-search"
+                                label="Search with Name/Proficency Level"
+                                type="search"
+                            ></lightning-input>
+                        </div>
+                        <template if:true={filteredUnAssignedUsersInfo}>
+                            <template for:each={filteredUnAssignedUsersInfo} for:item="user">
+                                <ul key={user.Id}>
+                                    <li> 
+                                        <div class="card">
+                                            <img src={user.FullPhotoUrl} alt="Image" class="unassignedImg">
+                                            <div class="userInfo">
+                                                <span style="font-weight: bold; font-size: 15px">{user.Name}</span>
+                                                <ul>
                                                     <template for:each={user.proficiency} for:item="inner">
                                                         <li key={inner.product.name}>
                                                             {inner.product.name}:
                                                             {inner.level}       
                                                         </li>
                                                     </template>
-                                                </div>
-                                                <lightning-button data-item = {user.Id} 
-                                                                    variant="brand"
-                                                                    label="Unassign" title="Assign/UnAssign" 
-                                                                    onclick={handleClick} 
-                                                                    class="slds-m-left_x-small assignBtn">
-                                                </lightning-button>       
-                                            </div>        
-                                        </li>
-                                    </ul>
-                                </template>
+                                                </ul>
+                                            </div>
+                                            <lightning-button data-item = {user.Id} 
+                                                                variant="brand"
+                                                                label="Assign" title="Assign/UnAssign" 
+                                                                onclick={handleAssign} 
+                                                                class="slds-m-left_x-small assignBtn">
+                                            </lightning-button>
+                                        </div>             
+                                    </li>
+                                </ul>
                             </template>
-                        </lightning-tab>
-                    </lightning-tabset>
-                </div>
+                        </template>              
+                    </div>
 
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={toggleAndReload} title="Cancel">Cancel</button>
                     <button class="slds-button slds-button_brand" onclick={pushDataAndToggle} title="OK">Save</button>
                 </footer>
 
