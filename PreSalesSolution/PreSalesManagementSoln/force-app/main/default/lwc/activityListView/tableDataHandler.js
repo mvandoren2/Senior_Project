@@ -24,7 +24,7 @@ export class TableDataHandler {
     }
 
     fetchCurrentUser = () => {
-        const userID = Id ? Id : '0055f0000041g1mAAA'
+        const userID = Id ? Id : '0055f000002RLvpAAG'
         const urlString = url + 'member/' + userID + '/'
 
         return fetch(urlString)
