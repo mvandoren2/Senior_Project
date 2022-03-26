@@ -13,4 +13,27 @@ export default class StatusChangeModal extends LightningElement {
 
     @track boxClasses = 'slds-modal'
     @track backdropClasses = 'slds-backdrop'
+
+    //push the data to backend
+    declineActivity(){
+        
+        let activity_ID = this.activityID.activity_ID;
+
+        //create a json to push
+        let pushingData = {
+            'status': "Decline"
+        };
+
+        console.log(pushingData);
+        fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
+            method: 'PATCH', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pushingData),
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
 }
