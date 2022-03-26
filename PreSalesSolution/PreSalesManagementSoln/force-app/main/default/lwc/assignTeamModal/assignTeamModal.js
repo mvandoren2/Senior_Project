@@ -154,14 +154,14 @@ export default class AssignTeamModal extends LightningElement {
 
         //remove the unassigned user
         const anotherIndex = this.selectedUsersId.indexOf(evt.target.dataset.item);
+
         if(index > -1){
-            this.selectedUsersId.splice(index, 1);
+            this.selectedUsersId.splice(anotherIndex, 1);
         }
     }
 
     handleCheckbox(evt){
         this.leadMemberId = evt.target.dataset.item;
-        console.log(this.leadMemberId);
     }
 
     //push the data to backend

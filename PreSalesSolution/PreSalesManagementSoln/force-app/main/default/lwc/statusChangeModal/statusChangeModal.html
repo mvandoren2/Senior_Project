@@ -18,13 +18,22 @@
                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                         <div class="row">
                             <h2 class="header">Decline Message:</h2>
-                            <lightning-textarea name="input3" placeholder="Description for declining the request..."></lightning-textarea>
+                            <lightning-textarea name="declineMessage" 
+                                                required 
+                                                maxlength="140" 
+                                                message-when-too-long="Maximum 140 characters allowed" 
+                                                message-when-value-missing="Missing decline message" 
+                                                placeholder="Description for declining the request..." 
+                                                value={declineMessage}
+                                                onchange={setDisableButton}>
+                            </lightning-textarea>
+                    
                         </div> 
                    </div>
 
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" title="Cancel" onclick={declineActivity}>Submit</button>
+                    <button class="slds-button slds-button_neutral" title="Cancel" onclick={declineActivity} disabled={submitStatus}>Submit</button>
                 </footer>
 
             </div>
