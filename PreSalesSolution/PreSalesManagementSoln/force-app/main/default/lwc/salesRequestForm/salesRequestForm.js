@@ -120,6 +120,7 @@ export default class SalesRequestForm extends LightningElement {
             "twoDateTime": this.date2 ? this.date2 : null,
             "threeDateTime": this.date3 ? this.date3 : null,
             "status": "Request",
+            "notes": this.notes,
             "flag": this.unexpectedFlag
         }
         fetch('http://localhost:8080/api/activity/', {
