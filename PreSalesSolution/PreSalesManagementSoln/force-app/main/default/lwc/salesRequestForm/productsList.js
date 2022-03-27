@@ -45,15 +45,19 @@ export class ProductSelector {
 
     products = products
 
+    
+
     //search for products in the text bar
     searchEvt = (evt) => {
         const value = evt.target.value;
         if (value === '') {
             this.parent.filteredProducts = [];
+            this.parent.searchBarEmpty = true
 
         } else {
             const lValue = value.toLowerCase();
             this.parent.filteredProducts = this.products.filter(item => item.name.toLowerCase().includes(lValue));
+            this.parent.searchBarEmpty = false || !this.parent.filteredProducts.length
         }
     }
 
@@ -64,7 +68,7 @@ export class ProductSelector {
             return;
         
         this.parent.selectedProducts.push(prod);
-        this.products = this.products.filter(item => item.id !== prod.id);
+        this.products = this.products.filter(item => item.external_product_ID !== prod.external_product_ID);
         
         this.parent.template.querySelector(".search").value = '';
         this.searchEvt({target:{value: ''}})
@@ -74,10 +78,11 @@ export class ProductSelector {
 
     //event button to remove from cart
     removeProd = (evt) => {
-        const prod = evt.target.value;
+        const product_ID = parseInt(evt.target.dataset.item, 10);
+        const product = this.parent.selectedProducts.filter(item => item.external_product_ID === product_ID)[0]
 
-        this.products.push(prod);
-        this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item.id !== prod.id);
+        this.products.push(product);
+        this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item.external_product_ID !== product_ID);
 
         this.parent.template.querySelector(".search").value = '';
         this.searchEvt({target:{value: ''}})
