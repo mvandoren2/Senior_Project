@@ -112,7 +112,9 @@ def getActivity(request, activityID):
                 updateActivity.members.add(m)
 
         if('leadMember' in activity_patch):
-            updateActivity.leadMember = activity_patch['leadMember']
+            leadMember = searchMember([activity_patch['leadMember']])[0]
+
+            updateActivity.leadMember = Member.objects.get(member_ID = leadMember)
             updateActivity.save()
 
         if('status' in activity_patch):
