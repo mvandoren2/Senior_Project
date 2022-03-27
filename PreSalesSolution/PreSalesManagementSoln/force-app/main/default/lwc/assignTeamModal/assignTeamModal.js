@@ -18,7 +18,6 @@ export default class AssignTeamModal extends LightningElement {
             this.activity = row;
             this.handleAllWireFunction();
         }
-
         else if(row === undefined) {
             let reloadParentTable = new CustomEvent('reloadtablerows')
             this.dispatchEvent(reloadParentTable)
@@ -37,8 +36,7 @@ export default class AssignTeamModal extends LightningElement {
     @track filteredSelectedUsersInfo;
     @track filteredUnAssignedUsersInfo;
     selectedUsersId = [];
-    @track leadMember = [];
-    @track leadMemberId = "";
+    @track leadMemberId;
 
     //fetch all members and selected members from djangodb
     membersFetched = false;
@@ -89,6 +87,7 @@ export default class AssignTeamModal extends LightningElement {
                 
             commonUser.proficiency = djangoUser.proficiency
             commonUser.role = djangoUser.user_role
+            commonUser.leadState = false
 
             this.commonUsersInfo[i] = commonUser
         })
@@ -98,9 +97,11 @@ export default class AssignTeamModal extends LightningElement {
 
 
         this.selectedUsersInfo.forEach((user, i) => {
-            if(this.selectedUsersInfo[i].role.name === "Lead Member"){
-                this.leadMemberId = this.selectedUsersInfo[i].Id;
-                this.leadMember.push(this.selectedUsersInfo[i]);
+            if(this.activity.leadMember){
+                if(this.selectedUsersInfo[i].Id === this.activity.leadMember.external_member_ID){
+                    this.leadMemberId = this.selectedUsersInfo[i].Id;
+                    this.selectedUsersInfo[i].leadState = true;
+                }
             }
         })
 
@@ -160,8 +161,17 @@ export default class AssignTeamModal extends LightningElement {
         }
     }
 
-    handleCheckbox(evt){
-        this.leadMemberId = evt.target.dataset.item;
+    handleLead(evt){
+
+        if(!this.leadMemberId){
+            evt.target.selected = !(evt.target.selected);
+            this.leadMemberId = evt.target.dataset.item;
+        } else if(this.leadMemberId && this.leadMemberId == evt.target.dataset.item){
+            evt.target.selected = !(evt.target.selected);
+            this.leadMemberId = null;
+        } else {
+            alert("Lead already selected");
+        }
     }
 
     //push the data to backend
@@ -171,7 +181,8 @@ export default class AssignTeamModal extends LightningElement {
     
             //create a json to push
             let pushingData = {
-                'members': this.selectedUsersId
+                'members': this.selectedUsersId,
+                'leadMember': this.leadMemberId
             };
 
             fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
@@ -184,6 +195,10 @@ export default class AssignTeamModal extends LightningElement {
             .catch((error) => {
                 console.error('Error:', error);
             });
+
+            let lead = {
+                'leadMember': this.leadMemberId
+            }
     }
 
     //save button action

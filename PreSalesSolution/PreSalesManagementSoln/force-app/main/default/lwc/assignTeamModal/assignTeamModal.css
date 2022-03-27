@@ -40,24 +40,29 @@
     border-radius: 20px;
 }
 
-.smallCard .helpText{
-    visibility: hidden;
-  width: 120px;
-  background-color: rgb(65, 61, 61);
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px;
+.parent{
+    position: relative;
+    display: inline-block;
 }
 
-.smallCard:hover .helpText{
+.parent .helpText{
+    visibility: hidden;
+    width: 120px;
+    background-color: rgb(65, 61, 61);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+  
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.parent:hover .helpText{
     visibility: visible;
 }
 
@@ -67,7 +72,6 @@
     display: inline-block;
 }
 
-.checkbox{
-    margin-left: 10px;
-    margin-right: 10px;
+.leadBtn{
+    margin: 15px;
 }

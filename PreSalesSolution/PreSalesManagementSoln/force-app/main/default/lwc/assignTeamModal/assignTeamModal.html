@@ -26,12 +26,11 @@
                                                                    icon-name="utility:close"
                                                                    variant="bare" alternative-text="remove user" 
                                                                    class="slds-m-left_xx-small my-round-button" 
-                                                                   title="remove user" onclick={handleRemove}>
+                                                                   title="Remove user" onclick={handleRemove}>
                                                                 </lightning-button-icon>
-
-                                            <img src={user.FullPhotoUrl} alt="Image" class="assignedImg">
-                                            {user.Name}
-                                            <input data-item={user.Id} type="checkbox" name="selectedMember" value="member" class="checkbox" onclick={handleCheckbox}>
+                                            <div class="parent">
+                                                <img src={user.FullPhotoUrl} alt="Image" class="assignedImg">
+                                                {user.Name}
                                                 <template for:each={user.proficiency} for:item="inner">
                                                     <li key={inner.product.name} class="helpText">
                                                         Proficiency:<br>
@@ -39,6 +38,8 @@
                                                         {inner.level}  
                                                     </li>
                                                 </template>
+                                            </div>
+                                            <lightning-button-icon-stateful data-item={user.Id} icon-name="utility:adduser" size="small" selected={user.leadState} onclick={handleLead} alternative-text="Assign Lead" class="leadBtn"></lightning-button-icon-stateful>
                                         </div>
                                     </li>
                                 </ul>
