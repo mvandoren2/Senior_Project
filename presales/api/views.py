@@ -1,6 +1,4 @@
 from datetime import datetime
-from re import L
-from turtle import up
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -10,8 +8,6 @@ from .helper import *
 from .serializers import *
 import json
 
-#Need to fix this
-# - Needs to fix POST and fix patch
 @csrf_exempt
 @api_view(['POST'])
 def addActivity(request):
@@ -185,7 +181,6 @@ def getActiveActvivities(request):
     activities = Activity.objects.filter(status__in=['Accept', 'Reschedule', 'Schedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
-
 
 @api_view(['GET'])
 def getAcceptedActivities(request):
