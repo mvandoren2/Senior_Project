@@ -108,9 +108,12 @@ def getActivity(request, activityID):
                 updateActivity.members.add(m)
 
         if('leadMember' in activity_patch):
-            leadMember = searchMember([activity_patch['leadMember']])[0]
-
-            updateActivity.leadMember = Member.objects.get(member_ID = leadMember)
+            #remove leadMember from the update activity if they do not exist in the memberForm
+            if(activity_patch['leadMember'] == None):
+                updateActivity.leadMember = None
+            else:
+                leadMember = searchMember([activity_patch['leadMember']])[0]
+                updateActivity.leadMember = Member.objects.get(external_member_ID=leadMember)
             updateActivity.save()
 
         if('status' in activity_patch):
@@ -200,6 +203,10 @@ def getPastActivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
+# Create an api that will weight the members for suggested members. This will take in account for profiecency, availability, opportunity, and account.
+# The date time should be not within the hour.
+
+# add in the account look up and opportunity look up as well.
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getMembers(request):
@@ -228,7 +235,14 @@ def getMembers(request):
         myMember = Member.objects.get(member_ID=searchMember(memberId)[0])
         myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
         for prof in member['proficiency']:
-            myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['product']['level']))
+            #check to see if proficiency name and level is in the database
+            if(Proficiency.objects.filter(name=prof['name'], level=prof['level']).exists()):
+                myMember.proficiency.add(Proficiency.objects.get(name=prof['name'], level=prof['level']))
+            else:
+                #create a new proficiency
+                newProf = Proficiency(name=prof['name'], level=prof['level'])
+                newProf.save()
+                myMember.proficiency.add(newProf)
         myMember.save()
 
         return HttpResponse(json.dumps(member), content_type="application/json")

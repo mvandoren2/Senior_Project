@@ -1,9 +1,10 @@
+from enum import unique
 from itertools import product
 from django.db import models
 
 class UserRole(models.Model):
    roles_ID = models.AutoField(primary_key=True)
-   name = models.CharField(max_length=50)
+   name = models.CharField(max_length=50, unique=True)
 
    class meta:
       verbose_name_plural = 'User Roles'
@@ -14,7 +15,7 @@ class UserRole(models.Model):
 class Product(models.Model):
    product_ID = models.AutoField(primary_key=True)
    external_product_ID = models.CharField(max_length=50, blank=True, null=True)
-   name = models.CharField(max_length=100)
+   name = models.CharField(max_length=100, unique=True)
 
    class meta:
       verbose_name = 'Product'
@@ -37,7 +38,7 @@ class Proficiency(models.Model):
 
 class Member(models.Model):
    member_ID = models.AutoField(primary_key=True)
-   external_member_ID = models.CharField(max_length=50)
+   external_member_ID = models.CharField(max_length=50, unique=True)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
    proficiency = models.ManyToManyField(Proficiency, blank=True)
 
@@ -50,7 +51,7 @@ class Member(models.Model):
    
 class ActivityType(models.Model):
    type_ID = models.AutoField(primary_key=True)   
-   name = models.CharField(max_length=50)
+   name = models.CharField(max_length=50, unique=True)
    
    class meta:
       verbose_name_plural = 'Activity Type'
@@ -84,7 +85,7 @@ class Activity(models.Model):
    ]
  
    activity_ID = models.AutoField(primary_key=True)
-   opportunity_ID = models.CharField(max_length=100)
+   opportunity_ID = models.CharField(max_length=100, unique=True)
    account_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
    activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE)    
@@ -110,7 +111,7 @@ class Note(models.Model):
    note_ID = models.AutoField(primary_key=True)
    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
    member = models.ForeignKey(Member, on_delete=models.CASCADE)
-   note_text = models.CharField(max_length=500)
+   note_text = models.CharField(max_length=500, unique=True)
 
    class meta:
       verbose_name_plural = 'Notes'
