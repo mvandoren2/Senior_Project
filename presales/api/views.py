@@ -1,22 +1,26 @@
 from datetime import datetime
-from re import L
-from turtle import up
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse
+from collections import OrderedDict
 from management.models import *
+from itertools import chain
 from .helper import *
 from .serializers import *
 import json
 
-#Need to fix this
-# - Needs to fix POST and fix patch
+results = 5
+
 @csrf_exempt
 @api_view(['POST'])
 def addActivity(request):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
+
+        #Check if activity already exists
+        if(searchActivity(activity)):
+            return HttpResponse("Activity already exists", status=409)
 
         #add activity type
         activity_type_ID = searchActivityType(activity['activity_Type'])
@@ -112,9 +116,12 @@ def getActivity(request, activityID):
                 updateActivity.members.add(m)
 
         if('leadMember' in activity_patch):
-            leadMember = searchMember([activity_patch['leadMember']])[0]
-
-            updateActivity.leadMember = Member.objects.get(member_ID = leadMember)
+            #remove leadMember from the update activity if they do not exist in the memberForm
+            if(activity_patch['leadMember'] == None):
+                updateActivity.leadMember = None
+            else:
+                leadMember = searchMember([activity_patch['leadMember']])[0]
+                updateActivity.leadMember = Member.objects.get(external_member_ID=leadMember)
             updateActivity.save()
 
         if('status' in activity_patch):
@@ -186,7 +193,6 @@ def getActiveActvivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
-
 @api_view(['GET'])
 def getAcceptedActivities(request):
     activities = Activity.objects.filter(status__in=['Accept', 'Scheduled'])
@@ -205,6 +211,54 @@ def getPastActivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
+# Create an api that will weight the members for suggested members. This will take in account for profiecency, availability, opportunity, and account.
+# The date time should be not within the hour.
+@csrf_exempt
+@api_view(['GET'])
+def getSuggestedMembers(request, activityID):
+    #get the activity
+    activity = Activity.objects.get(activity_ID=activityID)
+    oID = activity.opportunity_ID
+    aID = activity.account_ID
+
+    prod = []
+    for p in activity.products.all():
+        prod.append(str(p) + " " + str(activity.activity_Level[-1:]))
+
+
+    prodW = 3
+    oppW = 2
+    accW = 1
+
+    allmembers = Member.objects.filter(user_role__name='Presales Member')
+    serializers = MemberSerializer(allmembers, many=True)
+    members = serializers.data
+
+    for m in members:
+        memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
+
+        #get the count of how manny activity the member is appart of
+        oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count() * oppW
+        aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count() * accW
+        
+        #see if the proficiency is the same as the activity
+        # prof = list(memID[0].proficiency.all())
+        # #make prof into a list
+        # # prof = [str(p) for p in prof]
+        # for p in prod:
+        #     if(p in m['proficiency']):
+        #         print(p)
+        # print("PROF:", prof)
+            
+        
+        m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount}) #need to add product weight
+
+    #sort the members by the weight
+    members = sorted(members, key=lambda k: k['Opportunity Weight'] + k['Account Weight'], reverse=True)
+
+    return Response(members)
+
+# add in the account look up and opportunity look up as well.
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getMembers(request):
@@ -233,7 +287,14 @@ def getMembers(request):
         myMember = Member.objects.get(member_ID=searchMember(memberId)[0])
         myMember.user_role = UserRole.objects.get(name=member['user_role']['name'])
         for prof in member['proficiency']:
-            myMember.proficiency.add(Proficiency.objects.get(product__name=prof['product']['name'], level=prof['product']['level']))
+            #check to see if proficiency name and level is in the database
+            if(Proficiency.objects.filter(name=prof['name'], level=prof['level']).exists()):
+                myMember.proficiency.add(Proficiency.objects.get(name=prof['name'], level=prof['level']))
+            else:
+                #create a new proficiency
+                newProf = Proficiency(name=prof['name'], level=prof['level'])
+                newProf.save()
+                myMember.proficiency.add(newProf)
         myMember.save()
 
         return HttpResponse(json.dumps(member), content_type="application/json")

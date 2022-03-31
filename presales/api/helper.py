@@ -1,4 +1,5 @@
 from management.models import *
+from datetime import datetime
 
 def searchMember(members):
     arrM = []
@@ -37,4 +38,27 @@ def searchActivityType(activityType):
         return act[0].type_ID
     else:
         print("Oopsie Woopsie! Uwu someone made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!")
-        
+    
+def searchActivity(activity):
+    #search to see if there is a activity with the same opportunity_ID, acount_ID, and date
+
+    activity_type_ID = searchActivityType(activity['activity_Type'])
+
+    request_activity_Type = ActivityType.objects.get(type_ID=activity_type_ID)        
+
+    date1 = datetime.fromisoformat(activity['oneDateTime'].split('.')[0] + '+00:00')
+
+    act = Activity.objects.filter(
+        opportunity_ID=activity['opportunity_ID'], 
+        account_ID = activity['account_ID'], 
+        location = activity['location'], 
+        activity_Type = request_activity_Type,
+        activity_Level = activity['activity_Level'], 
+        oneDateTime=date1,
+        status = activity['status'], 
+        flag=activity['flag']
+    )
+    if(act):
+        return True
+    else:
+        return False
