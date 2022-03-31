@@ -8,7 +8,7 @@ urlpatterns = [
     path('activity/types/', views.getActivityType),
     path('activity/note/<noteID>/', views.getActivityNote),
     path('activity/<activityID>/notes/', views.getActivityNotes),
-    path('activity/<activityID>/suggestions/', views.getSuggestedMembers),
+    path('activity/<activityID>/suggested_members/', views.getSuggestedMembers),
     
     #Collection Activity endpoints
     path('activities/', views.getActivities),

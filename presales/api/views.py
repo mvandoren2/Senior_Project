@@ -220,12 +220,14 @@ def getSuggestedMembers(request, activityID):
     activity = Activity.objects.get(activity_ID=activityID)
     oID = activity.opportunity_ID
     aID = activity.account_ID
+    date = activity.oneDateTime
 
     prod = []
     for p in activity.products.all():
         prod.append(str(p))
 
-    prodW = .5 / len(prod)
+    avaW = .25
+    prodW = .25 / len(prod)
     oppW = .3
     accW = .2
     # total = 0.0
@@ -235,7 +237,26 @@ def getSuggestedMembers(request, activityID):
     members = serializers.data
 
     for m in members:
+        avaAmount = avaW
         memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
+
+        #get all activity that the member is assigned to that have the status of accept, reschedule, or schedule
+        memAct = Activity.objects.filter(members=memID[0], status__in=['Request', 'Accept', 'Reschedule', 'Schedule'])
+
+        aList = []
+
+        #then see if any of the oneDateTime is within the hour of this activity
+        for a in memAct:
+            if(str(a) != str(activityID) and a.selectedDateTime != None):
+                if(isWithinAnHour(a.selectedDateTime, date)):
+                    #add just the activity ID to aList
+                    aList.append(a.activity_ID)
+                    avaAmount = 0
+                    break
+
+        if(avaAmount == 0):
+            m.update({'Conflicts': aList})
+            print("Member:", memID[0], "Active Activity", aList)
 
         #get the count of how manny activity the member is appart of
         oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count()
@@ -244,7 +265,7 @@ def getSuggestedMembers(request, activityID):
         aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count()
         if(aAmount > 0):
             aAmount = accW
-        pAmount = 0
+        pAmount = 0.0
         
         #see if the proficiency is the same as the activity
         prof = list(memID[0].proficiency.all())
@@ -258,15 +279,26 @@ def getSuggestedMembers(request, activityID):
                 pAmount += prodW
             
         if(total == 0):
-            oAmount = oAmount / 10
-            aAmount = aAmount / 10
+            oAmount = oAmount / 100
+            aAmount = aAmount / 100
+            avaAmount = avaAmount / 100
         
         # total = oAmount + aAmount + pAmount
         
-        m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount, "Product Weight": pAmount}) #, "Total Percentage": total})
+        m.update(
+        {
+            "Opportunity Weight": oAmount, 
+            "Account Weight": aAmount, 
+            "Product Weight": pAmount, 
+            "Availablity": avaAmount
+        }) #, "Total Percentage": total})
 
     #sort the members by the weight
-    members = sorted(members, key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'], reverse=True)
+    members = sorted(
+        members, 
+        key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'], 
+        reverse=True
+    )
 
     return Response(members)
 

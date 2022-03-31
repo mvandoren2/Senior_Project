@@ -62,3 +62,12 @@ def searchActivity(activity):
         return True
     else:
         return False
+
+def isWithinAnHour(date1, date2):
+    #get abs value of the difference
+    diff = abs(date1 - date2)
+    #if the difference is less than an hour, return true
+    if(diff.seconds < 3600):
+        return True
+    else:
+        return False
