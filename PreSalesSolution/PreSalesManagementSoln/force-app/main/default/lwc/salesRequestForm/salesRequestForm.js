@@ -51,6 +51,7 @@ export default class SalesRequestForm extends LightningElement {
 
     selectedProducts = [];
     filteredProducts = [];
+    searchBarEmpty = true
     
     productSelector = new ProductSelector(this)
 
