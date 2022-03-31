@@ -114,15 +114,14 @@ def getActivity(request, activityID):
             arrM = searchMember(members)
             for m in arrM:
                 updateActivity.members.add(m)
-
-        if('leadMember' in activity_patch):
-            #remove leadMember from the update activity if they do not exist in the memberForm
-            if(activity_patch['leadMember'] == None):
-                updateActivity.leadMember = None
-            else:
-                leadMember = searchMember([activity_patch['leadMember']])[0]
-                updateActivity.leadMember = Member.objects.get(external_member_ID=leadMember)
+            
             updateActivity.save()
+
+        if('members' in activity_patch):
+            #if the leadMember is not in the memberForm, remove it
+            if(updateActivity.leadMember not in updateActivity.members.all() and updateActivity.leadMember != None):
+                updateActivity.leadMember = None
+                updateActivity.save()
 
         if('status' in activity_patch):
             updateActivity.status = activity_patch['status']
@@ -211,8 +210,6 @@ def getPastActivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
-# Create an api that will weight the members for suggested members. This will take in account for profiecency, availability, opportunity, and account.
-# The date time should be not within the hour.
 @csrf_exempt
 @api_view(['GET'])
 def getSuggestedMembers(request, activityID):
@@ -220,7 +217,15 @@ def getSuggestedMembers(request, activityID):
     activity = Activity.objects.get(activity_ID=activityID)
     oID = activity.opportunity_ID
     aID = activity.account_ID
-    date = activity.oneDateTime
+    date1 = activity.oneDateTime
+    if(activity.twoDateTime != None):
+        date2 = activity.twoDateTime
+    else:
+        date2 = None
+    if(activity.threeDateTime != None):
+        date3 = activity.threeDateTime
+    else:
+        date3 = None
 
     prod = []
     for p in activity.products.all():
@@ -230,7 +235,7 @@ def getSuggestedMembers(request, activityID):
     prodW = .25 / len(prod)
     oppW = .3
     accW = .2
-    # total = 0.0
+    total = 0
 
     allmembers = Member.objects.filter(user_role__name='Presales Member')
     serializers = MemberSerializer(allmembers, many=True)
@@ -241,22 +246,34 @@ def getSuggestedMembers(request, activityID):
         memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
 
         #get all activity that the member is assigned to that have the status of accept, reschedule, or schedule
-        memAct = Activity.objects.filter(members=memID[0], status__in=['Request', 'Accept', 'Reschedule', 'Schedule'])
+        memAct = Activity.objects.filter(
+            members=memID[0], 
+            status__in=['Request', 'Accept', 'Reschedule', 'Schedule']
+        )
 
         aList = []
 
         #then see if any of the oneDateTime is within the hour of this activity
         for a in memAct:
             if(str(a) != str(activityID) and a.selectedDateTime != None):
-                if(isWithinAnHour(a.selectedDateTime, date)):
+                if(isWithinAnHour(a.selectedDateTime, date1)):
                     #add just the activity ID to aList
                     aList.append(a.activity_ID)
                     avaAmount = 0
-                    break
+                if(date2):
+                    if(isWithinAnHour(a.selectedDateTime, date2)):
+                        aList.append(a.activity_ID)
+                        avaAmount = 0
+                if(date3):
+                    if(isWithinAnHour(a.selectedDateTime, date3)):
+                        aList.append(a.activity_ID)
+                        avaAmount = 0
+
+        aList = Activity.objects.filter(activity_ID__in=aList)
 
         if(avaAmount == 0):
-            m.update({'Conflicts': aList})
-            print("Member:", memID[0], "Active Activity", aList)
+            conflicts = SimpleActivitySerializer(aList, many=True).data
+            m.update({'Conflicts': conflicts})
 
         #get the count of how manny activity the member is appart of
         oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count()
@@ -265,7 +282,7 @@ def getSuggestedMembers(request, activityID):
         aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count()
         if(aAmount > 0):
             aAmount = accW
-        pAmount = 0.0
+        pAmount = 0
         
         #see if the proficiency is the same as the activity
         prof = list(memID[0].proficiency.all())
@@ -278,12 +295,13 @@ def getSuggestedMembers(request, activityID):
                 total += 1
                 pAmount += prodW
             
-        if(total == 0):
+        if(total < len(prod)):
             oAmount = oAmount / 100
             aAmount = aAmount / 100
             avaAmount = avaAmount / 100
+            pAmount = pAmount / 100
         
-        # total = oAmount + aAmount + pAmount
+        total = oAmount + aAmount + pAmount + avaAmount
         
         m.update(
         {

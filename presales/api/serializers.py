@@ -58,3 +58,8 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = '__all__'
+
+class SimpleActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ('activity_ID', 'opportunity_ID', 'account_ID', 'selectedDateTime', 'status')

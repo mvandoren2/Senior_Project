@@ -16,6 +16,7 @@ class Product(models.Model):
    product_ID = models.AutoField(primary_key=True)
    external_product_ID = models.CharField(max_length=50, blank=True, null=True)
    name = models.CharField(max_length=100, unique=True)
+   available = models.BooleanField(default=True)
 
    class meta:
       verbose_name = 'Product'
