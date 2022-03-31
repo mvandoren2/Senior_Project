@@ -253,6 +253,9 @@ def getSuggestedMembers(request, activityID):
         
         m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount}) #need to add product weight
 
+    #sort the members by the weight
+    members = sorted(members, key=lambda k: k['Opportunity Weight'] + k['Account Weight'], reverse=True)
+
     return Response(members)
 
 # add in the account look up and opportunity look up as well.
