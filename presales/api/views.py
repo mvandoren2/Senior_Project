@@ -223,12 +223,12 @@ def getSuggestedMembers(request, activityID):
 
     prod = []
     for p in activity.products.all():
-        prod.append(str(p) + " " + str(activity.activity_Level[-1:]))
+        prod.append(str(p))
 
-
-    prodW = 3
-    oppW = 2
-    accW = 1
+    prodW = .5 / len(prod)
+    oppW = .3
+    accW = .2
+    # total = 0.0
 
     allmembers = Member.objects.filter(user_role__name='Presales Member')
     serializers = MemberSerializer(allmembers, many=True)
@@ -238,23 +238,35 @@ def getSuggestedMembers(request, activityID):
         memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
 
         #get the count of how manny activity the member is appart of
-        oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count() * oppW
-        aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count() * accW
+        oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count()
+        if(oAmount > 0):
+            oAmount = oppW
+        aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count()
+        if(aAmount > 0):
+            aAmount = accW
+        pAmount = 0
         
         #see if the proficiency is the same as the activity
-        # prof = list(memID[0].proficiency.all())
-        # #make prof into a list
-        # # prof = [str(p) for p in prof]
-        # for p in prod:
-        #     if(p in m['proficiency']):
-        #         print(p)
-        # print("PROF:", prof)
+        prof = list(memID[0].proficiency.all())
+        #make prof into a list
+        prof = [str(p)[:-2] for p in prof]
+
+        total = 0
+        for p in prof:
+            if(p in prod):
+                total += 1
+                pAmount += prodW
             
+        if(total == 0):
+            oAmount = oAmount / 10
+            aAmount = aAmount / 10
         
-        m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount}) #need to add product weight
+        # total = oAmount + aAmount + pAmount
+        
+        m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount, "Product Weight": pAmount}) #, "Total Percentage": total})
 
     #sort the members by the weight
-    members = sorted(members, key=lambda k: k['Opportunity Weight'] + k['Account Weight'], reverse=True)
+    members = sorted(members, key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'], reverse=True)
 
     return Response(members)
 
