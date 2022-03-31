@@ -85,7 +85,7 @@ class Activity(models.Model):
    ]
  
    activity_ID = models.AutoField(primary_key=True)
-   opportunity_ID = models.CharField(max_length=100, unique=True)
+   opportunity_ID = models.CharField(max_length=100)
    account_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
    activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE)    

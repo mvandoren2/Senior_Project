@@ -3,16 +3,24 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import HttpResponse
+from collections import OrderedDict
 from management.models import *
+from itertools import chain
 from .helper import *
 from .serializers import *
 import json
+
+results = 5
 
 @csrf_exempt
 @api_view(['POST'])
 def addActivity(request):
     if(request.method == 'POST'):
         activity = json.loads(request.body)
+
+        #Check if activity already exists
+        if(searchActivity(activity)):
+            return HttpResponse("Activity already exists", status=409)
 
         #add activity type
         activity_type_ID = searchActivityType(activity['activity_Type'])
@@ -205,6 +213,47 @@ def getPastActivities(request):
 
 # Create an api that will weight the members for suggested members. This will take in account for profiecency, availability, opportunity, and account.
 # The date time should be not within the hour.
+@csrf_exempt
+@api_view(['GET'])
+def getSuggestedMembers(request, activityID):
+    #get the activity
+    activity = Activity.objects.get(activity_ID=activityID)
+    oID = activity.opportunity_ID
+    aID = activity.account_ID
+
+    prod = []
+    for p in activity.products.all():
+        prod.append(str(p) + " " + str(activity.activity_Level[-1:]))
+
+
+    prodW = 3
+    oppW = 2
+    accW = 1
+
+    allmembers = Member.objects.filter(user_role__name='Presales Member')
+    serializers = MemberSerializer(allmembers, many=True)
+    members = serializers.data
+
+    for m in members:
+        memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
+
+        #get the count of how manny activity the member is appart of
+        oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count() * oppW
+        aAmount = Activity.objects.filter(account_ID=aID, members=memID[0]).count() * accW
+        
+        #see if the proficiency is the same as the activity
+        # prof = list(memID[0].proficiency.all())
+        # #make prof into a list
+        # # prof = [str(p) for p in prof]
+        # for p in prod:
+        #     if(p in m['proficiency']):
+        #         print(p)
+        # print("PROF:", prof)
+            
+        
+        m.update({"Opportunity Weight": oAmount, "Account Weight": aAmount}) #need to add product weight
+
+    return Response(members)
 
 # add in the account look up and opportunity look up as well.
 @csrf_exempt
