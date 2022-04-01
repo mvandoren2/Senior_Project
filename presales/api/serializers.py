@@ -1,3 +1,4 @@
+from dataclasses import fields
 from rest_framework import serializers
 from management.models import *
 
@@ -40,7 +41,12 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityType
         fields = '__all__'
-        
+
+class UserRolesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserRole
+        fields = '__all__'        
+                
 class ActivitySerializer(serializers.ModelSerializer):
     members = MemberSerializer(read_only=True, many=True)
     products = ProductSerializer(read_only=True, many=True)

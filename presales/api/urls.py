@@ -17,9 +17,11 @@ urlpatterns = [
     path('activities/requests/', views.getRequestActivities),
     path('activities/past/', views.getPastActivities),
     
+    
     #Singleton and collection Member endpoints
     path('member/<id>/', views.getMember),
     path('members/', views.getMembers),
+    path('members/roles/', views.getUserRoles),
 
     #Collection Product endpoint
     path('products/', views.getProducts),

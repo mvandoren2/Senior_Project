@@ -437,6 +437,21 @@ def getActivityType(request):
         new_activity_Type.save()
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
 
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def getUserRoles(request):
+    if(request.method =='GET'):
+        user_roles = UserRole.objects.all()
+        serializer = UserRolesSerializer(user_roles, many=True)
+        return Response(serializer.data)
+    elif(request.method == 'POST'):
+        user_role = json.loads(request.body)
+        if(UserRole.objects.filter(name=user_role['name']).exists()):
+            return HttpResponse(json.dumps({'POST working!': 'Already exist!'}), content_type='application/json')
+        new_user_role = UserRole(name=user_role['name'])
+        new_user_role.save()
+        return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
+    
 #----------------------------------------------------------
 #Daniel program below
 # @csrf_exempt
