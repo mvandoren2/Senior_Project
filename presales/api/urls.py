@@ -5,7 +5,7 @@ urlpatterns = [
     #Singleton Activity endpoints
     path('activity/', views.addActivity),
     path('activity/<activityID>/', views.getActivity),
-    path('activity/types/', views.getActivityType),
+    path('activity_types/', views.getActivityType),
     path('activity/note/<noteID>/', views.getActivityNote),
     path('activity/<activityID>/notes/', views.getActivityNotes),
     path('activity/<activityID>/suggested_members/', views.getSuggestedMembers),
@@ -20,6 +20,7 @@ urlpatterns = [
     
     #Singleton and collection Member endpoints
     path('member/<id>/', views.getMember),
+    path('member/<id>/activities/', views.getMemberActivities),
     path('members/', views.getMembers),
     path('members/roles/', views.getUserRoles),
 

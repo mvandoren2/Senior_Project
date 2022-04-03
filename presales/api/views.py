@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -51,6 +52,8 @@ def addActivity(request):
         member = member[0]
         newActivity.createdByMember = Member.objects.get(member_ID=member)
         newActivity.save()
+
+        #add members in
 
         #add product_ID to the activity
         products = activity['products']
@@ -153,7 +156,6 @@ def getActivity(request, activityID):
 
         return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
 
-@csrf_exempt
 @api_view(['GET'])
 def getActivities(request):
     query = Activity.objects.all()
@@ -210,7 +212,6 @@ def getPastActivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
-@csrf_exempt
 @api_view(['GET'])
 def getSuggestedMembers(request, activityID):
     #get the activity
@@ -371,6 +372,15 @@ def getMember(request, id):
     except:
         return Response(status=204)
 
+@api_view(['GET'])
+def getMemberActivities(request, id):
+    #memberId == external_member_ID
+    memID = Member.objects.filter(external_member_ID=id)[0]
+    acts = Activity.objects.filter(members=memID)
+    print(acts)
+
+    return HttpResponse(json.dumps({'GET working!': 'Nothing to see here!'}), content_type='application/json')
+
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getProducts(request):
@@ -423,14 +433,9 @@ def getActivityNotes(request, activityID):
 @api_view(['GET', 'POST'])
 def getActivityType(request):
     if(request.method =='GET'):
-        if(request.GET.get('name')):
-            activity_Type = ActivityType.objects.filter(name=request.Get.get('name'))
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
-        else:
-            activity_Type = ActivityType.objects.all()
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
+        activity_Type = ActivityType.objects.all()
+        serializer = ActivityTypeSerializer(activity_Type, many=True)
+        return Response(serializer.data)
     elif(request.method == 'POST'):
         activity_Type = json.loads(request.body)
         new_activity_Type = ActivityType(name=activity_Type['name'])
