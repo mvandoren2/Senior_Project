@@ -372,15 +372,6 @@ def getMember(request, id):
     except:
         return Response(status=204)
 
-@api_view(['GET'])
-def getMemberActivities(request, id):
-    #memberId == external_member_ID
-    memID = Member.objects.filter(external_member_ID=id)[0]
-    acts = Activity.objects.filter(members=memID)
-    print(acts)
-
-    return HttpResponse(json.dumps({'GET working!': 'Nothing to see here!'}), content_type='application/json')
-
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getProducts(request):
