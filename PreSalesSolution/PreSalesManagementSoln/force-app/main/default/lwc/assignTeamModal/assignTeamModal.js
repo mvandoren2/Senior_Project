@@ -1,6 +1,5 @@
 import { LightningElement, track, api, wire } from 'lwc';
 import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMembers";
-import fetchAllMemebers from './fetchHelper';
 
 export default class AssignTeamModal extends LightningElement {
     
@@ -8,6 +7,7 @@ export default class AssignTeamModal extends LightningElement {
     @track modalTab = ""
 
     @api toggleShow = (row) => {
+
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
 
@@ -33,7 +33,6 @@ export default class AssignTeamModal extends LightningElement {
     @track commonUsersInfo = [];
     @track selectedUsersInfo = [];
     @track unAssignedUsersInfo = [];
-    @track filteredSelectedUsersInfo;
     @track filteredUnAssignedUsersInfo;
     selectedUsersId = [];
     @track leadMemberId;
@@ -41,12 +40,20 @@ export default class AssignTeamModal extends LightningElement {
     //fetch all members and selected members from djangodb
     membersFetched = false;
     async handleAllFetch() {
-        const members = await fetchAllMemebers();
-        this.djangoUsers = members;
+        let members = [];
 
+        await fetch('http://localhost:8080/api/activity/' + this.activity.activity_ID + '/suggested_members/')
+            .then(response => response.json())
+            .then(data => {
+                members = data;
+            })
+        
+        this.djangoUsers = members;
+        console.log(this.djangoUsers)
+    
         //save the id of all the members in the db
         this.djangoUserID = this.djangoUsers.map(user => user.external_member_ID)
-                    
+    
         this.membersFetched = true;
     }
 
@@ -76,25 +83,29 @@ export default class AssignTeamModal extends LightningElement {
         //get the users from salesforce, compare the ids to all members and if match save to any array
         this.commonUsersInfo = []
 
-        let commonUsersInfo = [...this.salesforceUsers].filter(user => this.djangoUserID.includes(user.Id))
+        let commonUsersInfo = [];
+
+        this.djangoUserID.forEach((user,i) => {
+            commonUsersInfo.push((this.salesforceUsers.filter(suser => this.djangoUserID[i] === suser.Id))[0]);
+        });
 
         //add proficiency field to all users
-
         commonUsersInfo.forEach((user, i) => {
-            let djangoUser = this.djangoUsers.filter(dUser => dUser.external_member_ID === user.Id)[0]
+            let djangoUser = this.djangoUsers.filter(dUser => dUser.external_member_ID === user.Id)[0];
 
             let commonUser = Object.create(user)
-                
             commonUser.proficiency = djangoUser.proficiency
-            commonUser.role = djangoUser.user_role
+            commonUser.productWeight = djangoUser["Product Weight"];
+            commonUser.accountWeight = djangoUser["Account Weight"];
+            commonUser.opportunityWeight = djangoUser["Opportunity Weight"];
             commonUser.leadState = false
+            commonUser.alreadyAssigned = false
 
             this.commonUsersInfo[i] = commonUser
         })
 
         //get the users from salesforce, compare the ids to selected members and if match save to any array
         this.selectedUsersInfo = this.commonUsersInfo.filter(user => this.djangoActivityUsersId.includes(user.Id))
-
 
         this.selectedUsersInfo.forEach((user, i) => {
             if(this.activity.leadMember){
@@ -108,16 +119,49 @@ export default class AssignTeamModal extends LightningElement {
         //get all the unassigned users by filtering selcted and all
         this.unAssignedUsersInfo = this.commonUsersInfo.filter(val => !this.selectedUsersInfo.includes(val));
 
-        this.filteredUnAssignedUsersInfo = this.unAssignedUsersInfo;
+        //selectedUserInfo save their index
+        this.unAssignedUsersInfo.forEach((user, i) => {
+            user.index = i;
+        })
 
-        this.filteredSelectedUsersInfo = this.selectedUsersInfo;
+        this.filteredUnAssignedUsersInfo = this.unAssignedUsersInfo;
     }
 
     //search input function
     searchUsers = (evt) => {
             const value = evt.target.value.toLowerCase();
-            this.filteredSelectedUsersInfo = this.selectedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
             this.filteredUnAssignedUsersInfo = this.unAssignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
+    }
+
+    //function to change the status of group button
+    buttonStatus(evt){
+        const btn = this.template.querySelectorAll(".sortBtn");
+        btn.forEach((btn,i) => {
+            btn.variant = "neutral";
+        });
+       
+        evt.target.variant = "brand";
+    }
+
+    //all the sort functions for the button-group
+    handleAll(evt){
+        this.handleAllWireFunction();
+        this.buttonStatus(evt);
+    }
+
+    filteredWithProficiency(evt){
+        this.filteredUnAssignedUsersInfo.sort((a, b) => b.productWeight - a.productWeight);
+        this.buttonStatus(evt);
+    }
+
+    filteredWithOpportunity(evt){
+        this.filteredUnAssignedUsersInfo.sort((a, b) => b.opportunityWeight - a.opportunityWeight);
+        this.buttonStatus(evt);
+    }
+
+    filteredWithAccount(evt){
+        this.filteredUnAssignedUsersInfo.sort((a, b) => b.accountWeight - a.accountWeight);
+        this.buttonStatus(evt);
     }
 
     //onclick change the button label and save the data to selected array
@@ -127,7 +171,7 @@ export default class AssignTeamModal extends LightningElement {
             let index;
 
             for(let i=0; i < this.filteredUnAssignedUsersInfo.length; i++){
-                if(this.filteredUnAssignedUsersInfo[i].Id == evt.target.dataset.item){
+                if(this.filteredUnAssignedUsersInfo[i].Id === evt.target.dataset.item){
                     this.selectedUsersInfo.push(this.filteredUnAssignedUsersInfo[i]);
                     index = i;
                 }
@@ -143,8 +187,8 @@ export default class AssignTeamModal extends LightningElement {
     handleRemove(evt){
         let index;
         for(let i=0; i < this.selectedUsersInfo.length; i++){
-            if(this.selectedUsersInfo[i].Id == evt.target.dataset.item){
-                this.filteredUnAssignedUsersInfo.push(this.selectedUsersInfo[i]);
+            if(this.selectedUsersInfo[i].Id === evt.target.dataset.item){
+                this.filteredUnAssignedUsersInfo.splice(this.selectedUsersInfo[i].index, 0 , this.selectedUsersInfo[i]);
                 index = i;
             }
         }
@@ -176,14 +220,14 @@ export default class AssignTeamModal extends LightningElement {
 
     //push the data to backend
     pushData(){
-
             let activity_ID = this.activity.activity_ID;
-    
-            //create a json to push
+
             let pushingData = {
                 'members': this.selectedUsersId,
                 'leadMember': this.leadMemberId
-            };
+            }    
+
+            console.log(pushingData);
 
             fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
                 method: 'PATCH', 
@@ -195,10 +239,6 @@ export default class AssignTeamModal extends LightningElement {
             .catch((error) => {
                 console.error('Error:', error);
             });
-
-            let lead = {
-                'leadMember': this.leadMemberId
-            }
     }
 
     //save button action
@@ -209,5 +249,10 @@ export default class AssignTeamModal extends LightningElement {
 
     closeModal(){
         this.toggleShow();
+    }
+
+    handleChange(event) {
+        this.value = event.detail.value;
+        this.checkMembersDateTime();
     }
 }
