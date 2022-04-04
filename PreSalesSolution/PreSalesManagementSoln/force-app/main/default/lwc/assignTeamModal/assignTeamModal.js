@@ -5,8 +5,9 @@ export default class AssignTeamModal extends LightningElement {
     
     activity;
     @track modalTab = ""
+    @track saveBtnStatus = true;
 
-    @api toggleShow = (row) => {
+    @api toggleShow = async (row) => {
 
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
@@ -16,11 +17,16 @@ export default class AssignTeamModal extends LightningElement {
         //execute the function only once
         if(row !== undefined && row !== this.activity) {
             this.activity = row;
-            this.handleAllWireFunction();
+            await this.handleAllWireFunction();
         }
         else if(row === undefined) {
             let reloadParentTable = new CustomEvent('reloadtablerows')
             this.dispatchEvent(reloadParentTable)
+        }
+
+        //initail check of there is leadMember
+        if(this.leadMemberId){
+            this.saveBtnStatus = false;
         }
     }
 
@@ -99,7 +105,16 @@ export default class AssignTeamModal extends LightningElement {
             commonUser.accountWeight = djangoUser["Account Weight"];
             commonUser.opportunityWeight = djangoUser["Opportunity Weight"];
             commonUser.leadState = false
-            commonUser.alreadyAssigned = false
+            commonUser.conflictStatus = djangoUser["Conflict Status"];
+
+            //check if there is a conflict and assign values for the heltext
+            if(djangoUser["Conflict Status"] === true){
+                let count = 0;
+                for(let i=0; i < djangoUser.Conflicts.length; i++){
+                    count++;
+                }
+                commonUser.numOfConflict = "This member has time conflict with " + count + " other active activity!";
+            }
 
             this.commonUsersInfo[i] = commonUser
         })
@@ -205,16 +220,20 @@ export default class AssignTeamModal extends LightningElement {
         }
     }
 
+
     handleLead(evt){
 
-        if(!this.leadMemberId){
-            evt.target.selected = !(evt.target.selected);
-            this.leadMemberId = evt.target.dataset.item;
-        } else if(this.leadMemberId && this.leadMemberId == evt.target.dataset.item){
-            evt.target.selected = !(evt.target.selected);
-            this.leadMemberId = null;
+        this.template.querySelector(".leadBtn").selected = false;
+
+        evt.target.selected = true;
+
+        this.leadMemberId = evt.target.dataset.item;
+
+        //make the btn disabled/abled
+        if(this.leadMemberId){
+            this.saveBtnStatus = false;
         } else {
-            alert("Lead already selected");
+            this.saveBtnStatus = true;
         }
     }
 

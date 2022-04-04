@@ -69,8 +69,8 @@
                                             <img src={user.FullPhotoUrl} alt="Image" class="unassignedImg">
                                             <div class="userInfo">
                                                 <span style="font-weight: bold; font-size: 15px">{user.Name}
-                                                    <template if:true={user.alreadyAssigned}>
-                                                        <lightning-helptext icon-name="utility:info" content="This member is already assigned in other tasks!"></lightning-helptext>
+                                                    <template if:true={user.conflictStatus}>
+                                                        <lightning-helptext icon-name="utility:info" content={user.numOfConflict}></lightning-helptext>
                                                     </template>
                                                 </span>
                                                 <ul>
@@ -97,7 +97,7 @@
 
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_brand" onclick={pushDataAndToggle} title="OK">Save</button>
+                    <button class="slds-button slds-button_brand" onclick={pushDataAndToggle} disabled={saveBtnStatus} title="OK">Save</button>
                 </footer>
 
             </div>
