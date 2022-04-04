@@ -371,6 +371,16 @@ def getMember(request, id):
     except:
         return Response(status=204)
 
+@api_view(['GET'])
+def getMemberActivities(request, id):
+    memID = Member.objects.filter(external_member_ID=id)[0]
+    actsM = Activity.objects.filter(members=memID)
+    actsL = Activity.objects.filter(createdByMember=memID)
+    acts = set(actsM | actsL)
+    serializers = serializers = ActivitySerializer(acts, many=True)
+
+    return Response(serializers.data)
+
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getProducts(request):
