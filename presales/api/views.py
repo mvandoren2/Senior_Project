@@ -247,6 +247,7 @@ def getSuggestedMembers(request, activityID):
     members = serializers.data
 
     for m in members:
+        aS = False
         avaAmount = avaW
         memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
 
@@ -265,14 +266,17 @@ def getSuggestedMembers(request, activityID):
                     #add just the activity ID to aList
                     aList.append(a.activity_ID)
                     avaAmount = 0
+                    aS = True
                 if(date2):
                     if(isWithinAnHour(a.selectedDateTime, date2)):
                         aList.append(a.activity_ID)
                         avaAmount = 0
+                        aS = True
                 if(date3):
                     if(isWithinAnHour(a.selectedDateTime, date3)):
                         aList.append(a.activity_ID)
                         avaAmount = 0
+                        aS = True
 
         aList = Activity.objects.filter(activity_ID__in=aList)
 
@@ -300,7 +304,7 @@ def getSuggestedMembers(request, activityID):
                 total += 1
                 pAmount += prodW
             
-        if(total < len(prod)):
+        if(total == 0):
             oAmount = oAmount / 100
             aAmount = aAmount / 100
             avaAmount = avaAmount / 100
@@ -310,16 +314,18 @@ def getSuggestedMembers(request, activityID):
         
         m.update(
         {
+            "Conflict Status": aS,
             "Opportunity Weight": oAmount, 
             "Account Weight": aAmount, 
             "Product Weight": pAmount, 
-            "Availablity": avaAmount
-        }) #, "Total Percentage": total})
+            "Availablity": avaAmount, 
+            "Total Percentage": total
+        })
 
     #sort the members by the weight
     members = sorted(
         members, 
-        key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'], 
+        key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'] + k['Total Percentage'], 
         reverse=True
     )
 
