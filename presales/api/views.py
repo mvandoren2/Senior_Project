@@ -121,7 +121,9 @@ def getActivity(request, activityID):
 
         if('members' in activity_patch):
             #if the leadMember is not in the memberForm, remove it
-            if(updateActivity.leadMember not in updateActivity.members.all() and not 'leadMember' in activity_patch):
+            if('leadMember' in activity_patch):
+                leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
+            if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
                 updateActivity.leadMember = None
                 updateActivity.save()
             elif('leadMember' in activity_patch):
