@@ -297,6 +297,7 @@ def getSuggestedMembers(request, activityID):
         
         #see if the proficiency is the same as the activity
         prof = list(memID[0].proficiency.all())
+        print(prof)
         #make prof into a list
         prof = [str(p)[:-2] for p in prof]
 
@@ -305,12 +306,6 @@ def getSuggestedMembers(request, activityID):
             if(p in prod):
                 total += 1
                 pAmount += prodW
-            
-        if(total == 0):
-            oAmount = oAmount / 100
-            aAmount = aAmount / 100
-            avaAmount = avaAmount / 100
-            pAmount = pAmount / 100
         
         total = oAmount + aAmount + pAmount + avaAmount
         
@@ -330,6 +325,9 @@ def getSuggestedMembers(request, activityID):
         key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'] + k['Total Percentage'], 
         reverse=True
     )
+
+    #remove all members that have a product weight of 0
+    members = [m for m in members if m['Product Weight'] != 0]
 
     return Response(members)
 
