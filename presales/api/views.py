@@ -1,5 +1,4 @@
 from datetime import datetime
-import re
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -122,8 +121,13 @@ def getActivity(request, activityID):
 
         if('members' in activity_patch):
             #if the leadMember is not in the memberForm, remove it
-            if(updateActivity.leadMember not in updateActivity.members.all() and updateActivity.leadMember != None):
+            if(updateActivity.leadMember not in updateActivity.members.all() and not 'leadMember' in activity_patch):
                 updateActivity.leadMember = None
+                updateActivity.save()
+            elif('leadMember' in activity_patch):
+                member = [activity_patch['leadMember']]
+                memberID = searchMember(member)
+                updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
                 updateActivity.save()
 
         if('status' in activity_patch):
