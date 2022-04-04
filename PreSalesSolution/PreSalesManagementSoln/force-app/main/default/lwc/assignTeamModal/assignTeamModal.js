@@ -55,7 +55,6 @@ export default class AssignTeamModal extends LightningElement {
             })
         
         this.djangoUsers = members;
-        console.log(this.djangoUsers)
     
         //save the id of all the members in the db
         this.djangoUserID = this.djangoUsers.map(user => user.external_member_ID)
@@ -253,8 +252,6 @@ export default class AssignTeamModal extends LightningElement {
                 'members': this.selectedUsersId,
                 'leadMember': this.leadMemberId
             }    
-
-            console.log(pushingData);
 
             fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
                 method: 'PATCH', 
