@@ -52,6 +52,8 @@ def addActivity(request):
         newActivity.createdByMember = Member.objects.get(member_ID=member)
         newActivity.save()
 
+        #add members in
+
         #add product_ID to the activity
         products = activity['products']
         arrP = searchProduct(products)
@@ -119,8 +121,15 @@ def getActivity(request, activityID):
 
         if('members' in activity_patch):
             #if the leadMember is not in the memberForm, remove it
-            if(updateActivity.leadMember not in updateActivity.members.all() and updateActivity.leadMember != None):
+            if('leadMember' in activity_patch):
+                leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
+            if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
                 updateActivity.leadMember = None
+                updateActivity.save()
+            elif('leadMember' in activity_patch):
+                member = [activity_patch['leadMember']]
+                memberID = searchMember(member)
+                updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
                 updateActivity.save()
 
         if('status' in activity_patch):
@@ -153,7 +162,6 @@ def getActivity(request, activityID):
 
         return HttpResponse(json.dumps({'PATCH working!': 'Nothing to see here!'}), content_type='application/json')
 
-@csrf_exempt
 @api_view(['GET'])
 def getActivities(request):
     query = Activity.objects.all()
@@ -210,7 +218,6 @@ def getPastActivities(request):
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
-@csrf_exempt
 @api_view(['GET'])
 def getSuggestedMembers(request, activityID):
     #get the activity
@@ -242,6 +249,7 @@ def getSuggestedMembers(request, activityID):
     members = serializers.data
 
     for m in members:
+        aS = False
         avaAmount = avaW
         memID = Member.objects.filter(external_member_ID=m['external_member_ID'])
 
@@ -260,14 +268,17 @@ def getSuggestedMembers(request, activityID):
                     #add just the activity ID to aList
                     aList.append(a.activity_ID)
                     avaAmount = 0
+                    aS = True
                 if(date2):
                     if(isWithinAnHour(a.selectedDateTime, date2)):
                         aList.append(a.activity_ID)
                         avaAmount = 0
+                        aS = True
                 if(date3):
                     if(isWithinAnHour(a.selectedDateTime, date3)):
                         aList.append(a.activity_ID)
                         avaAmount = 0
+                        aS = True
 
         aList = Activity.objects.filter(activity_ID__in=aList)
 
@@ -286,6 +297,7 @@ def getSuggestedMembers(request, activityID):
         
         #see if the proficiency is the same as the activity
         prof = list(memID[0].proficiency.all())
+        print(prof)
         #make prof into a list
         prof = [str(p)[:-2] for p in prof]
 
@@ -294,29 +306,28 @@ def getSuggestedMembers(request, activityID):
             if(p in prod):
                 total += 1
                 pAmount += prodW
-            
-        if(total < len(prod)):
-            oAmount = oAmount / 100
-            aAmount = aAmount / 100
-            avaAmount = avaAmount / 100
-            pAmount = pAmount / 100
         
         total = oAmount + aAmount + pAmount + avaAmount
         
         m.update(
         {
+            "Conflict Status": aS,
             "Opportunity Weight": oAmount, 
             "Account Weight": aAmount, 
             "Product Weight": pAmount, 
-            "Availablity": avaAmount
-        }) #, "Total Percentage": total})
+            "Availablity": avaAmount, 
+            "Total Percentage": total
+        })
 
     #sort the members by the weight
     members = sorted(
         members, 
-        key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'], 
+        key=lambda k: k['Opportunity Weight'] + k['Account Weight'] + k['Product Weight'] + k['Availablity'] + k['Total Percentage'], 
         reverse=True
     )
+
+    #remove all members that have a product weight of 0
+    members = [m for m in members if m['Product Weight'] != 0]
 
     return Response(members)
 
@@ -433,14 +444,9 @@ def getActivityNotes(request, activityID):
 @api_view(['GET', 'POST'])
 def getActivityType(request):
     if(request.method =='GET'):
-        if(request.GET.get('name')):
-            activity_Type = ActivityType.objects.filter(name=request.Get.get('name'))
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
-        else:
-            activity_Type = ActivityType.objects.all()
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
+        activity_Type = ActivityType.objects.all()
+        serializer = ActivityTypeSerializer(activity_Type, many=True)
+        return Response(serializer.data)
     elif(request.method == 'POST'):
         activity_Type = json.loads(request.body)
         new_activity_Type = ActivityType(name=activity_Type['name'])

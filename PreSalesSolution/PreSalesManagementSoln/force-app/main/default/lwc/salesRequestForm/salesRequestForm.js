@@ -1,4 +1,4 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement,api, track } from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productsList';
@@ -6,6 +6,7 @@ import { ProductSelector } from './productsList';
 export default class SalesRequestForm extends LightningElement {
     connectedCallback () {
         this.getAccountId()
+        this.getActivityType()
     }
 
     @api opportunityId;
@@ -18,15 +19,31 @@ export default class SalesRequestForm extends LightningElement {
         this.accountId = this.account[0].Id    
     }
 
-    activityTypes = [
-            { label: 'Demonstration', value: '1' },
-            { label: 'Guided lab', value: '2' },
-            { label: 'Sandbox', value: '3' },
-            { label: 'Consult', value: '4' },
-            { label: 'Host Sale Support', value: '5' },
-            { label: 'Shadow', value: '6' },
-            { label: 'Proposal Request', value: '7' },
-    ];
+
+    //pull activity types and put into combobox
+    @track activityTypeArray = [];
+    @track value = '';
+
+    getActivityType(){
+        const endPoint = "http://localhost:8080/api/activity_types/";
+        fetch(endPoint, {
+            method: "GET"
+        })
+        .then((response) => response.json())
+        .then((jsonResponse) => {
+            let arr = [];
+            for(var i = 0; i < jsonResponse.length; i++){
+                arr.push({ label : jsonResponse[i].name, value : jsonResponse[i].type_ID })
+            }
+            this.activityTypeArray = arr;
+            
+        })
+    }
+    get activityTypes() {
+        return this.activityTypeArray;
+    }
+
+    
    
     selectActivityType(event) {        
         this.activityType = event.detail.value;
