@@ -227,7 +227,11 @@ export default class AssignTeamModal extends LightningElement {
 
     handleLead(evt){
 
-        this.template.querySelector(".leadBtn").selected = false;
+        const leadBtn = this.template.querySelectorAll(".leadBtn");
+
+        leadBtn.forEach((btn,i) => {
+            btn.selected = false;
+        });
 
         evt.target.selected = true;
 
@@ -272,10 +276,5 @@ export default class AssignTeamModal extends LightningElement {
 
     closeModal(){
         this.toggleShow();
-    }
-
-    handleChange(event) {
-        this.value = event.detail.value;
-        this.checkMembersDateTime();
     }
 }
