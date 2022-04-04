@@ -104,6 +104,7 @@ export default class AssignTeamModal extends LightningElement {
             commonUser.productWeight = djangoUser["Product Weight"];
             commonUser.accountWeight = djangoUser["Account Weight"];
             commonUser.opportunityWeight = djangoUser["Opportunity Weight"];
+            commonUser.totalWeight = djangoUser["Total Percentage"];
             commonUser.leadState = false
             commonUser.conflictStatus = djangoUser["Conflict Status"];
 
@@ -207,6 +208,9 @@ export default class AssignTeamModal extends LightningElement {
                 index = i;
             }
         }
+
+        //sort the array according to the total weight 
+        this.filteredUnAssignedUsersInfo.sort((a, b) => b.totalWeight - a.totalWeight);
 
         if(index > -1){
             this.selectedUsersInfo.splice(index, 1);
