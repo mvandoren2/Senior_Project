@@ -97,70 +97,76 @@
             <tbody>
                 <template for:each={displayedRows} for:item="row">
                     <tr key={row.id} data-item={row.id} class="slds-hint-parent">
-                            
-                            <!-- data -->
-                            <td scope="row" class="slds-cell-wrap">
-                                <div>
-                                    {row.account}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.opportunity}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.product}
-                                </div>
-                            </td>       
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.activity}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div >
-                                    {row.date}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.location}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.submittedBy}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="slds-cell-wrap">
-                                    {row.presalesTeam}
-                                </div>
-                            </td>
-                            <td class="slds-cell-wrap">
-                                <div>
-                                    {row.status}
-                                </div>
-                            </td>
 
-                            <!-- actions -->
-                            <td>
-                                <div>
-                                    <lightning-button-menu alternative-text="Show menu">
-                                        <template for:each={actions} for:item="action">
-                                            <lightning-menu-item key={action.id} label={action.label} data-item={action.name} onclick={rowActionHandler.handleMenuAction}></lightning-menu-item>
-                                        </template>
-                                    </lightning-button-menu>
-                                </div>
-                            </td>
+                        <!-- data -->
+                        <td scope="row" class="slds-cell-wrap">
+                            <div>
+                                {row.account}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.opportunity}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.product}
+                            </div>
+                        </td>       
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.activity}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div >
+                                {row.date}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.location}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.submittedBy}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="slds-cell-wrap">
+                                {row.presalesTeam}
+                            </div>
+                        </td>
+                        <td class="slds-cell-wrap">
+                            <div>
+                                {row.status}
+                            </div>
+                        </td>
+
+                        <!-- actions -->
+                        <td class="slds-cell-buffer_right">
+                            <div>
+                                <lightning-button-menu alternative-text="Show menu">
+                                    <template for:each={actions} for:item="action">
+                                        <lightning-menu-item    key={action.id} 
+                                                                label={action.label} 
+                                                                data-item={action.name} 
+                                                                onclick={rowActionHandler.handleMenuAction} >
+                                        </lightning-menu-item>
+                                    </template>
+                                </lightning-button-menu>
+                            </div>
+                        </td>
                     </tr>
                 </template>             
             </tbody>
         </table>
     </div>
 
+    <!--Row Action Modals-->
+    <c-activity-detail-view onreloadtablerows={loadTableRows}></c-activity-detail-view>
     <c-assign-team-modal onreloadtablerows={loadTableRows}></c-assign-team-modal>
     <c-status-change-modal ></c-status-change-modal>
 </template>

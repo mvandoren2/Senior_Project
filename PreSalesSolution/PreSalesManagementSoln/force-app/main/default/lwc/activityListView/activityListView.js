@@ -22,15 +22,6 @@ export default class ActivityListView extends LightningElement {
     rows = this.tableFormat.rows.dislpay
     displayedRows = [...this.rows]
 
-    loadTableRows = () => {
-        this.tableFormatter.getTableFormat()
-            .then(data => this.fillTable(data))
-    }
-
-    getRowById = (rowId) => {
-        return this.tableFormat.rows.detailed.filter(row => row.activity_ID === rowId)[0]
-    }
-
     fillTable = (data) => {
         this.tableFormat = data
 
@@ -39,5 +30,16 @@ export default class ActivityListView extends LightningElement {
         this.rows = this.tableFormat.rows.dislpay
 
         this.displayedRows = [...this.rows]
+    }
+    
+    loadTableRows = () => {
+        this.tableFormatter.getTableFormat()
+            .then(data => this.fillTable(data))
+    }
+
+    getRowById = (rowId) => {
+        let activityInd = this.tableFormat.rows.detailed.findIndex(row => row.activity_ID === rowId)
+
+        return {detailed: this.tableFormat.rows.detailed[activityInd], display: this.tableFormat.rows.dislpay[activityInd]}
     }
 }
