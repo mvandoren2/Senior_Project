@@ -9,6 +9,7 @@ from itertools import chain
 from .helper import *
 from .serializers import *
 import json
+import requests
 
 results = 5
 
@@ -458,15 +459,22 @@ def getUserRoles(request):
         new_user_role.save()
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
     
-#----------------------------------------------------------
-#Daniel program below
-# @csrf_exempt
-# def sendNotification():
-#     pass
-#----------------------------------------------------------
-#----------------------------------------------------------    
-# @api_view(['GET']) 
-# def getStatus(request):
-#     serializer = StatusSerilizer(Status, many=True)
-#     return Response(serializer.data)
-# #--------------------------------------------------------
+def sendNotification():
+    url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
+
+    data = {
+        'inputs': [{
+               'customNotifTypeId': '0ML5f000000brbbGAA',
+               'recipientIds' : ['0055f000002968SAAQ'],
+               'title': 'test',
+               'body': 'This is a custom notification.',
+               'targetId': '0065f000003swZ9AAI'
+               }]
+            }
+
+    headers = {
+        "Authorization": "Bearer 00D5f000003H4cm!ASAAQJKTo8flvPbaKObo_i6Dvajk4cc_YM9nLSyJd0YYPEv0YrlSpiXaEbXNz617RS.UdsiL2XfbBIyuBE9ANpMkVp8ye0KH",
+        "Content-Type": "application/json"
+    }
+    r = requests.post(url, data=json.dumps(data), headers=headers)
+    return r
