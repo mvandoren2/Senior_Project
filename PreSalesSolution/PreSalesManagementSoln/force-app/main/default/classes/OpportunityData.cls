@@ -1,6 +1,6 @@
 public with sharing class OpportunityData {
     @AuraEnabled(cacheable=true)
-    public static List <Account> OpportunityData(List<String> opportunity_IDs) {
+    public static List <Account> OpportunityData(List<String> opportunity_Ids) {
         List<Account> ret = new List<Account>();
         
         List <Account> accounts = 

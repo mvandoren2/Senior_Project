@@ -16,7 +16,7 @@ export default class AssignTeamModal extends LightningElement {
 
         //execute the function only once
         if(row !== undefined && row !== this.activity) {
-            this.activity = row;
+            this.activity = row.detailed;
             await this.handleAllWireFunction();
         }
         else if(row === undefined) {

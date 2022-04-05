@@ -27,12 +27,13 @@ export class TableFormatter {
     //Builds an array of action names based on the user's role
     getRowActions = (userProfile) => {
         const actions = {
-            'Pre Sales Manager': [
+            'Presales Manager': [
                 {id: 'action_' + 0, label: 'Assign Request', name: 'assign_request'},
-                {id: 'action_' + 1, label: 'Decline Request', name: 'decline_request'}
+                {id: 'action_' + 1, label: 'Decline Request', name: 'decline_request'},
+                {id: 'action_' + 2, label: 'Show Details', name: 'show_details'}
             ],
 
-            'Pre Sales Member': [
+            'Presales Member': [
                 {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
                 {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'}
             ],

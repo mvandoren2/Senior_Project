@@ -1,4 +1,4 @@
-import getPreSalesTeamMembers from "@salesforce/apex/GetUsers.getPreSalesTeamMembers"
+import GetNinjaUsers from "@salesforce/apex/GetNinjaUsers.GetNinjaUsers"
 import OpportunityData from "@salesforce/apex/OpportunityData.OpportunityData"
 import Id from "@salesforce/user/Id"
 
@@ -24,12 +24,25 @@ export class TableDataHandler {
     }
 
     fetchCurrentUser = () => {
-        const userID = Id ? Id : '0055f000002RLvpAAG'
+        const userID = Id ? Id : '0055f0000041g1mAAA'
         const urlString = url + 'member/' + userID + '/'
 
         return fetch(urlString)
             .then(res => res.json())
     }
+
+    fetchSalesforceUsers = async () => {
+        let members = await fetch(url + 'members/')
+            .then(response => response.json())
+
+        let memberIds = members.map(member => member.external_member_ID)
+        
+        let ret = await GetNinjaUsers({user_Ids: memberIds})
+
+        return ret
+    }
+
+    assembleUser
 
     fetchOpportunities = async (requests) => {
         const opportunity_IDs = requests.map(request => request.opportunity_ID)
@@ -130,11 +143,13 @@ export class TableDataHandler {
     }
 
     getTableData = async () => {
-        let [currentUser, salesforceMembers, rawData] = await Promise.all([this.fetchCurrentUser(), getPreSalesTeamMembers(), this.fetchRequests()])
+        let rawData
+        let currentUser
+
+        [currentUser, this.salesforceMembers, rawData] = await Promise.all([this.fetchCurrentUser(), this.fetchSalesforceUsers(), this.fetchRequests()])
 
         if (!rawData.length) return this.getEmptyTableData()
 
-        this.salesforceMembers = salesforceMembers
         this.opportunities = await this.fetchOpportunities(rawData);
 
         let dislpayData = rawData.map(request => this.generateDisplayRow(request))
