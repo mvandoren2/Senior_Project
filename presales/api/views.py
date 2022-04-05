@@ -469,7 +469,7 @@ def getUserRoles(request):
         new_user_role.save()
         return HttpResponse(json.dumps({'POST working!': 'Nothing to see here!'}), content_type='application/json')
 
-#Display as a notification in dashboard
+#Display and send a notification in dashboard
 def sendNotification():
     url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
 
