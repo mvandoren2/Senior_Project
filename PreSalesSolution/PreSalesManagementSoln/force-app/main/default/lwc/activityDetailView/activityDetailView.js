@@ -107,7 +107,7 @@ export default class ActivityDetailView extends LightningElement {
 
         this.selectedDate = this.dates[i]
     }
-
+    //Accepts request
     acceptRequestHandler = () => {
         let patchBody = {};
 
