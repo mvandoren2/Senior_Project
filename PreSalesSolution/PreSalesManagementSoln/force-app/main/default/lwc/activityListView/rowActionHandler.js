@@ -16,6 +16,10 @@ export class RowActionHandler {
         this.parent.template.querySelector('c-status-change-modal').toggleShow(this.row)
     }
 
+    flipShowDetail = () => {
+        this.parent.template.querySelector('c-activity-detail-view').showModal(this.row)
+    }
+
     handleMenuAction = (evt) => {
         const parentElement = evt.target.closest('tr')
 
@@ -28,5 +32,8 @@ export class RowActionHandler {
 
         if(evt.target.dataset.item === 'decline_request')
             this.flipShowDecline()   
+            
+        if(evt.target.dataset.item === 'show_details')
+            this.flipShowDetail()   
     }
 }

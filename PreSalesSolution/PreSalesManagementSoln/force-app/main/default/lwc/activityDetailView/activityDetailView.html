@@ -1,0 +1,259 @@
+<template>
+    <section    role="dialog" 
+                tabindex="-1" 
+                aria-labelledby="modal-heading-01" 
+                aria-modal="true"
+                aria-describedby="modal-content-id-1" 
+                class={boxClasses} >
+        
+        <div class="slds-modal__container">            
+            <template if:true={isShowing}>
+
+                <!-- modal header start -->
+                <header class="slds-modal__header">
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <lightning-button-icon  icon-name="utility:close" 
+                                            aria-label="close" 
+                                            alternative-text="Close this window" 
+                                            size="large"  
+                                            variant="bare-inverse" 
+                                            onclick={closeModal} 
+                                            title="close" 
+                                            class="slds-modal__close" >  
+                    </lightning-button-icon>  
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Presales Activity: {activity.detailed.status}</h2>
+                </header>            
+
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
+                    <table>
+                        
+                        <!--Account-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Account:
+                                </p>    
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <a>
+                                    {activity.display.account}
+                                </a>    
+                            </td>
+                        </tr>
+
+                        <!--Opportunity-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Opportunity:
+                                </p>
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <a>
+                                    {activity.display.opportunity}
+                                </a>
+                            </td>
+                        </tr>
+
+                        <!--Product-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Product(s):
+                                </p>    
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    {activity.display.product}
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!--Activity-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Activity Type:
+                                </p>
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    {activity.display.activity}
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!--Location-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Location:
+                                </p>        
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    {activity.display.location}
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!--Date-->
+                        <tr>
+                            <td class="slds-var-p-around_small" style="vertical-align: top;">
+                                <p>
+                                    Date:
+                                </p>
+                            </td>
+                            <td class="slds-var-p-around_small" style="display: flex; align-items: center; gap: 1rem;">
+                                
+                                <!--case: date has already been selected-->
+                                <template if:false={dateIsOptional}>
+                                    
+                                    <!--case: selected date has not yet passed-->
+                                    <template if:false={dateIsPast} >
+                                        <p>
+                                            {activity.display.date}
+                                        </p>
+                                    </template>
+
+                                    <!--case: selected date has passed-->
+                                    <template if:true={dateIsPast} >
+                                        <p>Requested date has already passed.</p>
+                                        
+                                        <lightning-button-group>
+                                            <lightning-button   variant="destructive-text"
+                                                                data-item={activity}
+                                                                label="Reschedule" >
+                                            </lightning-button>
+                                            <lightning-button   variant="destructive"
+                                                                data-item={activity}
+                                                                label="Cancel" >
+                                            </lightning-button>
+                                        </lightning-button-group>
+                                    </template>
+                                </template>
+
+                                
+                                <!--case: date has not been selected yet-->
+                                <template if:true={dateIsOptional}>
+                                    <template for:each={dates} for:item="date" >
+                                        <template if:true={date.selected} >
+                                            <lightning-button   key={date.id} 
+                                                                variant='brand'
+                                                                data-item={date.id}
+                                                                onclick={selectDateHandler}
+                                                                label={date.localeString} >
+                                            </lightning-button>
+                                        </template>
+
+                                        <template if:false={date.selected} >
+                                            <lightning-button   key={date.id} 
+                                                                variant='neutral'
+                                                                data-item={date.id}
+                                                                onclick={selectDateHandler}
+                                                                label={date.localeString} >
+                                            </lightning-button>
+                                        </template>
+                                    </template>
+                                </template>
+                            </td>
+                        </tr>
+
+                        <!--Submitted By-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Submitted By:
+                                </p>
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <a>
+                                    {activity.display.submittedBy}
+                                </a>
+                            </td>
+                        </tr>
+
+                        <!--Team-->
+                        <tr>
+                            <td class="slds-var-p-around_small">
+                                <p>
+                                    Assigned To:
+                                </p>    
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                
+                                <!--case: team is assigned-->
+                                <template if:true={teamIsAssigned} >
+                                    <p>
+                                        {activity.display.presalesTeam}
+                                    </p>
+                                    <lightning-button   variant='neutral'
+                                                        onclick={openTeamModal}
+                                                        label='Manage Team' >
+                                    </lightning-button>
+                                </template>
+
+                                <!--case: no team is assigned-->
+                                <template if:false={teamIsAssigned} >
+                                    <lightning-button   variant='neutral'
+                                                        onclick={openTeamModal}
+                                                        label='Assign Team' >
+                                    </lightning-button>
+                                </template>
+                            </td>
+                        </tr>
+
+                        <!--Notes-->
+                        <tr>
+                            <td class="slds-var-p-around_small" style="vertical-align: top;">
+                                    <p>
+                                        Notes:
+                                    </p>
+                            </td>
+                            <td class="slds-var-p-around_small">
+                                <template for:each={notes} for:item="note">  
+                                    <div class="slds-box slds-var-m-bottom_small" key={note.note_ID} >
+                                        
+                                        <!--note header-->
+                                        <div style="display: grid;">
+                                            <a>User Name Placeholder</a>
+                                        </div>    
+                                        
+                                        <!--note content-->
+                                        <p>    
+                                            {note.note_text}
+                                        </p>
+                                    </div>
+                                </template>
+                                <lightning-button   variant='base'
+                                                    data-item={activity.detailed.activity_ID}
+                                                    onclick={selectDateHandler}
+                                                    label='Add Note' >
+                                </lightning-button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </template>
+
+            <!-- modal footer start -->
+            <footer class="slds-modal__footer">
+                <lightning-button   variant='brand'
+                                    onclick={acceptRequestHandler}
+                                    label='Accept'
+                                    class="slds-var-m-right_small" >
+                </lightning-button>
+                
+                <lightning-button   variant='neutral'
+                                    onclick={closeModal}
+                                    label='Cancel' >
+                </lightning-button>
+            </footer>
+
+        </div>
+    </section>
+    <div class={backdropClasses}></div>
+
+    <c-assign-team-modal></c-assign-team-modal>
+</template>
