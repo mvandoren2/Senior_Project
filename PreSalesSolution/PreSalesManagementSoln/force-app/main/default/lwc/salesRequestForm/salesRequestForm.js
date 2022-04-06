@@ -1,4 +1,4 @@
-import { LightningElement,api, track } from 'lwc';
+import { LightningElement,api } from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productsList';
@@ -11,6 +11,8 @@ export default class SalesRequestForm extends LightningElement {
 
     @api opportunityId;
 
+    url = "http://localhost:8080/api/"
+
     getAccountId = async () => {
         let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXpAAI'
 
@@ -21,28 +23,25 @@ export default class SalesRequestForm extends LightningElement {
 
 
     //pull activity types and put into combobox
-    @track activityTypeArray = [];
-    @track value = '';
+    
+    activityType = ''
+    activityTypes = [];
 
     getActivityType(){
-        const endPoint = "http://localhost:8080/api/activity_types/";
+        const endPoint = this.url+ "activity_types/";
         fetch(endPoint, {
             method: "GET"
         })
         .then((response) => response.json())
         .then((jsonResponse) => {
             let arr = [];
-            for(var i = 0; i < jsonResponse.length; i++){
-                arr.push({ label : jsonResponse[i].name, value : jsonResponse[i].type_ID })
+            for(let i = 0; i < jsonResponse.length; i++){
+                arr.push({ label : jsonResponse[i].name, value : jsonResponse[i].type_ID.toString() })
             }
-            this.activityTypeArray = arr;
             
+            this.activityTypes = arr;
         })
     }
-    get activityTypes() {
-        return this.activityTypeArray;
-    }
-
     
    
     selectActivityType(event) {        
@@ -141,7 +140,8 @@ export default class SalesRequestForm extends LightningElement {
             "notes": this.notes,
             "flag": this.unexpectedFlag
         }
-        fetch('http://localhost:8080/api/activity/', {
+        
+        fetch(this.url + 'activity/', {
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(jsonData)

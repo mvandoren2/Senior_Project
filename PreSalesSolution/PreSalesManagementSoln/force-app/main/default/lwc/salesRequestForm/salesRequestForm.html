@@ -28,18 +28,17 @@
 
                 <abbr title="required" class="slds-required">*</abbr>
                 <label for="date1" class="slds-text-title" >Selected:</label>
-                <lightning-layout multiple-rows="true" >                    
+                <div class="selected-product-container" style="display: flex; gap: 1rem; flex-wrap: wrap;">                    
                     <template for:each={selectedProducts} for:item="prod">
-                        <lightning-layout-item key={prod.external_product_ID} size="3" padding="arround-small">
-                            <lightning-pill variant="destructive" 
+                            <lightning-pill key={prod.external_product_ID}
+                                            variant="destructive" 
                                             label={prod.name}
                                             title="Destructive action"
                                             data-item={prod.external_product_ID}
                                             onremove={productSelector.removeProd} >
                             </lightning-pill>
-                        </lightning-layout-item>                   
                     </template>
-                </lightning-layout>
+                </div>
             </div>
 
             <div class="slds-grid slds-gutters_xx-small">
@@ -48,7 +47,7 @@
                                     label="Activity Type"
                                     placeholder="Select activity type" 
                                     options={activityTypes}
-                                    class="slds-col slds-size_2.5-of-5"
+                                    class="slds-col slds-size_3-of-5"
                                     onchange={selectActivityType} 
                                     required >
                 </lightning-combobox>
@@ -57,7 +56,7 @@
                                     label="Activity Level" 
                                     placeholder="Select activity level" 
                                     options={activityLevels}
-                                    class="slds-col slds-size_2.5-of-5" 
+                                    class="slds-col slds-size_2-of-5" 
                                     onchange={selectActivityLevel} 
                                     required >
                 </lightning-combobox>

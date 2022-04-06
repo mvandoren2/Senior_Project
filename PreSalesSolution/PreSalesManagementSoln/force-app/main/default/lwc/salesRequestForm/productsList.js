@@ -1,51 +1,22 @@
 import SalesRequestForm from "./salesRequestForm";
 
-export const products = [
-    {
-        'external_product_ID': 1,
-        "name": "Watch"
-    },
-    {
-        'external_product_ID': 2,
-        "name": "Laptop"
-    },
-    {
-        'external_product_ID': 3,
-        "name": "Phone"
-    },  
-    {
-        'external_product_ID': 4,
-        "name": "Tablet"
-    },  
-    {
-        'external_product_ID': 5,
-        "name": "TV"
-    },
-    {
-        'external_product_ID': 6,
-        "name": "Xbox Series X"
-    },
-    {
-        'external_product_ID': 7,
-        "name": "Xbox Series S"
-    },
-    {
-        'external_product_ID': 8,
-        "name": "Playstation 5"
-    }
-]
-
 export class ProductSelector {
     constructor (parentObj) {
         this.parent = parentObj
+
+        this.getProducts()
 
         if(!(this.parent instanceof SalesRequestForm))
             throw new Error('ProductSelector was invoked by an invalid parent')
     }
 
-    products = products
+    products = []
 
-    
+    getProducts = () => {
+        fetch(this.parent.url + 'products/')
+            .then(res => res.json())
+            .then(data => {this.products = data})
+    }
 
     //search for products in the text bar
     searchEvt = (evt) => {
@@ -78,11 +49,11 @@ export class ProductSelector {
 
     //event button to remove from cart
     removeProd = (evt) => {
-        const product_ID = parseInt(evt.target.dataset.item, 10);
+        const product_ID = evt.target.dataset.item
         const product = this.parent.selectedProducts.filter(item => item.external_product_ID === product_ID)[0]
 
         this.products.push(product);
-        this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item.external_product_ID !== product_ID);
+        this.parent.selectedProducts.remove(product);
 
         this.parent.template.querySelector(".search").value = '';
         this.searchEvt({target:{value: ''}})
