@@ -123,6 +123,7 @@ def getActivity(request, activityID):
             activity_Type = ActivityType.objects.get(name=activity_Type['name'])
             activity_Type.delete()
             return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
+    else:
         if(request.method == 'GET'):
             try:
                 activity = Activity.objects.filter(activity_ID=activityID)
@@ -204,10 +205,10 @@ def getActivity(request, activityID):
                 updateActivity.save()
 
             return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+            
 @api_view(['GET'])
 def getActivities(request):
     query = Activity.objects.all()
-    print(request.GET)
     
     if(request.GET.get('opportunity_ID') or request.GET.get('activeManager') or request.GET.get('account_ID') or request.GET.get('createdByMember') or request.GET.get('members') or request.GET.get('products') or request.GET.get('status') or request.GET.get('flag')):
         #query whatever is passed in
