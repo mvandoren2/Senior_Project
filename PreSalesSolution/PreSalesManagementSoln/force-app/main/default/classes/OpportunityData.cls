@@ -9,7 +9,7 @@ public with sharing class OpportunityData {
                 .addSubquery(
                     Query.subquery('Opportunities')
                         .selectFields('Id, Name')
-                        .addConditionIn('Id', opportunity_IDs)
+                        .addConditionIn('Id', opportunity_Ids)
                 )
                 .run();
 
