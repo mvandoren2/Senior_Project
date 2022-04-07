@@ -94,6 +94,7 @@ class Activity(models.Model):
    createdByMember = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(Member, blank=True)
    leadMember =  models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='leadMember')
+   activeManager = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='activeManager')
    oneDateTime = models.DateTimeField(help_text = "Year-Month-Day Hour:Minute:Second")
    twoDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")
    threeDateTime = models.DateTimeField(blank=True, null=True, help_text = "Year-Month-Day Hour:Minute:Second")

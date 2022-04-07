@@ -1,3 +1,4 @@
+from unicodedata import name
 from management.models import *
 from datetime import datetime
 
@@ -16,24 +17,29 @@ def searchMember(members):
 
     return arrM
 
-def searchProduct(products):
+def searchProducttoAdd(products):
     arrP = []
     for p in products:
         #filter by external_presales_member_ID and return the presales_member_ID
-        prod = Product.objects.filter(external_product_ID=p['external_product_ID'])
+        prod = Product.objects.filter(external_product_ID=p)
         if(prod):
             arrP.append(prod[0].product_ID)
-        else:
-            #save the external_presales_member_ID and return the presales_member_ID
-            newProd = Product(external_product_ID=p['product_ID'], name=p['name'])
-            newProd.save()
-            arrP.append(newProd.product_ID)
+    return arrP
 
+def searchProducttoCreate(product):
+    arrP = []
+    #save the external_presales_member_ID and return the presales_member_ID
+    newProd = Product(external_product_ID=product['external_product_ID'], name=product['name'])
+    newProd.save()
+    for i in range(1,5):
+        newProf = Proficiency(product=newProd, level=i)
+        newProf.save()
+    arrP.append(newProd.product_ID)
     return arrP
 
 def searchActivityType(activityType):
     #check to see if the activity name is already in the database
-    act = ActivityType.objects.filter(type_ID=activityType)
+    act = ActivityType.objects.filter(name=activityType)
     if(act):
         return act[0].type_ID
     else:
@@ -62,6 +68,17 @@ def searchActivity(activity):
         return True
     else:
         return False
+
+def searchProficiency(prodLevels):
+    arrP = []
+    for p in prodLevels:
+        #filter proficiencies by product name and level
+        name = p.split(' ')[0]
+        level = p.split(' ')[1]
+        prof = Proficiency.objects.filter(product__name=name, level=level)
+        if(prof):
+            arrP.append(prof[0].proficiency_ID)
+    return arrP
 
 def isWithinAnHour(date1, date2):
     #get abs value of the difference
