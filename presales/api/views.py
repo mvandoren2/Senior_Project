@@ -113,6 +113,8 @@ def getActivity(request, activityID):
             return Response(serializer.data)
         elif(request.method == 'POST'):
             activity_Type = json.loads(request.body)
+            if(ActivityType.objects.filter(type_ID=activity_Type['type_ID']).exists()):
+                return HttpResponse("Activity type already exists", status=409)
             new_activity_Type = ActivityType(name=activity_Type['name'])
             new_activity_Type.save()
             return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
@@ -395,6 +397,10 @@ def getMembers(request):
 def getMember(request, id):
     if(request.method == 'POST'):
         data = request.data
+
+        if(Member.objects.filter(external_member_ID=id).exists()):
+            return HttpResponse("Member already exists", status=409)
+        
         #get the role ID
         role = UserRole.objects.get(name=data['role'])
         #create the memeber
@@ -446,7 +452,7 @@ def getMember(request, id):
             role = UserRole.objects.get(name=data['role'])
             member.user_role = role
             member.save()
-            
+
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 
 @api_view(['GET'])
@@ -473,6 +479,10 @@ def getProducts(request):
             return Response(serializers.data)
     elif(request.method == 'POST'):
         product = json.loads(request.body)
+
+        if(Product.objects.filter(name=product['name']).exists()):
+            return HttpResponse("Product already exists", status=409)
+        
         searchProducttoCreate(product)
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
@@ -489,6 +499,7 @@ def getActivityNote(request, noteID):
         note.note_text = jForm['note_text']
         note.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def getActivityNotes(request, activityID):
@@ -498,6 +509,10 @@ def getActivityNotes(request, activityID):
         return Response(serializers.data)
     elif(request.method == 'POST'):
         note = json.loads(request.body)
+
+        if(Note.objects.filter(activity=activityID, note_text=note['note_text']).exists()):
+            return HttpResponse("Note already exists", status=409)
+        
         memberID = searchMember([note['member']])[0]
 
         act = Activity.objects.get(activity_ID=activityID)
@@ -516,10 +531,11 @@ def getUserRoles(request):
     elif(request.method == 'POST'):
         user_role = json.loads(request.body)
         if(UserRole.objects.filter(name=user_role['name']).exists()):
-            return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+            return HttpResponse("User role already exists", status=409)
         new_user_role = UserRole(name=user_role['name'])
         new_user_role.save()
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+
 #Display and send a notification in dashboard
 def sendNotification():
     url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
