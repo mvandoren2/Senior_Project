@@ -45,9 +45,9 @@ export class TableDataHandler {
     assembleUser
 
     fetchOpportunities = async (requests) => {
-        const opportunity_IDs = requests.map(request => request.opportunity_ID)
+        const opportunity_Ids = requests.map(request => request.opportunity_ID)
 
-        let apexAccountData = await OpportunityData({opportunity_IDs: opportunity_IDs})
+        let apexAccountData = await OpportunityData({opportunity_Ids: opportunity_Ids})
 
         let opportunities = []
 
