@@ -25,8 +25,7 @@ SECRET_KEY = 'cg_cd6!gd3jg#_d)2ee@qh+h83c@cf)h+8z4wy45uhn8tru(jg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -136,4 +135,4 @@ SFDC_CONSUMER_KEY = "3MVG9p1Q1BCe9GmCzbNEHis6ekvmynHYjtp00lXIfsK3gqLWRzhyEBYOvV4
 SFDC_CONSUMER_SECRET = "367427909C00EC54CEDDF1CDF27D4BD59AB43508ADFB9E1FA62FA1616C97A3F7"
 CUSTOM_CALLBACK = "management.callback.oauth_callback"
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True  

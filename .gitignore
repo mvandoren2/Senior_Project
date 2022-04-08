@@ -4,5 +4,4 @@ env
 
 **/db.sqlite3
 
-django_sandbox/django_sandbox/settings.py
-django_sandbox/django_sandbox/settings/local.py
+presales/settings/dev.py
