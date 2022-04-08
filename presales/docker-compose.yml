@@ -9,8 +9,7 @@ services:
      sh -c "python manage.py makemigrations && 
      python manage.py migrate && 
      python manage.py collectstatic --noinput &&
-     python manage.py runserver 8000"
-    #  gunicorn presales.wsgi:application --bind 0.0.0.0:8000"
+     gunicorn presales.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
       - static:/usr/src/app/static
@@ -29,15 +28,15 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data/
 
-  # nginx:
-  #   build: ./nginx
-  #   container_name: nginx
-  #   volumes:
-  #     - static:/usr/src/app/static
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     - django
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    volumes:
+      - static:/usr/src/app/static
+    ports:
+      - "80:80"
+    depends_on:
+      - django
 
 volumes:
   pgdata:
