@@ -28,15 +28,15 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data/
 
-  nginx:
-    build: ./nginx
-    container_name: nginx
-    volumes:
-      - static:/usr/src/app/static
-    ports:
-      - "80:80"
-    depends_on:
-      - django
+  # nginx:
+  #   build: ./nginx
+  #   container_name: nginx
+  #   volumes:
+  #     - static:/usr/src/app/static
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - django
 
 volumes:
   pgdata:
