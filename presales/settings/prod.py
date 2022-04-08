@@ -38,5 +38,5 @@ if(switch):
             'PASSWORD': 'postgres',
             'HOST': 'pgdb',
             'PORT': '5432',
-    }
+        }
     }
