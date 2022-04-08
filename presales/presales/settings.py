@@ -25,7 +25,7 @@ SECRET_KEY = 'cg_cd6!gd3jg#_d)2ee@qh+h83c@cf)h+8z4wy45uhn8tru(jg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,18 +84,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'postgres',
-#         'HOST': 'pgdb',
-#         'PORT': '5432',
-#    }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
