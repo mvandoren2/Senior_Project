@@ -5,11 +5,10 @@ switch = False
 try:
     from .dev import *
 except:
-    swich = True
+    switch = True
     pass
 
 if(switch):
-    print("Here is prod.py!")
     # For static folder
     STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
