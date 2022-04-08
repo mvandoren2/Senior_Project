@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  django:
+    tty: true
+    build: .
+    container_name: django
+    command: 
+      sh -c "python manage.py makemigrations && 
+      python manage.py migrate && 
+      python manage.py collectstatic --noinput && 
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+
+  pgdb:
+    image: postgres
+    container_name: pgdb
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+volumes:
+  pgdata:
