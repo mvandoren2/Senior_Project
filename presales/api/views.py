@@ -118,7 +118,7 @@ def getActivity(request, activityID):
             return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
         elif(request.method == 'DELETE'):
             activity_Type = json.loads(request.body)
-            activity_Type = ActivityType.objects.get(name=activity_Type['name'])
+            activity_Type = ActivityType.objects.get(type_ID=activity_Type['type_ID'])
             activity_Type.delete()
             return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
     else:
