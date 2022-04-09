@@ -282,8 +282,12 @@ def getSuggestedMembers(request, activityID):
     for p in activity.products.all():
         prod.append(str(p))
 
+    if(len(prod) == 0):
+        prodW = 0
+    else:
+        prodW = .25 / len(prod)
+
     avaW = .25
-    prodW = .25 / len(prod)
     oppW = .3
     accW = .2
     total = 0
@@ -391,6 +395,7 @@ def getMembers(request):
         serializers = MemberSerializer(members, many=True)
         return Response(serializers.data)
 
+#FIX PROFICIENCY
 @csrf_exempt
 @api_view(['GET', 'DELETE', 'POST', 'PATCH'])
 def getMember(request, id):
@@ -401,7 +406,7 @@ def getMember(request, id):
             return HttpResponse("Member already exists", status=409)
         
         #get the role ID
-        role = UserRole.objects.get(name=data['role'])
+        role = UserRole.objects.get(name=data['user_role'])
         #create the memeber
         member = Member(
             external_member_ID = id,
@@ -434,6 +439,7 @@ def getMember(request, id):
         #get the member
         member = Member.objects.get(external_member_ID=id)
 
+        # FIX change proficiencies to accept json object array
         if("proficiency" in data):
             #get the proficiency ID's
             prof = searchProficiency(data['proficiency'])
@@ -465,7 +471,7 @@ def getMemberActivities(request, id):
     return Response(serializers.data)
 
 @csrf_exempt
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'PATCH'])
 def getProducts(request):
     if(request.method == 'GET'):
         if(request.GET.get('available')):
@@ -484,6 +490,19 @@ def getProducts(request):
         
         searchProducttoCreate(product)
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+    elif(request.method == 'PATCH'):
+        data = request.data
+        product = Product.objects.get(product_ID=data['product_ID'])
+        if("name" in data):
+            product.name = data['name']
+            product.save()
+        if("external_product_ID" in data):
+            product.external_product_ID = data['external_product_ID']
+            product.save()
+        if("available" in data):
+            product.available = data['available']
+            product.save()
+        return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
 @api_view(['PATCH', 'DELETE'])

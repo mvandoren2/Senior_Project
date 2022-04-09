@@ -29,7 +29,9 @@ def searchProducttoAdd(products):
 def searchProducttoCreate(product):
     arrP = []
     #save the external_presales_member_ID and return the presales_member_ID
-    newProd = Product(external_product_ID=product['external_product_ID'], name=product['name'])
+    newProd = Product(name=product['name'])
+    if('external_product_ID' in product):
+        newProd.external_product_ID = product['external_product_ID']
     newProd.save()
     for i in range(1,5):
         newProf = Proficiency(product=newProd, level=i)
@@ -63,9 +65,8 @@ def searchProficiency(prodLevels):
     arrP = []
     for p in prodLevels:
         #filter proficiencies by product name and level
-        name = p.split(' ')[0]
-        level = p.split(' ')[1]
-        prof = Proficiency.objects.filter(product__name=name, level=level)
+        name = Product.objects.get(product_ID=p['product_ID'])
+        prof = Proficiency.objects.filter(product__name=name, level=p['level'])
         if(prof):
             arrP.append(prof[0].proficiency_ID)
     return arrP

@@ -114,6 +114,7 @@ class Note(models.Model):
    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
    member = models.ForeignKey(Member, on_delete=models.CASCADE)
    note_text = models.CharField(max_length=500, unique=True)
+   note_date = models.DateTimeField(auto_now_add=True)
 
    class meta:
       verbose_name_plural = 'Notes'
