@@ -24,9 +24,7 @@ def addActivity(request):
             return HttpResponse("Activity already exists", status=409)
 
         #add activity type
-        activity_type_ID = searchActivityType(activity['activity_Type'])
-
-        request_activity_Type = ActivityType.objects.get(type_ID=activity_type_ID)        
+        request_activity_Type = ActivityType.objects.get(type_ID=activity['activity_Type'])
 
         date1 = datetime.fromisoformat(activity['oneDateTime'].split('.')[0] + '+00:00')
         

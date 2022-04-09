@@ -39,7 +39,7 @@ def searchProducttoCreate(product):
 
 def searchActivityType(activityType):
     #check to see if the activity name is already in the database
-    act = ActivityType.objects.filter(name=activityType)
+    act = ActivityType.objects.filter(type_ID=activityType)
     if(act):
         return act[0].type_ID
     else:
