@@ -36,21 +36,11 @@ def searchProducttoCreate(product):
         newProf.save()
     arrP.append(newProd.product_ID)
     return arrP
-
-def searchActivityType(activityType):
-    #check to see if the activity name is already in the database
-    act = ActivityType.objects.filter(type_ID=activityType)
-    if(act):
-        return act[0].type_ID
-    else:
-        print("Oopsie Woopsie! Uwu someone made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!")
     
 def searchActivity(activity):
     #search to see if there is a activity with the same opportunity_ID, acount_ID, and date
 
-    activity_type_ID = searchActivityType(activity['activity_Type'])
-
-    request_activity_Type = ActivityType.objects.get(type_ID=activity_type_ID)        
+    request_activity_Type = ActivityType.objects.get(type_ID=activity['activity_Type'])        
 
     date1 = datetime.fromisoformat(activity['oneDateTime'].split('.')[0] + '+00:00')
 
