@@ -5,9 +5,6 @@ switch = False
 try:
     from .dev import *
 except:
-    switch = True
-
-if(switch):
     # Overrides base.py settings here
     DEBUG = False
 
