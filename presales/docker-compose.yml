@@ -9,7 +9,7 @@ services:
      sh -c "python manage.py makemigrations && 
      python manage.py migrate && 
      python manage.py collectstatic --noinput &&
-     gunicorn presales.wsgi:application --bind 54.146.229.49:8000"
+     gunicorn presales.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - .:/usr/src/app
       - static:/usr/src/app/static
