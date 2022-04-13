@@ -14,7 +14,7 @@ services:
       - .:/usr/src/app
       - static:/usr/src/app/static
     expose:
-      - '8000'
+      - "8000"
     depends_on:
       - pgdb
 
