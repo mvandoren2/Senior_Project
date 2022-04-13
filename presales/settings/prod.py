@@ -6,15 +6,14 @@ try:
     from .dev import *
 except:
     switch = True
-    pass
 
 if(switch):
+    # Overrides base.py settings here
+    DEBUG = False
+
     # For static folder
     STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-    # Overrides base.py settings here
-    DEBUG = False
-    
     # HTTPS SETTINGS
     SECURE_SSL_REDIRECT = True
     CSRF_COOKIE_SECURE = True
