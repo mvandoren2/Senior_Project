@@ -1,7 +1,5 @@
 from .base import *
 
-switch = False
-
 try:
     from .dev import *
 except:
