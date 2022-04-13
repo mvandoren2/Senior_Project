@@ -14,6 +14,7 @@ if(switch):
 
     # Overrides base.py settings here
     DEBUG = False
+    
     # HTTPS SETTINGS
     SECURE_SSL_REDIRECT = True
     CSRF_COOKIE_SECURE = True
