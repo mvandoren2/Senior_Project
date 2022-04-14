@@ -1,5 +1,6 @@
 from enum import unique
 from itertools import product
+from multiprocessing.dummy import active_children
 from django.db import models
 
 class UserRole(models.Model):
@@ -16,7 +17,7 @@ class Product(models.Model):
    product_ID = models.AutoField(primary_key=True)
    external_product_ID = models.CharField(max_length=50, blank=True, null=True)
    name = models.CharField(max_length=100, unique=True)
-   available = models.BooleanField(default=True)
+   active = models.BooleanField(default=True)
 
    class meta:
       verbose_name = 'Product'

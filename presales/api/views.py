@@ -34,7 +34,6 @@ def addActivity(request):
             account_ID = activity['account_ID'], 
             location = activity['location'], 
             activity_Type = request_activity_Type,
-            activity_Level = activity['activity_Level'], 
             oneDateTime=date1,
             status = activity['status'], 
             flag=activity['flag']
@@ -150,6 +149,10 @@ def getActivity(request, activityID):
                 for m in arrM:
                     updateActivity.members.add(m)
                 
+                updateActivity.save()
+
+            if('activityLevel' in activity_patch):
+                updateActivity.activityLevel = activity_patch['activityLevel']
                 updateActivity.save()
 
             if('members' in activity_patch):
@@ -474,8 +477,8 @@ def getMemberActivities(request, id):
 @api_view(['GET', 'POST', 'PATCH'])
 def getProducts(request):
     if(request.method == 'GET'):
-        if(request.GET.get('available')):
-            products = Product.objects.filter(available=request.GET.get('available'))
+        if(request.GET.get('active')):
+            products = Product.objects.filter(active=request.GET.get('active'))
             serializers = ProductSerializer(products, many=True)
             return Response(serializers.data)
         else:
@@ -499,8 +502,8 @@ def getProducts(request):
         if("external_product_ID" in data):
             product.external_product_ID = data['external_product_ID']
             product.save()
-        if("available" in data):
-            product.available = data['available']
+        if("active" in data):
+            product.active = data['active']
             product.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 

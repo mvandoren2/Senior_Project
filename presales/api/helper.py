@@ -32,6 +32,8 @@ def searchProducttoCreate(product):
     newProd = Product(name=product['name'])
     if('external_product_ID' in product):
         newProd.external_product_ID = product['external_product_ID']
+    if('active' in product):
+        newProd.active = product['active']
     newProd.save()
     for i in range(1,5):
         newProf = Proficiency(product=newProd, level=i)
