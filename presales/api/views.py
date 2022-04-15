@@ -110,10 +110,12 @@ def getActivity(request, activityID):
             return Response(serializer.data)
         elif(request.method == 'POST'):
             activity_Type = json.loads(request.body)
-            if(ActivityType.objects.filter(name=activity_Type['name']).exists()):
-                return HttpResponse("Activity type already exists", status=409)
-            new_activity_Type = ActivityType(name=activity_Type['name'])
-            new_activity_Type.save()
+            for a in activity_Type["activity_types"]:
+                if(ActivityType.objects.filter(name=a['name']).exists()):
+                    pass
+                else:
+                    new_activity_Type = ActivityType(name=a['name'])
+                    new_activity_Type.save()
             return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
         elif(request.method == 'DELETE'):
             activity_Type = json.loads(request.body)
@@ -487,11 +489,8 @@ def getProducts(request):
             return Response(serializers.data)
     elif(request.method == 'POST'):
         product = json.loads(request.body)
-
-        if(Product.objects.filter(name=product['name']).exists()):
-            return HttpResponse("Product already exists", status=409)
         
-        searchProducttoCreate(product)
+        searchProducttoCreate(product["products"])
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
     elif(request.method == 'PATCH'):
         data = request.data
