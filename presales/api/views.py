@@ -495,7 +495,8 @@ def getProducts(request):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
     elif(request.method == 'PATCH'):
         data = request.data
-        product = Product.objects.get(product_ID=data['product_ID'])
+        product = Product.objects.get(name=data['name'])
+        print(product)
         if("name" in data):
             product.name = data['name']
             product.save()
