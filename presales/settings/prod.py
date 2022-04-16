@@ -1,7 +1,5 @@
 from .base import *
 
-print('prod')
-
 try:
     from .dev import *
 except:

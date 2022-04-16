@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http import HttpResponse
 from collections import OrderedDict
@@ -10,8 +10,9 @@ from .helper import *
 from .serializers import *
 import requests
 import json
+from rest_framework.permissions import IsAuthenticated
 
-results = 5
+results = 5 
 
 @csrf_exempt
 @api_view(['POST'])
@@ -34,7 +35,6 @@ def addActivity(request):
             account_ID = activity['account_ID'], 
             location = activity['location'], 
             activity_Type = request_activity_Type,
-            activity_Level = activity['activity_Level'], 
             oneDateTime=date1,
             status = activity['status'], 
             flag=activity['flag']
@@ -111,14 +111,16 @@ def getActivity(request, activityID):
             return Response(serializer.data)
         elif(request.method == 'POST'):
             activity_Type = json.loads(request.body)
-            if(ActivityType.objects.filter(name=activity_Type['name']).exists()):
-                return HttpResponse("Activity type already exists", status=409)
-            new_activity_Type = ActivityType(name=activity_Type['name'])
-            new_activity_Type.save()
+            for a in activity_Type["activity_types"]:
+                if(ActivityType.objects.filter(name=a['name']).exists()):
+                    pass
+                else:
+                    new_activity_Type = ActivityType(name=a['name'])
+                    new_activity_Type.save()
             return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
         elif(request.method == 'DELETE'):
             activity_Type = json.loads(request.body)
-            activity_Type = ActivityType.objects.get(type_ID=activity_Type['type_ID'])
+            activity_Type = ActivityType.objects.get(name=activity_Type['name'])
             activity_Type.delete()
             return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
     else:
@@ -150,6 +152,10 @@ def getActivity(request, activityID):
                 for m in arrM:
                     updateActivity.members.add(m)
                 
+                updateActivity.save()
+
+            if('activityLevel' in activity_patch):
+                updateActivity.activityLevel = activity_patch['activityLevel']
                 updateActivity.save()
 
             if('members' in activity_patch):
@@ -472,10 +478,10 @@ def getMemberActivities(request, id):
 
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
-def getProducts(request):
+def getProducts(request,):
     if(request.method == 'GET'):
-        if(request.GET.get('available')):
-            products = Product.objects.filter(available=request.GET.get('available'))
+        if(request.GET.get('active')):
+            products = Product.objects.filter(active=request.GET.get('active'))
             serializers = ProductSerializer(products, many=True)
             return Response(serializers.data)
         else:
@@ -484,23 +490,21 @@ def getProducts(request):
             return Response(serializers.data)
     elif(request.method == 'POST'):
         product = json.loads(request.body)
-
-        if(Product.objects.filter(name=product['name']).exists()):
-            return HttpResponse("Product already exists", status=409)
         
-        searchProducttoCreate(product)
+        searchProducttoCreate(product["products"])
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
     elif(request.method == 'PATCH'):
         data = request.data
-        product = Product.objects.get(product_ID=data['product_ID'])
+        product = Product.objects.get(name=data['name'])
+        print(product)
         if("name" in data):
             product.name = data['name']
             product.save()
         if("external_product_ID" in data):
             product.external_product_ID = data['external_product_ID']
             product.save()
-        if("available" in data):
-            product.available = data['available']
+        if("active" in data):
+            product.active = data['active']
             product.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 

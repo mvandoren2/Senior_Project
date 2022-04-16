@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__
 SECRET_KEY = 'cg_cd6!gd3jg#_d)2ee@qh+h83c@cf)h+8z4wy45uhn8tru(jg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '54.146.229.49']
 
@@ -144,9 +144,10 @@ CUSTOM_CALLBACK = "management.callback.oauth_callback"
 CORS_ORIGIN_ALLOW_ALL = True
 
 # HTTPS SETTINGS
-SECURE_SSL_REDIRECT = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
 #will be True when we have SSL certificate
 SECURE_SSL_REDIRECT = False
 

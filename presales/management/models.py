@@ -1,6 +1,10 @@
 from enum import unique
 from itertools import product
+from multiprocessing.dummy import active_children
 from django.db import models
+from django.db.models.signals import *
+from django.dispatch import receiver
+from django.utils import timezone
 
 class UserRole(models.Model):
    roles_ID = models.AutoField(primary_key=True)
@@ -16,7 +20,7 @@ class Product(models.Model):
    product_ID = models.AutoField(primary_key=True)
    external_product_ID = models.CharField(max_length=50, blank=True, null=True)
    name = models.CharField(max_length=100, unique=True)
-   available = models.BooleanField(default=True)
+   active = models.BooleanField(default=True)
 
    class meta:
       verbose_name = 'Product'
@@ -121,3 +125,9 @@ class Note(models.Model):
 
    def __str__(self):
       return self.note_text
+   
+@receiver(pre_save, sender = Activity)
+def pre_Status_Update(sender, instance, **kwargs):
+   if(instance.selectedDateTime < timezone.now() and instance.status == 'Scheduled'):
+      instance.status = 'Expire'
+      instance.save()   

@@ -12,6 +12,7 @@ def searchMember(members):
         else:
             #save the external_presales_member_ID and return the presales_member_ID
             newMem = Member(external_member_ID=m)
+            newMem.user_role = UserRole.objects.get(name='Sales Representative')
             newMem.save()
             arrM.append(newMem.member_ID)
 
@@ -26,17 +27,23 @@ def searchProducttoAdd(products):
             arrP.append(prod[0].product_ID)
     return arrP
 
-def searchProducttoCreate(product):
+def searchProducttoCreate(products):
     arrP = []
-    #save the external_presales_member_ID and return the presales_member_ID
-    newProd = Product(name=product['name'])
-    if('external_product_ID' in product):
-        newProd.external_product_ID = product['external_product_ID']
-    newProd.save()
-    for i in range(1,5):
-        newProf = Proficiency(product=newProd, level=i)
-        newProf.save()
-    arrP.append(newProd.product_ID)
+    for p in products:
+        if(Product.objects.filter(name=p['name']).exists()):
+            pass
+        else:
+            #save the external_presales_member_ID and return the presales_member_ID
+            newProd = Product(name=p['name'])
+            if('external_product_ID' in p):
+                newProd.external_product_ID = p['external_product_ID']
+            if('active' in p):
+                newProd.active = p['active']
+            newProd.save()
+            for i in range(1,5):
+                newProf = Proficiency(product=newProd, level=i)
+                newProf.save()
+            arrP.append(newProd.product_ID)
     return arrP
     
 def searchActivity(activity):
