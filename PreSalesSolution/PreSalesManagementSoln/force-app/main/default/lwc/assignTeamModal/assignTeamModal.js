@@ -1,277 +1,276 @@
-import { LightningElement, track, api, wire } from 'lwc';
-import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMembers";
+import { LightningElement, track, api } from 'lwc';
+import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
 
 export default class AssignTeamModal extends LightningElement {
     
-    activity;
-    @track modalTab = ""
-    @track saveBtnStatus = true;
+    isShowing = false
 
-    @api toggleShow = async (row) => {
+    @api showModal = async (activity) => {        
+        this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
+            true : false
+        
+        if(this.activity !== activity){
+            this.activity = activity; 
+            this.suggestedMembers = await this.fetchSuggestedMembers()
+        }       
 
-        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
-        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
+        this.setSelectedMembers();
 
-        this.isShowing = !this.isShowing
+        this.isShowing = true
 
-        //execute the function only once
-        if(row !== undefined && row !== this.activity) {
-            this.activity = row.detailed;
-            await this.handleAllWireFunction();
-        }
-        else if(row === undefined) {
-            let reloadParentTable = new CustomEvent('reloadtablerows')
-            this.dispatchEvent(reloadParentTable)
-        }
+        this.toggleModalClasses()
+    }
 
-        //initail check of there is leadMember
-        if(this.leadMemberId){
-            this.saveBtnStatus = false;
-        }
+    closeModal = (evt) => {
+        this.toggleModalClasses()
+        
+        this.isShowing = false
+
+        this.dispatchEvent(evt)
     }
 
     @track boxClasses = 'slds-modal'
     @track backdropClasses = 'slds-backdrop'
+    
+    toggleModalClasses = () => {
+        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
+        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
+    }
 
-    djangoUsers = [];
-    djangoActivityUsersId = [];
-    djangoUserID = [];
-    @track commonUsersInfo = [];
-    @track selectedUsersInfo = [];
-    @track unAssignedUsersInfo = [];
-    @track filteredUnAssignedUsersInfo;
-    selectedUsersId = [];
+    suggestedNinjaMembers = [];
+    @track selectedNinjaMembers = [];
+    unselectedNinjaMembers = [];
+    @track unselectedNinjaMembers_filtered = [];
     @track leadMemberId;
 
     //fetch all members and selected members from djangodb
     membersFetched = false;
-    async handleAllFetch() {
-        let members = [];
 
-        await fetch('http://localhost:8080/api/activity/' + this.activity.activity_ID + '/suggested_members/')
+    url = 'http://localhost:8080/api/activity/'
+
+    async fetchSuggestedMembers() {
+        let suggestedNinjaMembers = await fetch(this.url + this.activity.activity_ID + '/suggested_members/')
             .then(response => response.json())
-            .then(data => {
-                members = data;
-            })
-        
-        this.djangoUsers = members;
+            .catch(err => {console.error('Error: ', err)})
     
-        //save the id of all the members in the db
-        this.djangoUserID = this.djangoUsers.map(user => user.external_member_ID)
-    
+        const suggestedUserIds = suggestedNinjaMembers.map(user => user.external_member_ID)
+
+        let salesforceNinjaMembers = await GetNinjaUsers({user_Ids: suggestedUserIds})
+            .catch(err => {console.error('Error: ', err)})
+
+        suggestedNinjaMembers.forEach(suggestedMember => {
+            let salesforceMemberData = salesforceNinjaMembers.find(member => suggestedMember.external_member_ID === member.Id)
+
+            suggestedMember.salesforceData = salesforceMemberData
+            suggestedMember.leadState = false
+        })
+
         this.membersFetched = true;
+
+        return suggestedNinjaMembers
     }
 
-    error;
-    salesforceUsers;
+    setSelectedMembers(){
+        let selectedUserIds = this.activity.team.map(member => member.Id)
 
-    //wire and get the users from the salesforce
-    @wire(getPreSalesTeamMembers) teamMembers({error, data}){
-        if(data){
-            this.salesforceUsers = data;
-            this.error = undefined;
-        } else if(error){
-            this.error = error;
-            console.error(error);
+        this.selectedNinjaMembers = this.suggestedMembers.filter(member => selectedUserIds.includes(member.external_member_ID))
+
+        this.unselectedNinjaMembers = this.suggestedMembers.filter(member => !selectedUserIds.includes(member.external_member_ID));
+
+        if(this.activity.leadMember) {
+            this.leadMemberId = this.activity.leadMember.external_member_ID
+            this.selectedNinjaMembers.find(user => user.Id === this.leadMemberId).leadState = true
+            this.saveBtnIsDisabled = false
         }
+
+        this.unselectedNinjaMembers_filtered = [...this.unselectedNinjaMembers];
     }
 
-    //main method: filter data for use in the template
-    async handleAllWireFunction(){
-        //wait for fetching of data from djangodb
-        if(!this.membersFetched) await this.handleAllFetch();
-
-        //fetch data of selected users and save their id to arrays
-        this.selectedUsersId = this.activity.members.map(member => member.external_member_ID)
-        this.djangoActivityUsersId = [...this.selectedUsersId]
-
-        //get the users from salesforce, compare the ids to all members and if match save to any array
-        this.commonUsersInfo = []
-
-        let commonUsersInfo = [];
-
-        this.djangoUserID.forEach((user,i) => {
-            commonUsersInfo.push((this.salesforceUsers.filter(suser => this.djangoUserID[i] === suser.Id))[0]);
-        });
-
-        //add proficiency field to all users
-        commonUsersInfo.forEach((user, i) => {
-            let djangoUser = this.djangoUsers.filter(dUser => dUser.external_member_ID === user.Id)[0];
-
-            let commonUser = Object.create(user)
-            commonUser.proficiency = djangoUser.proficiency
-            commonUser.productWeight = djangoUser["Product Weight"];
-            commonUser.accountWeight = djangoUser["Account Weight"];
-            commonUser.opportunityWeight = djangoUser["Opportunity Weight"];
-            commonUser.totalWeight = djangoUser["Total Percentage"];
-            commonUser.leadState = false
-            commonUser.conflictStatus = djangoUser["Conflict Status"];
-
-            //check if there is a conflict and assign values for the heltext
-            if(djangoUser["Conflict Status"] === true){
-                let count = 0;
-                for(let i=0; i < djangoUser.Conflicts.length; i++){
-                    count++;
-                }
-                commonUser.numOfConflict = "This member has time conflict with " + count + " other active activity!";
-            }
-
-            this.commonUsersInfo[i] = commonUser
-        })
-
-        //get the users from salesforce, compare the ids to selected members and if match save to any array
-        this.selectedUsersInfo = this.commonUsersInfo.filter(user => this.djangoActivityUsersId.includes(user.Id))
-
-        this.selectedUsersInfo.forEach((user, i) => {
-            if(this.activity.leadMember){
-                if(this.selectedUsersInfo[i].Id === this.activity.leadMember.external_member_ID){
-                    this.leadMemberId = this.selectedUsersInfo[i].Id;
-                    this.selectedUsersInfo[i].leadState = true;
-                }
-            }
-        })
-
-        //get all the unassigned users by filtering selcted and all
-        this.unAssignedUsersInfo = this.commonUsersInfo.filter(val => !this.selectedUsersInfo.includes(val));
-
-        //selectedUserInfo save their index
-        this.unAssignedUsersInfo.forEach((user, i) => {
-            user.index = i;
-        })
-
-        this.filteredUnAssignedUsersInfo = this.unAssignedUsersInfo;
-    }
-
-    //search input function
-    searchUsers = (evt) => {
+    memberFilterBarHandler = (evt) => {
             const value = evt.target.value.toLowerCase();
-            this.filteredUnAssignedUsersInfo = this.unAssignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
+            this.unselectedNinjaMembers_filtered = this.unselectedNinjaMembers
+                .filter(member => member.salesforceData.Name.toLowerCase().includes(value));
+    }
+
+    suggestedMemberFilter = ''
+
+    filterSuggestedMembers(filterString) {
+        if(filterString)
+            this.suggestedMemberFilter = filterString
+
+        this.unselectedNinjaMembers_filtered = this.unselectedNinjaMembers
+                .filter(member => member.salesforceData.Name.toLowerCase().includes(this.suggestedMemberFilter));
+    }
+
+    //
+    //all the sort functions for the button-group
+    //
+
+    sortedBy = 'All'
+
+    sortByCombinedWeights(evt){
+        this.unselectedNinjaMembers_filtered.sort((a, b) => b['Total Percentage'] - a['Total Percentage']);
+
+        if(evt)
+            this.setSelectedButton(evt);
+
+        this.sortedBy = 'All'
+    }
+
+    sortByProficiency(evt){
+        this.unselectedNinjaMembers_filtered.sort((a, b) => b.productWeight - a.productWeight);
+        
+        if(evt)
+            this.setSelectedButton(evt);
+
+        this.sortedBy = 'Proficiency'
+    }
+
+    sortByOpportunityWeight(evt){
+        this.unselectedNinjaMembers_filtered.sort((a, b) => b.opportunityWeight - a.opportunityWeight);
+        
+        if(evt)
+            this.setSelectedButton(evt);
+
+        this.sortedBy = 'Opportunity'
+    }
+
+    sortByAccountWeight(evt){
+        this.unselectedNinjaMembers_filtered.sort((a, b) => b.accountWeight - a.accountWeight);
+
+        if(evt)
+            this.setSelectedButton(evt);
+
+        this.sortedBy = 'Account'
     }
 
     //function to change the status of group button
-    buttonStatus(evt){
-        const btn = this.template.querySelectorAll(".sortBtn");
-        btn.forEach((btn,i) => {
+    setSelectedButton(evt){
+        const buttonGroup = this.template.querySelectorAll(".sortBtn");
+
+        buttonGroup.forEach(btn => {
             btn.variant = "neutral";
         });
        
         evt.target.variant = "brand";
     }
 
-    //all the sort functions for the button-group
-    handleAll(evt){
-        this.handleAllWireFunction();
-        this.buttonStatus(evt);
-    }
+    reSortSuggestedMembers() {
+        switch (this.sortedBy) {
+            case 'All' : 
+                this.sortByCombinedWeights()
+                break
 
-    filteredWithProficiency(evt){
-        this.filteredUnAssignedUsersInfo.sort((a, b) => b.productWeight - a.productWeight);
-        this.buttonStatus(evt);
-    }
+            case 'Proficiency' :
+                this.sortByProficiency()
+                break
 
-    filteredWithOpportunity(evt){
-        this.filteredUnAssignedUsersInfo.sort((a, b) => b.opportunityWeight - a.opportunityWeight);
-        this.buttonStatus(evt);
-    }
+            case 'Opportunity' :
+                this.sortByOpportunityWeight()
+                break
 
-    filteredWithAccount(evt){
-        this.filteredUnAssignedUsersInfo.sort((a, b) => b.accountWeight - a.accountWeight);
-        this.buttonStatus(evt);
+            case 'Account' :
+                this.sortByAccountWeight()
+                break
+
+            default: break
+        }
     }
 
     //onclick change the button label and save the data to selected array
-    handleAssign(evt) {
-        if(evt.target.label === "Assign"){
-            this.selectedUsersId.push(evt.target.dataset.item);
-            let index;
+    assignMemberToTeam(evt) {
+        const memberToAddId = evt.target.dataset.item
 
-            for(let i=0; i < this.filteredUnAssignedUsersInfo.length; i++){
-                if(this.filteredUnAssignedUsersInfo[i].Id === evt.target.dataset.item){
-                    this.selectedUsersInfo.push(this.filteredUnAssignedUsersInfo[i]);
-                    index = i;
-                }
-            }
+        const memberToAdd = this.suggestedMembers.find(member => member.external_member_ID === memberToAddId)
 
-            if(index > -1){
-                this.filteredUnAssignedUsersInfo.splice(index, 1);
-            }
-            
-        }
+        if(this.selectedNinjaMembers.length === 0)
+            memberToAdd.leadState = true
+
+        this.selectedNinjaMembers.push(memberToAdd)
+
+        this.unselectedNinjaMembers = this.unselectedNinjaMembers.filter(member => member.external_member_ID !== memberToAddId)
+
+        this.filterSuggestedMembers()
+
+        this.saveBtnIsDisabled = false
+
     }
 
-    handleRemove(evt){
-        let index;
-        for(let i=0; i < this.selectedUsersInfo.length; i++){
-            if(this.selectedUsersInfo[i].Id === evt.target.dataset.item){
-                this.filteredUnAssignedUsersInfo.splice(this.selectedUsersInfo[i].index, 0 , this.selectedUsersInfo[i]);
-                index = i;
-            }
+    removeMemberFromTeam(evt){
+        const memberToRemoveId = evt.target.dataset.item
+
+        const memberToRemove = this.suggestedMembers.find(member => member.external_member_ID === memberToRemoveId)
+
+        this.unselectedNinjaMembers.push(memberToRemove)
+
+        this.selectedNinjaMembers = this.selectedNinjaMembers.filter(member => member.external_member_ID !== memberToRemoveId)
+
+        if(this.selectedNinjaMembers.length === 1)
+            this.selectedNinjaMembers[0].leadState = true
+
+        this.filterSuggestedMembers()
+        this.reSortSuggestedMembers()
+
+        if(!this.selectedNinjaMembers.length)
+            this.saveBtnIsDisabled = true
         }
 
-        //sort the array according to the total weight 
-        this.filteredUnAssignedUsersInfo.sort((a, b) => b.totalWeight - a.totalWeight);
 
-        if(index > -1){
-            this.selectedUsersInfo.splice(index, 1);
-        }
-
-        //remove the unassigned user
-        const anotherIndex = this.selectedUsersId.indexOf(evt.target.dataset.item);
-
-        if(index > -1){
-            this.selectedUsersId.splice(anotherIndex, 1);
-        }
-    }
-
-
-    handleLead(evt){
-
+    @track saveBtnIsDisabled = true;
+    
+    selectLead(evt){
         const leadBtn = this.template.querySelectorAll(".leadBtn");
 
-        leadBtn.forEach((btn,i) => {
-            btn.selected = false;
-        });
+        leadBtn.forEach(btn => { btn.selected = false; });
 
         evt.target.selected = true;
 
         this.leadMemberId = evt.target.dataset.item;
 
-        //make the btn disabled/abled
-        if(this.leadMemberId){
-            this.saveBtnStatus = false;
-        } else {
-            this.saveBtnStatus = true;
-        }
+        this.saveBtnIsDisabled = false
     }
 
-    //push the data to backend
-    pushData(){
-            let activity_ID = this.activity.activity_ID;
-
-            let pushingData = {
-                'members': this.selectedUsersId,
-                'leadMember': this.leadMemberId
-            }    
-
-            fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
-                method: 'PATCH', 
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(pushingData),
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
+    patchActivity = false
 
     //save button action
-    pushDataAndToggle(){
-        this.pushData();
-        this.toggleShow();
+    selectTeam(){
+        const team = {
+            members: this.selectedNinjaMembers.map(member => member.external_member_ID),
+            leadMember: this.leadMemberId
+        }
+        
+        if(this.patchActivity)
+            this.patchActivityTeam(team);
+
+        let teamSelectedEvent = new CustomEvent('teamassigned', {
+            detail: team
+        })
+
+        this.closeModal(teamSelectedEvent);
+    }
+    
+    //push the data to backend
+    patchActivityTeam(){
+        let activity_ID = this.activity.activity_ID;
+
+        let patchBody = {
+            'members': this.selectedNinjaMembers.map(member => member.external_member_ID),
+            'leadMember': this.leadMemberId
+        }    
+
+        fetch(this.url + activity_ID + '/', {
+            method: 'PATCH', 
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(patchBody),
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
 
-    closeModal(){
-        this.toggleShow();
+    cancelSelectTeam() {
+        this.closeModal(new CustomEvent('cancel'))
     }
 }
