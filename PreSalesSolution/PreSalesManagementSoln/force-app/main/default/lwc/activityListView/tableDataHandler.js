@@ -5,23 +5,6 @@ import Id from "@salesforce/user/Id"
 export const url = 'http://localhost:8080/api/'
 
 export class TableDataHandler {
-    emptyActivity = {
-        id: '',
-        account: '',
-        opportunity: '',
-        product: '',
-        activity: '',
-        date: '',
-        location: '',
-        submittedBy: '',
-        presalesTeam: '',
-        status: ''
-    }
-
-    fetchRequests = () => {
-        return fetch(url + 'activities/')
-            .then(res => res.json())
-    }
 
     fetchCurrentUser = () => {
         const userID = Id ? Id : '0055f0000041g1mAAA'
@@ -42,10 +25,17 @@ export class TableDataHandler {
         return ret
     }
 
-    assembleUser
+    fetchActivities = async () => {
+        let activities = await fetch(url + 'activities/')
+            .then(res => res.json())
 
-    fetchOpportunities = async (requests) => {
-        const opportunity_Ids = requests.map(request => request.opportunity_ID)
+        this.opportunities = await this.fetchOpportunities(activities)
+
+        return activities.map(request => this.buildDetailedActivityObj(request))
+    }
+
+    fetchOpportunities = async (activities) => {
+        const opportunity_Ids = activities.map(request => request.opportunity_ID)
 
         let apexAccountData = await OpportunityData({opportunity_Ids: opportunity_Ids})
 
@@ -65,14 +55,77 @@ export class TableDataHandler {
         return opportunities
     }
 
-    //
-    //Data processing utilities
-    //
+    buildDetailedActivityObj = (activity) => {
+        let activityOpportunity = this.opportunities.filter(opportunity => opportunity.Id === activity.opportunity_ID)[0]
+        
+        let dates = this.dateArrayBuilder(activity)
+
+        let team = activity.members
+            .map(member => ( this.salesforceMembers
+                .filter(salesforceMember => ( salesforceMember.Id === member.external_member_ID)[0]))
+            )
+
+        let submittedBy = activity.createdByMember
+
+        if(submittedBy)
+                submittedBy = this.salesforceMembers.filter(member => member.Id === submittedBy.external_member_ID)[0]
+                
+        let manager = activity.activeManager
+
+        if(manager)
+                manager = this.salesforceMembers.filter(member => member.Id === manager.external_member_ID)[0]
+
+        let leadMember = activity.leadMember
+
+        if(leadMember)
+                leadMember = this.salesforceMembers.filter(member => member.Id === leadMember.external_member_ID)[0]
+
+        
+
+        return {
+            activity_ID: activity.activity_ID,
+            opportunity: activityOpportunity,
+            products: activity.products,
+            activity_Type: activity.activity_Type,
+            activity_Level: activity.activity_Level,
+            location: activity.location,
+            dates: dates,
+            selectedDate: activity.selectedDateTime,
+            submittedBy: submittedBy,
+            manager: manager,
+            leadMember: leadMember,
+            team: team,
+            status: activity.status,
+            flag: activity.flag
+        }
+    }
+
+    dateArrayBuilder = (activity) => {
+        let dates = []
+
+        if(activity.oneDateTime)
+            dates.push(activity.oneDateTime)
+
+        if(activity.twoDateTime)
+            dates.push(activity.twoDateTime)
+
+        if(activity.threeDateTime)
+            dates.push(activity.threeDateTime)
+
+        return dates.map((date, i) => {
+            date = new Date(date)
+
+            return {
+                id : i + 1,
+                date: date,
+                localeString: this.dateStringUtil(date),
+                selected: false
+            }
+        })
+    }
 
     //builds a formatted string from a JS Date object
-    dateStringUtil = (date) => {
-        let dateString = 'Optional'
-        
+    dateStringUtil = (date) => {        
         const dateDisplayOptions = {
             weekday:'short', 
             month:"numeric", 
@@ -83,80 +136,26 @@ export class TableDataHandler {
             hourCycle:'h12'
         }
 
-        if(date !== null) {
-            dateString = new Date(date)
-            dateString = dateString > new Date() ? dateString.toLocaleString('en-US', dateDisplayOptions) : 'Requested date passed'
-        }
-
+        const dateString = date.toLocaleString('en-US', dateDisplayOptions)
+            
         return dateString
     }
-    
-    getMemberByID = (member_ID) => {
-        let member = this.salesforceMembers.filter(user => user.Id === member_ID)
-    
-        return member === [] ? console.error('Team member ID not found') : member[0]
-    }
-    
-    getTeamMembers = (request) => {
-        return request.members
-            .map(member => this.getMemberByID(member.external_member_ID))
-            .filter(member => member)
-    }
-    
-    getOpportunity = (opportunity_ID) => {
-        let myOpportunity = this.opportunities.filter(opportunity => opportunity.Id === opportunity_ID)
-    
-        return myOpportunity === [] ? console.error('Opportunity not found') : myOpportunity[0]
-    }
-
-
-    generateDisplayRow = (request) => {
-        let newRow = Object.assign({}, this.emptyActivity)
-
-        const opportunity = this.getOpportunity(request.opportunity_ID)
-
-        const selectedDate = this.dateStringUtil(request.selectedDateTime)
-                    
-        newRow.id = request.activity_ID
-        newRow.account = opportunity.AccountName
-        newRow.opportunity = opportunity.Name
-        newRow.product = request.products.map((str) =>(str.name ? str.name : str.Name)).join(', ')
-        newRow.activity = request.activity_Type.name + ' ' + request.activity_Level
-        newRow.location = request.location
-        newRow.date =  selectedDate
-        newRow.submittedBy = this.getMemberByID(request.createdByMember.external_member_ID).Name
-        newRow.presalesTeam = this.getTeamMembers(request).map((str) =>(str.name ? str.name : str.Name)).join(', ')
-        newRow.status = request.status
-    
-        return newRow
-    }
 
     //
-    //Serve Processed Table Data, getEmptyTableData() is to render the table before the async method completes
+    //Serve Processed Table Data
     //
-
-    getEmptyTableData = () => {
-        return {
-            dislpay: [this.emptyActivity],
-            detailed: []
-        }
-    }
-
     getTableData = async () => {
-        let rawData
+        let detailedData
         let currentUser
 
-        [currentUser, this.salesforceMembers, rawData] = await Promise.all([this.fetchCurrentUser(), this.fetchSalesforceUsers(), this.fetchRequests()])
+        this.salesforceMembers = await this.fetchSalesforceUsers();
 
-        if (!rawData.length) return this.getEmptyTableData()
+        [currentUser, detailedData] = await Promise.all([this.fetchCurrentUser(), this.fetchActivities()])
 
-        this.opportunities = await this.fetchOpportunities(rawData);
-
-        let dislpayData = rawData.map(request => this.generateDisplayRow(request))
+        if (!detailedData.length) return this.getEmptyTableData()
     
         return {
-            dislpay: dislpayData, 
-            detailed: rawData,
+            activities: detailedData,
             user: currentUser
         }
     }
