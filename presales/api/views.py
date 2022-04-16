@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http import HttpResponse
 from collections import OrderedDict
@@ -10,8 +10,9 @@ from .helper import *
 from .serializers import *
 import requests
 import json
+from rest_framework.permissions import IsAuthenticated
 
-results = 5
+results = 5 
 
 @csrf_exempt
 @api_view(['POST'])
@@ -477,7 +478,7 @@ def getMemberActivities(request, id):
 
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
-def getProducts(request):
+def getProducts(request,):
     if(request.method == 'GET'):
         if(request.GET.get('active')):
             products = Product.objects.filter(active=request.GET.get('active'))
