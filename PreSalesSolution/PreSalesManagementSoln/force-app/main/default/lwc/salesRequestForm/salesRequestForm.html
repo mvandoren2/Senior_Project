@@ -17,7 +17,7 @@
                 <template if:false={searchBarEmpty}>    
                     <div class="slds-dropdown slds-dropdown_large">
                         <template for:each={filteredProducts} for:item="product">
-                                <lightning-menu-item    key={product.external_product_ID}
+                                <lightning-menu-item    key={product.product_ID}
                                                         value={product}
                                                         label={product.name} 
                                                         onclick={productSelector.addProd} >
@@ -30,11 +30,11 @@
                 <label for="date1" class="slds-text-title" >Selected:</label>
                 <div class="selected-product-container" style="display: flex; gap: 1rem; flex-wrap: wrap;">                    
                     <template for:each={selectedProducts} for:item="prod">
-                            <lightning-pill key={prod.external_product_ID}
+                            <lightning-pill key={prod.product_ID}
                                             variant="destructive" 
                                             label={prod.name}
                                             title="Destructive action"
-                                            data-item={prod.external_product_ID}
+                                            data-item={prod.product_ID}
                                             onremove={productSelector.removeProd} >
                             </lightning-pill>
                     </template>

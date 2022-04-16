@@ -14,9 +14,9 @@ export default class SalesRequestForm extends LightningElement {
     url = "http://localhost:8080/api/"
 
     getAccountId = async () => {
-        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXpAAI'
-
-        this.account = await OpportunityData({opportunity_IDs: [opportunity_Id]})
+        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
+        
+        this.account = await OpportunityData({opportunity_Ids: [opportunity_Id]})
 
         this.accountId = this.account[0].Id    
     }
@@ -28,18 +28,13 @@ export default class SalesRequestForm extends LightningElement {
     activityTypes = [];
 
     getActivityType(){
-        const endPoint = this.url+ "activity_types/";
+        const endPoint = this.url + "activity/types/";
         fetch(endPoint, {
             method: "GET"
         })
         .then((response) => response.json())
-        .then((jsonResponse) => {
-            let arr = [];
-            for(let i = 0; i < jsonResponse.length; i++){
-                arr.push({ label : jsonResponse[i].name, value : jsonResponse[i].type_ID.toString() })
-            }
-            
-            this.activityTypes = arr;
+        .then((data) => {
+            this.activityTypes = data.map(item => ({label: item.name, value: item.type_ID.toString()}))
         })
     }
     
@@ -123,13 +118,15 @@ export default class SalesRequestForm extends LightningElement {
     //POST JSON ----------
     handleUploadAction(){
         let memberId = Id ? Id : '0055f0000041g1mAAA'
-        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXpAAI'
+        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
+
+        let selectedProducts = this.selectedProducts.map(product => product.product_ID)
 
         let jsonData = {
             "createdByMember": memberId,
             "opportunity_ID": opportunity_Id,
             "account_ID": this.accountId,
-            "products": this.selectedProducts,
+            "products": selectedProducts,
             "activity_Type": parseInt(this.activityType, 10),
             "activity_Level": this.activityLevel,
             "location": this.location,
