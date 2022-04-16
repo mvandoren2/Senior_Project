@@ -1,0 +1,55 @@
+<template>
+    <!-- lightning button for open modal window -->
+    <lightning-button variant="brand"
+       label="Reschedule"
+       title="Reschedule"
+       onclick={openModal}
+       class="slds-m-left_x-small">
+    </lightning-button>
+    <!--Use template if:true to display/hide popup based on isModalOpen value--> 
+    <template if:true={isModalOpen}>
+        
+        
+        <!-- Modal starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <!-- Modal header here -->
+                <header class="slds-modal__header">
+                    <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reschedule form</h1>
+                </header>
+
+
+
+
+                <!-- Modal body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <abbr title="required" class="slds-required">*</abbr>
+                    <label for="date1" class="slds-text-title" >Date</label>
+                    <lightning-input type="datetime" label=" " data-item="date1" variant="label-hidden" onchange={dateInputHandler} required></lightning-input>
+
+                    <template if:false={alternateDates}>
+                    <lightning-button variant="base" label="Add Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates}></lightning-button>
+                    </template>
+
+                    <template if:true={alternateDates}>
+                        <lightning-input type="datetime" label=" " data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                        <lightning-input type="datetime" label=" " data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                        <lightning-button variant="base" label="Hide Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates} ></lightning-button>
+                    </template>
+                </div>
+
+
+                <!-- Modal footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                    <button class="slds-button slds-button_brand" disabled={isSubmitDisabled} onclick={handleUploadAction} title="OK">Submit</button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+
+ </template>
