@@ -19,7 +19,7 @@ export default class ActivityListView extends LightningElement {
     tableFormat = this.tableFormatter.getEmptyTableFormat()
     columns = this.tableFormat.columns
     actions = this.tableFormat.actions
-    rows = this.tableFormat.rows.dislpay
+    rows = this.tableFormat.data.display
     displayedRows = [...this.rows]
 
     fillTable = (data) => {
@@ -27,7 +27,7 @@ export default class ActivityListView extends LightningElement {
 
         this.columns = this.tableFormat.columns
         this.actions = this.tableFormat.actions
-        this.rows = this.tableFormat.rows.dislpay
+        this.rows = this.tableFormat.data.display
 
         this.displayedRows = [...this.rows]
     }
@@ -38,8 +38,8 @@ export default class ActivityListView extends LightningElement {
     }
 
     getRowById = (rowId) => {
-        let activityInd = this.tableFormat.rows.detailed.findIndex(row => row.activity_ID === rowId)
+        let activityInd = this.tableFormat.data.activities.findIndex(row => row.activity_ID === rowId)
 
-        return {detailed: this.tableFormat.rows.detailed[activityInd], display: this.tableFormat.rows.dislpay[activityInd]}
+        return this.tableFormat.data.activities[activityInd]
     }
 }

@@ -9,11 +9,11 @@ export class RowActionHandler {
     }
 
     flipShowAssign = () => {
-        this.parent.template.querySelector('c-assign-team-modal').toggleShow(this.row)
+        this.parent.template.querySelector('c-assign-team-modal').showModal(this.row)
     }
 
     flipShowDecline = () => {
-        this.parent.template.querySelector('c-status-change-modal').toggleShow(this.row)
+        this.parent.template.querySelector('c-status-change-modal').showModal(this.row)
     }
 
     flipShowDetail = () => {

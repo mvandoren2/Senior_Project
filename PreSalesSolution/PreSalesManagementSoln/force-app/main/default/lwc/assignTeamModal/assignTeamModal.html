@@ -1,106 +1,207 @@
 <!-- sldsValidatorIgnore -->
 <template>
-    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
-            aria-describedby="modal-content-id-1" class={boxClasses}>
-            <div class="slds-modal__container">
+    <template if:true={isShowing}>
+        <section    role="dialog" 
+                    tabindex="-1" 
+                    aria-labelledby="modal-heading-01" 
+                    aria-modal="true"
+                    aria-describedby="modal-content-id-1" 
+                    class={boxClasses} >
+
+            <div class="slds-modal__container" >
+                
                 <!-- modal header start -->
-                <header class="slds-modal__header">
+                <header class="slds-modal__header" >
+                
+                    <!--Close button-->
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
                             title="Close" 
-                            onclick={closeModal}>
-                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
-                        <span class="slds-assistive-text">Close</span>
+                            onclick={cancelSelectTeam} >
+
+                        <lightning-icon icon-name="utility:close" 
+                                        alternative-text="close" 
+                                        variant="inverse" 
+                                        size="small" >
+                        </lightning-icon>
+                        
+                        <span class="slds-assistive-text" >Close</span>
                     </button>
-                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Pre-Sales Teams</h2>
+                    
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" >Presales Team</h2>
                 </header>
 
-                   <!-- Modal/Popup Box LWC body starts here -->
-                   <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                        <h1>Selected members</h1>
-                        <template if:true={selectedUsersInfo}>
-                            <template for:each={selectedUsersInfo} for:item="user">
-                                <ul class="selectedUlList" key={user.Id}>
-                                    <li class="selectedLiList">
-                                        <div class="smallCard">
-                                            <lightning-button-icon data-item={user.Id} 
-                                                                   icon-name="utility:close"
-                                                                   variant="bare" alternative-text="remove user" 
-                                                                   class="slds-m-left_xx-small my-round-button" 
-                                                                   title="Remove user" onclick={handleRemove}>
-                                                                </lightning-button-icon>
-                                            <div class="parent">
-                                                <img src={user.FullPhotoUrl} alt="Image" class="assignedImg">
-                                                {user.Name}
-                                                <template for:each={user.proficiency} for:item="inner">
-                                                    <li key={inner.product.name} class="helpText">
-                                                        Proficiency:<br>
-                                                        {inner.product.name}:
-                                                        {inner.level}  
-                                                    </li>
-                                                </template>
-                                            </div>
-                                            <lightning-button-icon-stateful data-item={user.Id} icon-name="utility:adduser" size="small" selected={user.leadState} onclick={handleLead} alternative-text="Assign Lead" class="leadBtn"></lightning-button-icon-stateful>
-                                        </div>
-                                    </li>
-                                </ul>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" >
+                    
+                    <!--Selected Members Section-->
+                    <div>
+                        <h1 class="slds-text-title slds-var-m-bottom_small">Selected members:</h1>
+                    
+                        <lightning-layout multiple-rows="true" >
+                            <!--Display Selected Team-->
+                            <template for:each={selectedNinjaMembers} for:item="member">
+                                 
+                                <lightning-layout-item key={member.external_member_ID} flexibility="auto" class="slds-var-m-around_xx-small" >
+
+                                    <!--Member pills-->
+                                    <div  class="slds-box slds-box_x-small">
+                                        <lightning-layout vertical-align="center" horizontal-align="space" >
+                                            
+                                            <lightning-layout-item class="slds-var-m-right_xx-small" >
+                                                <lightning-button-icon  data-item={member.external_member_ID} 
+                                                                        icon-name="utility:close"
+                                                                        variant="bare" 
+                                                                        alternative-text="remove member" 
+                                                                        class="slds-m-left_xx-small my-round-button" 
+                                                                        title="Remove member" 
+                                                                        onclick={removeMemberFromTeam} >
+                                                </lightning-button-icon>
+                                            </lightning-layout-item>
+
+                                            <lightning-layout-item class="slds-var-m-right_x-small">
+                                                <p class="slds-text-title" >{member.salesforceData.Name}</p>
+                                            </lightning-layout-item>
+                                        
+                                            <lightning-layout-item>
+                                                <lightning-button-icon-stateful data-item={member.external_member_ID} 
+                                                                                icon-name="utility:adduser" 
+                                                                                size="small" 
+                                                                                selected={member.leadState} 
+                                                                                onclick={selectLead} 
+                                                                                alternative-text="Assign Lead" 
+                                                                                class="leadBtn">
+                                                </lightning-button-icon-stateful>
+                                            </lightning-layout-item>
+
+                                        </lightning-layout>
+                                    </div>
+                                </lightning-layout-item>
                             </template>
-                        </template>
-                        <div onchange={searchUsers}>
-                            <lightning-input
-                                name="enter-search"
-                                label="Search with Name/Proficency Level"
-                                type="search"
-                            ></lightning-input>
-                        </div>
-                        <div style="margin-top: 2%;">
-                            <label>Sort by:</label><br>
-                        </div>
-                        <lightning-button-group>
-                            <lightning-button label="Best Members" onclick={handleAll} title="Sort by best members" variant="brand" class="sortBtn"></lightning-button>
-                            <lightning-button label="Proficiency" onclick={filteredWithProficiency} title="Sort by product proficiency" class="sortBtn"></lightning-button>
-                            <lightning-button label="Opportunity" onclick={filteredWithOpportunity} title="Sort by opportunity involvement" class="sortBtn"></lightning-button>
-                            <lightning-button label="Account" onclick={filteredWithAccount} title="Sort by account involvement" class="sortBtn"></lightning-button>
-                        </lightning-button-group>
-                        <template if:true={filteredUnAssignedUsersInfo}>
-                            <template for:each={filteredUnAssignedUsersInfo} for:item="user">
-                                <ul key={user.Id}>
-                                    <li> 
-                                        <div class="card">
-                                            <img src={user.FullPhotoUrl} alt="Image" class="unassignedImg">
-                                            <div class="userInfo">
-                                                <span style="font-weight: bold; font-size: 15px">{user.Name}
-                                                    <template if:true={user.conflictStatus}>
-                                                        <lightning-helptext icon-name="utility:info" content={user.numOfConflict}></lightning-helptext>
-                                                    </template>
-                                                </span>
-                                                <ul>
-                                                    <template for:each={user.proficiency} for:item="inner">
-                                                        <li key={inner.product.name}>
-                                                            {inner.product.name}:
-                                                            {inner.level}       
+                        </lightning-layout>
+                    </div>
+                    
+                    <lightning-input    name="enter-search"
+                                        label="Search with Name/Proficency Level"
+                                        type="search"
+                                        onchange={memberFilterBarHandler}
+                                        class="slds-var-m-bottom_medium" >
+                    </lightning-input>
+                    
+                    <div class="slds-var-m-bottom_small" >
+                        <lightning-layout horizontal-align="center">
+                            <lightning-layout-item>
+                                <h3 class="slds-text-title slds-var-m-bottom_x-small" >Sort by:</h3>
+    
+                                <lightning-button-group>    
+    
+                                    <lightning-button   label="Best Members" 
+                                                        onclick={sortByCombinedWeights} 
+                                                        title="Sort by best members" 
+                                                        variant="brand" 
+                                                        class="sortBtn">
+                                    </lightning-button>
+            
+                                    <lightning-button   label="Proficiency" 
+                                                        onclick={sortByProficiency} 
+                                                        title="Sort by product proficiency" 
+                                                        class="sortBtn">
+                                    </lightning-button>
+            
+                                    <lightning-button   label="Opportunity" 
+                                                        onclick={sortByOpportunityWeight} 
+                                                        title="Sort by opportunity involvement" 
+                                                        class="sortBtn">
+                                    </lightning-button>
+            
+                                    <lightning-button   label="Account" 
+                                                        onclick={sortByAccountWeight} 
+                                                        title="Sort by account involvement" 
+                                                        class="sortBtn">
+                                    </lightning-button>
+            
+                                </lightning-button-group>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </div>
+
+                    <ul class="slds-scrollable_x" style="max-height: 100rem;" >
+                        <template for:each={unselectedNinjaMembers_filtered} for:item="member">
+
+                            <li key={member.external_member_ID}> 
+
+                                <!--Unselected Member Card-->
+                                <div  class="slds-box slds-var-m-around_small" >
+                                    
+                                    <lightning-layout>
+                                        
+                                        <lightning-layout-item >
+                                            <h3 class="slds-text-heading_small">
+                                                <lightning-avatar   src={member.salesforceData.FullPhotoUrl} 
+                                                                    size="large"
+                                                                    variant="circle"
+                                                                    alternative-text={member.salesforceData.Name} 
+                                                                    class="slds-var-m-right_small" >
+                                                </lightning-avatar>
+
+                                                {member.salesforceData.Name}
+                                            </h3>                                            
+                                        </lightning-layout-item>
+
+                                        <lightning-layout-item alignment-bump="left">
+                                            <lightning-button   data-item={member.external_member_ID} 
+                                                                variant="brand"
+                                                                label="Assign" 
+                                                                onclick={assignMemberToTeam} >
+                                            </lightning-button>
+                                        </lightning-layout-item>
+
+                                    </lightning-layout>
+
+                                    <lightning-layout class="slds-var-m-top_medium">
+
+                                        <lightning-layout-item padding="horizontal-large">
+                                            <h3 class="slds-text-title slds-var-m-left_small">Proficiencies:</h3>
+
+                                            <div class="userInfo" >
+                                                <template if:true={member.conflictStatus}>
+                                                    <lightning-helptext icon-name="utility:info" content={member.numOfConflict}></lightning-helptext>
+                                                </template>
+
+                                                <ul class="slds-var-m-left_xx-large">
+                                                    <template for:each={member.proficiency} for:item="proficiency">
+                                                        <li key={proficiency.product.name}>
+                                                            <p class="slds-text-body_small" >{proficiency.product.name}: {proficiency.level}</p>       
                                                         </li>
                                                     </template>
                                                 </ul>
                                             </div>
-                                            <lightning-button data-item = {user.Id} 
-                                                                variant="brand"
-                                                                label="Assign" title="Assign/UnAssign" 
-                                                                onclick={handleAssign} 
-                                                                class="slds-m-left_x-small assignBtn">
-                                            </lightning-button>
-                                        </div>             
-                                    </li>
-                                </ul>
-                            </template>
-                        </template>              
-                    </div>
+                                        </lightning-layout-item> 
+
+                                    </lightning-layout>                                    
+                                </div>
+                            </li>           
+                        </template>
+                    </ul> 
+                </div>
 
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_brand" onclick={pushDataAndToggle} disabled={saveBtnStatus} title="OK">Save</button>
+                    <lightning-button   label="Assign Team"
+                                        variant="brand" 
+                                        onclick={selectTeam} 
+                                        disabled={saveBtnIsDisabled} >
+                    </lightning-button>
+
+                    <lightning-button   label="Cancel"
+                                        variant="neutral" 
+                                        onclick={cancelSelectTeam}
+                                        class="slds-var-m-left_small" >
+                    </lightning-button>
                 </footer>
 
             </div>
         </section>
+
         <div class={backdropClasses}></div>
+    </template>
 </template>

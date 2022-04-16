@@ -35,11 +35,12 @@ export class ProductSelector {
     //event button to add to cart
     addProd = (evt) => {
         const prod = evt.target.value;
+
         if (this.parent.selectedProducts.includes(prod))
             return;
-        
+
         this.parent.selectedProducts.push(prod);
-        this.products = this.products.filter(item => item.external_product_ID !== prod.external_product_ID);
+        this.products = this.products.filter(item => item.product_ID !== prod.product_ID);
         
         this.parent.template.querySelector(".search").value = '';
         this.searchEvt({target:{value: ''}})
@@ -49,11 +50,11 @@ export class ProductSelector {
 
     //event button to remove from cart
     removeProd = (evt) => {
-        const product_ID = evt.target.dataset.item
-        const product = this.parent.selectedProducts.filter(item => item.external_product_ID === product_ID)[0]
+        const product_ID = parseInt(evt.target.dataset.item, 10)
+        const product = this.parent.selectedProducts.find(item => item.product_ID === product_ID)
 
         this.products.push(product);
-        this.parent.selectedProducts.remove(product);
+        this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item !== product);
 
         this.parent.template.querySelector(".search").value = '';
         this.searchEvt({target:{value: ''}})

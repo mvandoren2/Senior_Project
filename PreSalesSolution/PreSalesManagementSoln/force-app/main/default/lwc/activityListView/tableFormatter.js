@@ -13,7 +13,7 @@ export class TableFormatter {
 
     //Builds an array of column heading names from the key names of a request object 
     generateTableHeader = (tableData) => {
-        let columns = Object.keys(tableData.dislpay[0]).map((column, i) => ({
+        let columns = Object.keys(tableData.display[0]).map((column, i) => ({
             id: "column_" + i,
             label: this.fixCamelCase(column),
             fieldName: column
@@ -51,26 +51,78 @@ export class TableFormatter {
         return actions[userProfile]
     }
 
+    emptyActivity = {
+        id: '',
+        account: '',
+        opportunity: '',
+        product: '',
+        activity: '',
+        date: '',
+        location: '',
+        submittedBy: '',
+        presalesTeam: '',
+        status: ''
+    }
+
+    getDisplayRows = (detailedActivities) => {
+        return detailedActivities.map(activity => this.generateDisplayRow(activity))
+    }
+
+    generateDisplayRow = (activity) => {
+        let newRow = Object.assign({}, this.emptyActivity)
+
+        let selectedDate = this.setSelectedDate(activity.selectedDate)
+                    
+        newRow.id           = activity.activity_ID
+        newRow.account      = activity.opportunity.AccountName
+        newRow.opportunity  = activity.opportunity.Name
+        newRow.product      = activity.products.map(product => product.name).join(', ')
+        newRow.activity     = activity.activity_Type.name + ' ' + activity.activity_Level
+        newRow.location     = activity.location
+        newRow.date         = selectedDate
+        newRow.submittedBy  = activity.submittedBy.Name
+        newRow.presalesTeam = activity.team.map(member => member.Name).join(', ')
+        newRow.status       = activity.status
+    
+        return newRow
+    }
+
+    setSelectedDate = (date) => {
+        let dateString = 'Optional'
+
+        if(date) {
+            if(date.date < Date.now())
+                dateString = 'Selected date has passed.'
+
+            else
+                dateString = date.localeString
+        }
+
+        return dateString
+    }
+
     //Returns an empty table to render before the async method returns
     getEmptyTableFormat = () => {
-        let row = this.tableDataHandler.getEmptyTableData()
+        let data = {display: [this.emptyActivity], detailed: []}
 
-        let columns = this.generateTableHeader(row)
+        let columns = this.generateTableHeader(data)
 
         let actions = this.getRowActions('')
     
-        return {columns: columns, actions: actions, rows: row}
+        return {columns: columns, actions: actions, data: data}
     }
 
     getTableFormat = async () => {
-        let rows = await this.tableDataHandler.getTableData()
+        let data = await this.tableDataHandler.getTableData()
 
-        let user = rows.user
+        data.display = this.getDisplayRows(data.activities)
 
-        let columns = this.generateTableHeader(rows)
+        let user = data.user
+
+        let columns = this.generateTableHeader(data)
 
         let actions = this.getRowActions(user.user_role.name)
     
-        return {columns: columns, actions: actions, rows: rows}
+        return {columns: columns, actions: actions, data: data}
     }
 }

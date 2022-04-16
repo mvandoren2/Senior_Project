@@ -4,11 +4,9 @@
         <table  aria-multiselectable="true" 
                 class=" slds-table 
                         slds-table_cell-buffer 
-                        slds-table_bordered 
-                        slds-table_resizable-cols 
+                        slds-table_bordered
                         slds-table_striped " 
-                role="grid"
-                >
+                role="grid" >
 
             <!-- table head start -->
             <thead>
@@ -19,56 +17,32 @@
                         <th key={column.fieldName} 
                             aria-label={column.label} 
                             aria-sort="descending" 
-                            class=" slds-is-resizable slds-is-sortable slds-is-sorted slds-is-sorted_desc slds-cell_action-mode " 
-                            scope="col"
-                            >
+                            class="slds-is-sortable slds-cell_action-mode" 
+                            scope="col" >
+
                             <a  class=" slds-th__action 
                                         slds-text-link_reset" 
                                 href="#" 
                                 role="button" 
-                                tabindex="0"
-                                >
+                                tabindex="0" >
+
                               <span class="slds-assistive-text">Sort by: </span>
+
                               <div class="  slds-grid 
                                             slds-grid_vertical-align-center 
-                                            slds-has-flexi-truncate"
-                                            >
+                                            slds-has-flexi-truncate" >
 
                                 <!--Column Label + Sorting-->
                                 <span   class="slds-truncate" 
                                         data-item={column.fieldName}
                                         onclick={columnSortHandler.handleSort}
-                                        title={column.label}
-                                        >
+                                        title={column.label} >
+
                                     {column.label}
                                 </span>
-                                <span class="   slds-icon_container 
-                                                slds-icon-utility-arrowdown"
-                                                >
-                                  <svg  class=" slds-icon
-                                                slds-icon-text-default 
-                                                slds-is-sortable__icon" 
-                                        aria-hidden="true"
-                                        >
-                                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
-                                  </svg>
-                                </span>
+
                               </div>
                             </a>
-                            <div class="slds-resizable">
-                                <input    type="range" 
-                                          aria-label="Name column width" 
-                                          class=" slds-resizable__input 
-                                                  slds-assistive-text" 
-                                          max="1000" 
-                                          min="20" 
-                                          tabindex="0"
-                                          id={column.fieldName}
-                                          />
-                                <span class="slds-resizable__handle" >
-                                  <span class="slds-resizable__divider"></span>
-                                </span>
-                              </div>
                           </th>
                     </template>
                     <th></th>
@@ -80,11 +54,10 @@
                         <th key={column.id}>
                             <div>
                                 <lightning-input    type="search" 
-                                                    class="filter_input" 
                                                     label=" " 
                                                     variant="label-hidden"
                                                     data-item={column.fieldName}
-                                                    onchange={tableFilterHandler.handleFilter}>
+                                                    onchange={tableFilterHandler.handleFilter} >
                                 </lightning-input>
                             </div>
                         </th>
@@ -167,6 +140,6 @@
 
     <!--Row Action Modals-->
     <c-activity-detail-view onreloadtablerows={loadTableRows}></c-activity-detail-view>
-    <c-assign-team-modal onreloadtablerows={loadTableRows}></c-assign-team-modal>
+    <c-assign-team-modal data-patchactivity="true" onteamassigned={loadTableRows}></c-assign-team-modal>
     <c-status-change-modal ></c-status-change-modal>
 </template>
