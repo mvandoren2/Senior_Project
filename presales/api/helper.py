@@ -12,6 +12,7 @@ def searchMember(members):
         else:
             #save the external_presales_member_ID and return the presales_member_ID
             newMem = Member(external_member_ID=m)
+            newMem.user_role = UserRole.objects.get(name='Sales Representative')
             newMem.save()
             arrM.append(newMem.member_ID)
 
