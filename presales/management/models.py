@@ -46,6 +46,7 @@ class Member(models.Model):
    external_member_ID = models.CharField(max_length=50, unique=True)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
    proficiency = models.ManyToManyField(Proficiency, blank=True)
+   token = models.CharField(max_length=500, blank=True, null=True)
 
    class meta:
       verbose_name = 'Member'
@@ -128,6 +129,7 @@ class Note(models.Model):
    
 @receiver(pre_save, sender = Activity)
 def pre_Status_Update(sender, instance, **kwargs):
-   if(instance.selectedDateTime < timezone.now() and instance.status == 'Scheduled'):
-      instance.status = 'Expire'
-      instance.save()   
+   if(instance.selectedDateTime != None):
+      if(instance.selectedDateTime < timezone.now() and instance.status == 'Scheduled'):
+         instance.status = 'Expire'
+         instance.save()   

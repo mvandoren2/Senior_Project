@@ -20,6 +20,7 @@ urlpatterns = [
     #Singleton and collection Member endpoints
     path('member/<id>/', views.getMember),
     path('member/<id>/activities/', views.getMemberActivities),
+    path('member/<id>/token/', views.encoder),
     path('members/', views.getMembers),
     path('members/roles/', views.getUserRoles),
 

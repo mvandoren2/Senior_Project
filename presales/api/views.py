@@ -1,6 +1,8 @@
+from base64 import encode
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import HttpResponse
 from collections import OrderedDict
@@ -10,7 +12,7 @@ from .helper import *
 from .serializers import *
 import requests
 import json
-from rest_framework.permissions import IsAuthenticated
+import jwt
 
 results = 5 
 
@@ -558,6 +560,21 @@ def getUserRoles(request):
         new_user_role.save()
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
+def createURL(member):
+    #get the members token
+    member = Member.objects.get(external_member_ID=member)
+    token = member.token
+    url = "https://login.salesforce.com/services/oauth2/token"
+    data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': token
+    }
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    r = requests.post(url, data=data, headers=headers)
+    return r
+
 #Display and send a notification in dashboard
 def sendNotification():
     url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
@@ -578,3 +595,18 @@ def sendNotification():
     }
     r = requests.post(url, data=json.dumps(data), headers=headers)
     return r
+
+@csrf_exempt
+@api_view(['POST'])
+def encoder(request, id):
+    data = json.loads(request.body)
+    member = Member.objects.get(external_member_ID=id)
+    print("Data before encoding: ", data)
+    #use jwt to encode the data
+    token = jwt.encode(data, 'secret', algorithm='HS256')
+    print("Token after encoding:", token)
+    #save the token to the member
+    member.token = token
+    member.save()
+
+    return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')

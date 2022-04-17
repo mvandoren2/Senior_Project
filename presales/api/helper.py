@@ -1,6 +1,7 @@
 from unicodedata import name
 from management.models import *
 from datetime import datetime
+import jwt
 
 def searchMember(members):
     arrM = []
