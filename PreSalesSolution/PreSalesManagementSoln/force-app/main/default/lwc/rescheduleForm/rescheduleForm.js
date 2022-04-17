@@ -4,7 +4,6 @@ import Id from '@salesforce/user/Id';
 
 export default class ModalPopupLWC extends LightningElement {
 
-    
     @track isShowing = false;
 
     @api showModal = async (activity) => {        
@@ -16,8 +15,7 @@ export default class ModalPopupLWC extends LightningElement {
             
         }       
 
-        this.isShowing = true
-        
+        this.isShowing = true   
     }
 
     closeModal = (evt) => {
@@ -49,7 +47,7 @@ export default class ModalPopupLWC extends LightningElement {
 
     handleUploadAction(){
     let memberId = Id ? Id : '0055f0000041g1mAAA'
-
+    let activity_ID = this.activity.activity_ID;
     let pushingData = {
 
         "createdByMember": memberId,
@@ -59,7 +57,7 @@ export default class ModalPopupLWC extends LightningElement {
         "threeDateTime": this.date3 ? this.date3 : null
     }
 
-    fetch(this.url + this.activity.activity_ID + '/', {
+    fetch(this.url + activity_ID  + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',
@@ -71,7 +69,6 @@ export default class ModalPopupLWC extends LightningElement {
         });
 
     }
-
 
 
 }
