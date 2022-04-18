@@ -1,0 +1,145 @@
+<template>
+    <div style="height:600px; width:600px;">
+        <lightning-card>
+            <h1 slot="title" style="font-size: x-large;">PreSales Ninja Member Management</h1>
+            <div class="slds-scrollable_y" style="height: 500px;">
+                <lightning-tabset style="height: 500px;">
+                    <lightning-tab label="UnAssigned Members">
+                        <div onchange={searchUsersFirstTab} style="margin: 0 10px 0 10px">
+                            <lightning-input
+                                name="enter-search"
+                                label="Search with Name/Proficency Level"
+                                type="search"
+                            ></lightning-input>
+                        </div>
+                        <template if:true={filteredUnAssignedUsersInfo}>
+                            <template for:each={filteredUnAssignedUsersInfo} for:item="user">
+                                <ul key={user.Id}>
+                                    <li> 
+                                        <div class="card">
+                                            <div style="padding: 10px;">
+                                                <lightning-avatar variant="circle" size="large" src={user.FullPhotoUrl}></lightning-avatar>
+                                                <span style="margin-left: 10px; font-weight: bold">{user.Name}</span>
+                                                <lightning-button data-item = {user.Id} 
+                                                                variant="brand"
+                                                                label="Add" title="Add/Manage" 
+                                                                onclick={openModal} 
+                                                                class="slds-m-left_x-small assignBtn">
+                                                </lightning-button>
+                                            </div>
+                                        </div>             
+                                    </li>
+                                </ul>
+                            </template>
+                        </template>   
+                    </lightning-tab>
+                    <lightning-tab label="Assigned Members" title="2nd tab extended title">
+                        <div onchange={searchUsersSecondTab} style="margin: 0 10px 0 10px">
+                            <lightning-input
+                                name="enter-search"
+                                label="Search with Name/Proficency Level"
+                                type="search"
+                            ></lightning-input>
+                        </div>
+    
+                        <lightning-radio-group name="radioGroup"
+                              options={options}
+                              value={value}
+                              onchange={handleRadioButtonChange}
+                              type="button" style="text-align: center; margin-top:2%;"></lightning-radio-group>
+    
+                        <template if:true={filteredAssignedUsersInfo}>
+                            <template for:each={filteredAssignedUsersInfo} for:item="user">
+                                <ul key={user.Id}>
+                                    <li> 
+                                        <div class="card">
+                                            <div style="padding: 10px;">
+                                                <lightning-avatar variant="circle" size="large" src={user.FullPhotoUrl}></lightning-avatar>
+                                                <span style="margin-left: 10px; font-weight: bold">{user.Name}</span>
+                                                <lightning-button data-item = {user.Id} 
+                                                                variant="brand"
+                                                                label="Manage" title="Manage" 
+                                                                onclick={openModal} 
+                                                                class="slds-m-left_x-small assignBtn">
+                                                </lightning-button>
+                                            </div>
+                                        </div>             
+                                    </li>
+                                </ul>
+                            </template>
+                        </template>  
+                    </lightning-tab>
+                </lightning-tabset>
+            </div>  
+        </lightning-card>
+    </div>
+
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><lightning-avatar variant="circle" size="large" src={imgSrc} style="margin-right: 10px;"></lightning-avatar><span style="font-weight: bold;">{memberName}</span></h2>
+                </header>
+
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="min-height: 200px;">
+                    <lightning-combobox
+                        name="roles"
+                        label="Member Role"
+                        value={memberRole}
+                        placeholder="Select Member Role"
+                        options={ComboboxOptions}
+                        onchange={handleChange}
+                        required
+                    ></lightning-combobox>
+                    <template if:true={memberRoleIsPreSalesMember}>
+                        <br/>
+                        <h1>Select the product and level of Proficency for the member:</h1>
+                        <div style="height: 300px;">
+                            <lightning-datatable
+                                    key-field="product_ID"
+                                    data={data}
+                                    show-row-number-column
+                                    row-number-offset={rowOffset}
+                                    suppress-bottom-bar
+                                    columns={columns}
+                                    selected-rows={preSelectedRows}
+                                    onrowaction={handleRowAction}
+                                    onrowselection={rowSelectionAction}>
+                            </lightning-datatable>
+                        </div>
+                    </template>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <template if:false={saveStatus}>
+                        <lightning-button variant="brand" label="Add Memeber" title="Save" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                    </template>
+                    <template if:true={saveStatus}>
+                        <lightning-button variant="destructive" label="Delete Member" title="Delete" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-button variant="brand" label="Save Changes" title="Save" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                    </template>
+                </footer>
+            </div>
+            
+            <!-- delete confirmation dialog -->
+            <c-confirmation-dialog title='Are you Sure?'
+                           message='Do you want to delete this member from PreSales Ninja?'
+                           confirm-label='Yes'
+                           cancel-label='No'
+                           visible={isDialogVisible}
+                           name="confirmModal"
+                           onmodalaction={handleClick}></c-confirmation-dialog>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

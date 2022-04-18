@@ -233,14 +233,14 @@ export default class AssignTeamModal extends LightningElement {
     patchActivity = false
 
     //save button action
-    selectTeam(){
+    selectTeam(){      
+        if(this.patchActivity)
+            this.patchActivityTeam();
+
         const team = {
-            members: this.selectedNinjaMembers.map(member => member.external_member_ID),
+            team: this.selectedNinjaMembers.map(member => member.salesforceData),
             leadMember: this.leadMemberId
         }
-        
-        if(this.patchActivity)
-            this.patchActivityTeam(team);
 
         let teamSelectedEvent = new CustomEvent('teamassigned', {
             detail: team

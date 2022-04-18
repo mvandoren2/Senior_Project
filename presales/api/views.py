@@ -191,22 +191,22 @@ def getActivity(request, activityID):
                 updateActivity.save()
 
             if('oneDateTime' in activity_patch):
-                oneDateTime = activity_patch['oneDateTime'].split(".")[0]
+                oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
                 updateActivity.oneDateTime = oneDateTime
                 updateActivity.save()
 
             if('twoDateTime' in activity_patch):
-                twoDateTime = activity_patch['twoDateTime'].split(".")[0]
+                twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
                 updateActivity.twoDateTime = twoDateTime
                 updateActivity.save()
 
             if('threeDateTime' in activity_patch):
-                threeDateTime = activity_patch['threeDateTime'].split(".")[0]
+                threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
                 updateActivity.threeDateTime = threeDateTime
                 updateActivity.save()
 
             if('selectedDateTime' in activity_patch):
-                selectedDateTime = activity_patch['selectedDateTime'].split(".")[0]
+                selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
                 updateActivity.selectedDateTime = selectedDateTime
                 updateActivity.save()
 

@@ -1,0 +1,58 @@
+<template>
+    <div class="slds-box slds-box_small slds-theme_default" style="max-height: 25rem;">
+        <div class="slds-box slds-box_xx-small slds-theme_shade slds-scrollable_y" style="max-height: 15rem;">
+            <template for:each={notes} for:item="note">  
+                <div key={note.note_ID} class="slds-box slds-theme_default slds-var-m-around_x-small" >
+                    
+                    <!--note header-->
+                    <lightning-layout>
+                        <lightning-layout-item >
+                            <a>{note.member.name}</a>
+                        </lightning-layout-item>
+
+                        <lightning-layout-item alignment-bump="left">
+                            <p class="slds-text-title" >{note.note_date}</p>
+                        </lightning-layout-item>
+                    </lightning-layout>   
+                    
+                    <!--note content-->
+                    <p class="slds-var-p-around_small">    
+                        {note.note_text}
+                    </p>
+                </div>
+            </template>
+        </div>
+
+        <template if:true={passNote} >
+            <lightning-layout vertical-align="end" >
+                <lightning-layout-item size="12">
+                    <lightning-textarea name="new_note"
+                                    variant="hide-label"
+                                    placeholder="Add your notes here"
+                                    onchange={addNewNote} >
+                </lightning-textarea>
+                </lightning-layout-item>
+            </lightning-layout>
+        </template>
+    
+        <template if:true={postNote} >
+            <lightning-layout vertical-align="end" >
+                <lightning-layout-item size="9">
+                    <lightning-textarea name="new_note"
+                                    variant="hide-label"
+                                    placeholder="Add your notes here"
+                                    onchange={changeNewNoteText} >
+                </lightning-textarea>
+                </lightning-layout-item>
+    
+                <lightning-layout-item >
+                    <lightning-button   variant='brand'
+                                        onclick={postNewNote}
+                                        label='Submit'
+                                        class="slds-var-m-left_x-small" >
+                    </lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+        </template>
+    </div>
+</template>
