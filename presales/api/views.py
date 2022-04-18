@@ -403,7 +403,6 @@ def getMembers(request):
         serializers = MemberSerializer(members, many=True)
         return Response(serializers.data)
 
-#FIX PROFICIENCY
 @csrf_exempt
 @api_view(['GET', 'DELETE', 'POST', 'PATCH'])
 def getMember(request, id):
@@ -447,7 +446,7 @@ def getMember(request, id):
         #get the member
         member = Member.objects.get(external_member_ID=id)
 
-        # FIX change proficiencies to accept json object array
+        # proficiencies to accept json object array
         if("proficiency" in data):
             #get the proficiency ID's
             prof = searchProficiency(data['proficiency'])
@@ -478,9 +477,10 @@ def getMemberActivities(request, id):
 
     return Response(serializers.data)
 
+# CHANGE PATCH TO AN ARRAY
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
-def getProducts(request,):
+def getProducts(request):
     if(request.method == 'GET'):
         if(request.GET.get('active')):
             products = Product.objects.filter(active=request.GET.get('active'))
@@ -597,7 +597,7 @@ def sendNotification():
     return r
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(['PATCH'])
 def encoder(request, id):
     data = json.loads(request.body)
     member = Member.objects.get(external_member_ID=id)

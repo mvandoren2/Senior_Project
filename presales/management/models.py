@@ -132,4 +132,4 @@ def pre_Status_Update(sender, instance, **kwargs):
    if(instance.selectedDateTime != None):
       if(instance.selectedDateTime < timezone.now() and instance.status == 'Scheduled'):
          instance.status = 'Expire'
-         instance.save()   
+         instance.save()
