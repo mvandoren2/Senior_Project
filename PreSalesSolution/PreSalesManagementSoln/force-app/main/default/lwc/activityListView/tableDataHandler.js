@@ -56,31 +56,26 @@ export class TableDataHandler {
     }
 
     buildDetailedActivityObj = (activity) => {
-        let activityOpportunity = this.opportunities.filter(opportunity => opportunity.Id === activity.opportunity_ID)[0]
+        let activityOpportunity = this.opportunities.find(opportunity => opportunity.Id === activity.opportunity_ID)
         
         let dates = this.dateArrayBuilder(activity)
 
+        let selectedDate = activity.selectedDateTime ? 
+            this.buildDateObject(activity.selectedDateTime) : null
+
         let team = activity.members
-            .map(member => ( this.salesforceMembers
-                .filter(salesforceMember => ( salesforceMember.Id === member.external_member_ID)[0]))
+            .map( member => this.salesforceMembers
+                .find( salesforceMember => salesforceMember.Id === member.external_member_ID )
             )
 
-        let submittedBy = activity.createdByMember
-
-        if(submittedBy)
-                submittedBy = this.salesforceMembers.filter(member => member.Id === submittedBy.external_member_ID)[0]
+        let submittedBy = activity.createdByMember ? 
+            this.salesforceMembers.find(member => member.Id === activity.createdByMember.external_member_ID) : null
                 
-        let manager = activity.activeManager
+        let manager = activity.activeManager ? 
+            this.salesforceMembers.find(member => member.Id === activity.activeManager.external_member_ID) : null
 
-        if(manager)
-                manager = this.salesforceMembers.filter(member => member.Id === manager.external_member_ID)[0]
-
-        let leadMember = activity.leadMember
-
-        if(leadMember)
-                leadMember = this.salesforceMembers.filter(member => member.Id === leadMember.external_member_ID)[0]
-
-        
+        let leadMember = activity.leadMember ? 
+            this.salesforceMembers.find(member => member.Id === activity.leadMember.external_member_ID) : null        
 
         return {
             activity_ID: activity.activity_ID,
@@ -90,7 +85,7 @@ export class TableDataHandler {
             activity_Level: activity.activity_Level,
             location: activity.location,
             dates: dates,
-            selectedDate: activity.selectedDateTime,
+            selectedDate: selectedDate,
             submittedBy: submittedBy,
             manager: manager,
             leadMember: leadMember,
@@ -113,15 +108,22 @@ export class TableDataHandler {
             dates.push(activity.threeDateTime)
 
         return dates.map((date, i) => {
-            date = new Date(date)
+            let dateObj = this.buildDateObject(date)
 
-            return {
-                id : i + 1,
-                date: date,
-                localeString: this.dateStringUtil(date),
-                selected: false
-            }
+            dateObj.id = i + 1
+
+            return dateObj
         })
+    }
+
+    buildDateObject = (date) => {
+        date = new Date(date)
+
+        return {
+            date: date,
+            localeString: this.dateStringUtil(date),
+            selected: false
+        }
     }
 
     //builds a formatted string from a JS Date object
