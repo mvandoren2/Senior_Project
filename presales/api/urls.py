@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     #Singleton Activity endpoints
     path('activity/', views.addActivity),
+    path('activity/types/', views.getActivityTypes),
     path('activity/<activityID>/', views.getActivity),
     path('activity/note/<noteID>/', views.getActivityNote),
     path('activity/<activityID>/notes/', views.getActivityNotes),

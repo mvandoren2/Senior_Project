@@ -37,7 +37,7 @@ def addActivity(request):
             account_ID = activity['account_ID'], 
             location = activity['location'], 
             activity_Type = request_activity_Type,
-            oneDateTime=date1,
+            oneDateTime = date1,
             status = activity['status'], 
             flag=activity['flag']
         )
@@ -104,113 +104,133 @@ def addActivity(request):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
-@api_view(['GET', 'PATCH', 'POST', 'DELETE']) 
+@api_view(['GET', 'PATCH']) 
 def getActivity(request, activityID):
-    if(activityID == 'types'):
-        if(request.method =='GET'):
-            activity_Type = ActivityType.objects.all()
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
-        elif(request.method == 'POST'):
-            activity_Type = json.loads(request.body)
-            for a in activity_Type["activity_types"]:
-                if(ActivityType.objects.filter(name=a['name']).exists()):
-                    pass
-                else:
-                    new_activity_Type = ActivityType(name=a['name'])
-                    new_activity_Type.save()
-            return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
-        elif(request.method == 'DELETE'):
-            activity_Type = json.loads(request.body)
-            activity_Type = ActivityType.objects.get(name=activity_Type['name'])
-            activity_Type.delete()
-            return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
-    else:
-        if(request.method == 'GET'):
-            try:
-                activity = Activity.objects.filter(activity_ID=activityID)
-                serializer = ActivitySerializer(activity, many=True)
+    if(request.method == 'GET'):
+        try:
+            activity = Activity.objects.filter(activity_ID=activityID)
+            serializer = ActivitySerializer(activity, many=True)
 
-                return Response(serializer.data[0])
+            return Response(serializer.data[0])
+        
+        except:
+            return Response(status=204)
+
+    elif(request.method == 'PATCH'):
+        activity_patch = json.loads(request.body)
+
+        updateActivity = Activity.objects.get(activity_ID=activityID)
+
+        #check to see if the json contains a members
+        if('members' in activity_patch):
+            members = activity_patch['members']
+
+            #remove members from the update activity if they do not exist in the memberForm
+            for m in updateActivity.members.all():
+                if(m.external_member_ID not in members):
+                    updateActivity.members.remove(m)
+
+            arrM = searchMember(members)
+            for m in arrM:
+                updateActivity.members.add(m)
             
-            except:
-                return Response(status=204)
+            updateActivity.save()
 
-        elif(request.method == 'PATCH'):
-            activity_patch = json.loads(request.body)
+        if('activityLevel' in activity_patch):
+            updateActivity.activityLevel = activity_patch['activityLevel']
+            updateActivity.save()
 
-            updateActivity = Activity.objects.get(activity_ID=activityID)
-
-            #check to see if the json contains a members
-            if('members' in activity_patch):
-                members = activity_patch['members']
-
-                #remove members from the update activity if they do not exist in the memberForm
-                for m in updateActivity.members.all():
-                    if(m.external_member_ID not in members):
-                        updateActivity.members.remove(m)
-
-                arrM = searchMember(members)
-                for m in arrM:
-                    updateActivity.members.add(m)
-                
+        if('members' in activity_patch):
+            #if the leadMember is not in the memberForm, remove it
+            if('leadMember' in activity_patch):
+                leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
+            if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
+                updateActivity.leadMember = None
                 updateActivity.save()
-
-            if('activityLevel' in activity_patch):
-                updateActivity.activityLevel = activity_patch['activityLevel']
+            elif('leadMember' in activity_patch):
+                member = [activity_patch['leadMember']]
+                memberID = searchMember(member)
+                updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
                 updateActivity.save()
+        
+        if("activeManager" in activity_patch):
+            activeManager = activity_patch['activeManager']
+            if(type(activeManager) != list):
+                activeManager = [activeManager]
+            activeManager = searchMember(activeManager)
+            for member in activeManager:
+                updateActivity.activeManager = Member.objects.get(member_ID=member)
+            updateActivity.save()
 
-            if('members' in activity_patch):
-                #if the leadMember is not in the memberForm, remove it
-                if('leadMember' in activity_patch):
-                    leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
-                if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
-                    updateActivity.leadMember = None
-                    updateActivity.save()
-                elif('leadMember' in activity_patch):
-                    member = [activity_patch['leadMember']]
-                    memberID = searchMember(member)
-                    updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
-                    updateActivity.save()
-            
-            if("activeManager" in activity_patch):
-                activeManager = activity_patch['activeManager']
-                if(type(activeManager) != list):
-                    activeManager = [activeManager]
-                activeManager = searchMember(activeManager)
-                for member in activeManager:
-                    updateActivity.activeManager = Member.objects.get(member_ID=member)
-                updateActivity.save()
+        if('status' in activity_patch):
+            updateActivity.status = activity_patch['status']
+            updateActivity.save()
 
-            if('status' in activity_patch):
-                updateActivity.status = activity_patch['status']
-                updateActivity.save()
+        if('flag' in activity_patch):
+            updateActivity.flag = activity_patch['flag']
+            updateActivity.save()
 
-            if('flag' in activity_patch):
-                updateActivity.flag = activity_patch['flag']
-                updateActivity.save()
-
-            if('oneDateTime' in activity_patch):
+        if('oneDateTime' in activity_patch):
+            if(activity_patch['oneDateTime'] != None):
                 oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
                 updateActivity.oneDateTime = oneDateTime
                 updateActivity.save()
+            elif(activity_patch['oneDateTime'] == None):
+                updateActivity.oneDateTime = None
+                updateActivity.save()
 
-            if('twoDateTime' in activity_patch):
+        if('twoDateTime' in activity_patch):
+            if(activity_patch['twoDateTime'] != None):
                 twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
                 updateActivity.twoDateTime = twoDateTime
                 updateActivity.save()
+            elif(activity_patch['twoDateTime'] == None):
+                updateActivity.twoDateTime = None
+                updateActivity.save()
 
-            if('threeDateTime' in activity_patch):
+        if('threeDateTime' in activity_patch):
+            if(activity_patch['threeDateTime'] != None):
                 threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
                 updateActivity.threeDateTime = threeDateTime
                 updateActivity.save()
+            elif(activity_patch['threeDateTime'] == None):
+                updateActivity.threeDateTime = None
+                updateActivity.save()
 
-            if('selectedDateTime' in activity_patch):
+        if('selectedDateTime' in activity_patch):
+            if(activity_patch['selectedDateTime'] != None):
                 selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
                 updateActivity.selectedDateTime = selectedDateTime
                 updateActivity.save()
+            elif(activity_patch['selectedDateTime'] == None):
+                updateActivity.selectedDateTime = None
+                updateActivity.save()
 
-            return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+        return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['GET','POST', 'DELETE'])
+def getActivityTypes(request):
+    if(request.method =='GET'):
+        activity_Type = ActivityType.objects.all()
+        serializer = ActivityTypeSerializer(activity_Type, many=True)
+        return Response(serializer.data)
+
+    elif(request.method == 'POST'):
+        activity_Type = json.loads(request.body)
+        for a in activity_Type["activity_types"]:
+            if(ActivityType.objects.filter(name=a['name']).exists()):
+                pass
+            else:
+                new_activity_Type = ActivityType(name=a['name'])
+                new_activity_Type.save()
+        return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+
+    elif(request.method == 'DELETE'):
+        activity_Type = json.loads(request.body)
+        activity_Type = ActivityType.objects.get(name=activity_Type['name'])
+        activity_Type.delete()
+        return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
             
 @api_view(['GET'])
 def getActivities(request):
@@ -477,7 +497,6 @@ def getMemberActivities(request, id):
 
     return Response(serializers.data)
 
-# CHANGE PATCH TO AN ARRAY
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
 def getProducts(request):
