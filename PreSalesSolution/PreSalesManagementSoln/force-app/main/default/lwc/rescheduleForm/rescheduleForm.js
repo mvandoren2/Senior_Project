@@ -17,22 +17,19 @@ export default class ModalPopupLWC extends LightningElement {
     }
 
     closeModal = (evt) => {
-        this.isShowing = false
-
+        this.dispatchEvent(evt)
+        
         this.toggleModalClasses()
 
-        this.dispatchEvent(evt)
-    }
-
+        this.isShowing = false
+    }    
+    
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
     toggleModalClasses = () => {
-        this.boxClasses = this.isShowing ? 
-            'slds-modal slds-fade-in-open' : 'slds-modal'
-
-        this.backdropClasses = this.isShowing ? 
-            'slds-backdrop slds-backdrop_open' : 'slds-backdrop'
+        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
+        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
     }
     
 
@@ -40,15 +37,12 @@ export default class ModalPopupLWC extends LightningElement {
         let name = evt.target.dataset.item
 
         this[name] = evt.target.value
-
-        this.setDisableButton()
     }
 
+    date1 = ''
 
-    isSubmitDisabled = true
-
-    setDisableButton() {
-        this.isSubmitDisabled = !this.date1
+    get isSubmitDisabled() {
+        return this.date1 === ''
     }
 
     //PATCH date and time
