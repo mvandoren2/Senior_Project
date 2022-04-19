@@ -5,7 +5,8 @@ export default class AssignTeamModal extends LightningElement {
     
     isShowing = false
 
-    @api showModal = async (activity) => {        
+    @api showModal = async (activity) => {    
+
         this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
             true : false
         
@@ -78,8 +79,16 @@ export default class AssignTeamModal extends LightningElement {
         this.unselectedNinjaMembers = this.suggestedMembers.filter(member => !selectedUserIds.includes(member.external_member_ID));
 
         if(this.activity.leadMember) {
-            this.leadMemberId = this.activity.leadMember.external_member_ID
-            this.selectedNinjaMembers.find(user => user.Id === this.leadMemberId).leadState = true
+
+            this.leadMemberId = this.activity.leadMember.Id
+
+            let index = this.selectedNinjaMembers.indexOf(this.selectedNinjaMembers.find(user => user.external_member_ID === this.leadMemberId))
+
+            const memberWithLead = this.selectedNinjaMembers.find(user => user.external_member_ID === this.leadMemberId);
+            memberWithLead.leadState = true;
+            this.selectedNinjaMembers.splice(index,1);
+            this.selectedNinjaMembers.unshift(memberWithLead);
+
             this.saveBtnIsDisabled = false
         }
 
@@ -183,8 +192,10 @@ export default class AssignTeamModal extends LightningElement {
 
         const memberToAdd = this.suggestedMembers.find(member => member.external_member_ID === memberToAddId)
 
-        if(this.selectedNinjaMembers.length === 0)
+        if(this.selectedNinjaMembers.length === 0){
             memberToAdd.leadState = true
+            this.leadMemberId = memberToAddId;
+        }
 
         this.selectedNinjaMembers.push(memberToAdd)
 
@@ -199,33 +210,63 @@ export default class AssignTeamModal extends LightningElement {
     removeMemberFromTeam(evt){
         const memberToRemoveId = evt.target.dataset.item
 
+        for(let i=0; i < this.selectedNinjaMembers.length; i++){
+            if(memberToRemoveId === this.selectedNinjaMembers[i].external_member_ID){
+                if(this.selectedNinjaMembers[i].leadState === true){
+                    this.leadMemberId = undefined;
+                    this.selectedNinjaMembers[i].leadState = false;
+                }
+            }
+        }
+
         const memberToRemove = this.suggestedMembers.find(member => member.external_member_ID === memberToRemoveId)
 
         this.unselectedNinjaMembers.push(memberToRemove)
 
         this.selectedNinjaMembers = this.selectedNinjaMembers.filter(member => member.external_member_ID !== memberToRemoveId)
 
-        if(this.selectedNinjaMembers.length === 1)
-            this.selectedNinjaMembers[0].leadState = true
-
         this.filterSuggestedMembers()
         this.reSortSuggestedMembers()
 
         if(!this.selectedNinjaMembers.length)
             this.saveBtnIsDisabled = true
+
+        
+        if(this.selectedNinjaMembers.length === 1){
+            this.selectedNinjaMembers[0].leadState = true
+            this.leadMemberId = this.selectedNinjaMembers[0].external_member_ID;
+        } else if(this.selectedNinjaMembers.length > 1){
+            const newLead = this.selectedNinjaMembers[0];
+            newLead.leadState = true;
+            this.selectedNinjaMembers.splice(0,1);
+            this.leadMemberId = this.selectedNinjaMembers[0].external_member_ID;
+            this.selectedNinjaMembers.unshift(newLead);
         }
+    }
 
 
     @track saveBtnIsDisabled = true;
     
     selectLead(evt){
-        const leadBtn = this.template.querySelectorAll(".leadBtn");
-
-        leadBtn.forEach(btn => { btn.selected = false; });
-
-        evt.target.selected = true;
 
         this.leadMemberId = evt.target.dataset.item;
+
+        const oldLead = this.selectedNinjaMembers[0];
+        oldLead.leadState = false;
+        this.selectedNinjaMembers.splice(0,1);
+        this.selectedNinjaMembers.unshift(oldLead);
+
+        const leadMember = this.selectedNinjaMembers.find(member => member.external_member_ID === this.leadMemberId)
+
+        for(let i=0; i < this.selectedNinjaMembers.length; i++){
+            if(this.selectedNinjaMembers[i].external_member_ID === evt.target.dataset.item){
+                this.selectedNinjaMembers.splice(i,1);
+            }
+        }
+
+        leadMember.leadState = true
+
+        this.selectedNinjaMembers.unshift(leadMember);
 
         this.saveBtnIsDisabled = false
     }
