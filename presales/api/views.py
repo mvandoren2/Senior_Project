@@ -195,11 +195,17 @@ def getActivity(request, activityID):
                     oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
                     updateActivity.oneDateTime = oneDateTime
                     updateActivity.save()
+                elif(activity_patch['oneDateTime'] == None):
+                    updateActivity.oneDateTime = None
+                    updateActivity.save()
 
             if('twoDateTime' in activity_patch):
                 if(activity_patch['twoDateTime'] != None):
                     twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
                     updateActivity.twoDateTime = twoDateTime
+                    updateActivity.save()
+                elif(activity_patch['twoDateTime'] == None):
+                    updateActivity.twoDateTime = None
                     updateActivity.save()
 
             if('threeDateTime' in activity_patch):
@@ -207,11 +213,17 @@ def getActivity(request, activityID):
                     threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
                     updateActivity.threeDateTime = threeDateTime
                     updateActivity.save()
+                elif(activity_patch['threeDateTime'] == None):
+                    updateActivity.threeDateTime = None
+                    updateActivity.save()
 
             if('selectedDateTime' in activity_patch):
                 if(activity_patch['selectedDateTime'] != None):
                     selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
                     updateActivity.selectedDateTime = selectedDateTime
+                    updateActivity.save()
+                elif(activity_patch['selectedDateTime'] == None):
+                    updateActivity.selectedDateTime = None
                     updateActivity.save()
 
             return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
