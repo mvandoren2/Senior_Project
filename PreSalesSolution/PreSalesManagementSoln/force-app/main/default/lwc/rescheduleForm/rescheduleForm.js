@@ -6,22 +6,33 @@ export default class ModalPopupLWC extends LightningElement {
 
     @track isShowing = false;
 
-    @api showModal = async (activity) => {        
-        this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
-            true : false
-        
-        if(this.activity !== activity){
-            this.activity = activity; 
-            
-        }       
+    @api showModal = (activity) => {
+        if (activity !== this.activity) {
+            this.activity = activity
+        }
 
-        this.isShowing = true   
+        this.isShowing = true
+
+        this.toggleModalClasses()
     }
 
     closeModal = (evt) => {
-        
         this.isShowing = false
-        
+
+        this.toggleModalClasses()
+
+        this.dispatchEvent(evt)
+    }
+
+    boxClasses = 'slds-modal'
+    backdropClasses = 'slds-backdrop'
+
+    toggleModalClasses = () => {
+        this.boxClasses = this.isShowing ? 
+            'slds-modal slds-fade-in-open' : 'slds-modal'
+
+        this.backdropClasses = this.isShowing ? 
+            'slds-backdrop slds-backdrop_open' : 'slds-backdrop'
     }
     
 
@@ -35,14 +46,12 @@ export default class ModalPopupLWC extends LightningElement {
 
 
     isSubmitDisabled = true
+
     setDisableButton() {
-        this.isSubmitDisabled = !(
-            this.date1
-        )
+        this.isSubmitDisabled = !this.date1
     }
 
-    //PATCH date and time 
-
+    //PATCH date and time
     url = 'http://localhost:8080/api/activity/'
 
     handleUploadAction(){
@@ -52,7 +61,7 @@ export default class ModalPopupLWC extends LightningElement {
 
         "createdByMember": memberId,
         "status" : "Reschedule",
-        "oneDateTime" : this.date1,
+        "oneDateTime" : this.date1 ? this.date1 : null,
         "twoDateTime": this.date2 ? this.date2 : null,
         "threeDateTime": this.date3 ? this.date3 : null
     }
@@ -68,7 +77,10 @@ export default class ModalPopupLWC extends LightningElement {
             console.error('Error:', error);
         });
 
+        this.closeModal(new CustomEvent('submit'))
     }
 
-
+    cancelHandler = () => { 
+        this.closeModal(new CustomEvent('cancel'))
+    }
 }

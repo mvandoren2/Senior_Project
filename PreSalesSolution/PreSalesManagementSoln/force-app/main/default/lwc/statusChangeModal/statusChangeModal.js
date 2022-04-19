@@ -1,66 +1,130 @@
-import { LightningElement,api,track } from 'lwc';
-import uId from '@salesforce/user/Id';
+import { LightningElement,api } from 'lwc';
+import Id from '@salesforce/user/Id';
 
 export default class StatusChangeModal extends LightningElement {
+    connectedCallback() {
+        this.status = this.getAttribute('data-status')
 
-    activityID;
-    userId = uId;
-    declineMessage;
-    @track submitStatus = true;
+        switch(this.status) {
+            case 'decline': {
+                this.modalTitle = 'Decline Activity Request'
+                this.noteRequired = true
+                this.noteLabel = 'Reason for Declining'
+                this.submitLabel = 'Decline Request'
+                this.submitVariant = 'destructive'
 
-    @api toggleShow = (rowID) => {
-        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
-        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
+                this.status = 'Decline'
 
-        this.activityID = rowID
+                break
+            }
+
+            case 'cancel': {
+                this.modalTitle = 'Cancel Activity'
+                this.noteLabel = 'Reason for Canceling'
+                this.submitLabel = 'Cancel Activity'
+                this.submitVariant = 'destructive'
+
+                this.status = 'Cancel'
+
+                break
+            }
+
+            case 'complete': {
+                this.modalTitle = 'Complete Activity'
+                this.noteLabel = 'Notes'
+                this.submitLabel = 'Submit'
+                this.submitVariant = 'brand'
+
+                this.status = 'Complete'
+
+                break
+            }
+
+            default:
+                break
+        }
     }
 
-    @track boxClasses = 'slds-modal'
-    @track backdropClasses = 'slds-backdrop'
+    @api showModal = (activity) => {
+        this.toggleModalClasses()
 
-    setDisableButton(){
-        this.declineMessage = this.template.querySelector("lightning-textarea").value;
-        this.submitStatus = !(this.declineMessage !== '');
+        this.activityID = activity.activity_ID
+    }
+
+    closeModal = (evt) => {
+        this.dispatchEvent(evt)
+
+        this.toggleModalClasses()
+    }
+    
+    boxClasses = 'slds-modal'
+    backdropClasses = 'slds-backdrop'
+
+    toggleModalClasses = () => {
+        this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 
+            'slds-modal' : 'slds-modal slds-fade-in-open'
+            
+        this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 
+            'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
+    }
+
+    note = ''
+    
+    setNoteText = (evt) => {
+        this.note = evt.target.value
+    }
+
+    noteRequired = false
+
+    get submitIsDisabled(){
+        return this.noteRequired && this.note === '';
+    }
+
+    cancelHandler = () => { 
+        this.closeModal(new CustomEvent('cancel'))
     }
 
     //push the data to backend
-    declineActivity(){
+    submitStatusChange(){
+        this.patchActivity()
+        this.postNote()
 
-        let activity_ID = this.activityID.activity_ID;
+        this.closeModal(new CustomEvent('submit'));
+    }
 
-        //create a json to push
-        let pushingData = {
-            'status': "Decline"
-        };
+    url = 'http://localhost:8080/api/activity/'
 
-        fetch('http://localhost:8080/api/activity/' + activity_ID + '/', {
+    patchActivity = () => {
+        let activityPatchBody = {}
+
+        activityPatchBody.status = this.status
+
+        fetch(this.url + this.activityID + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(pushingData),
+            body: JSON.stringify(activityPatchBody)
         })
         .catch((error) => {
             console.error('Error:', error);
         });
+    }
 
-        let notesData = {
-            'member': this.userId,
-            'note_text': this.declineMessage
+    postNote = () => {
+        if(this.note !== '') {
+            let notePostBody = {
+                member: Id ? Id : '0055f0000041g1mAAA',
+                note_text: this.note
+            }
+
+            fetch(this.url + this.activityID + '/notes/', {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(notePostBody)
+            })
         }
-
-        fetch('http://localhost:8080/api/activity/' + activity_ID + '/notes/', {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(notesData),
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-
-        this.template.querySelector("lightning-textarea").value = "";
-        this.toggleShow();
     }
 }

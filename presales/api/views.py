@@ -403,7 +403,6 @@ def getMembers(request):
         serializers = MemberSerializer(members, many=True)
         return Response(serializers.data)
 
-#FIX PROFICIENCY
 @csrf_exempt
 @api_view(['GET', 'DELETE', 'POST', 'PATCH'])
 def getMember(request, id):
@@ -447,7 +446,7 @@ def getMember(request, id):
         #get the member
         member = Member.objects.get(external_member_ID=id)
 
-        # FIX change proficiencies to accept json object array
+        # proficiencies to accept json object array
         if("proficiency" in data):
             #get the proficiency ID's
             prof = searchProficiency(data['proficiency'])
@@ -478,9 +477,10 @@ def getMemberActivities(request, id):
 
     return Response(serializers.data)
 
+# CHANGE PATCH TO AN ARRAY
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
-def getProducts(request,):
+def getProducts(request):
     if(request.method == 'GET'):
         if(request.GET.get('active')):
             products = Product.objects.filter(active=request.GET.get('active'))
@@ -497,17 +497,17 @@ def getProducts(request,):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
     elif(request.method == 'PATCH'):
         data = request.data
-        product = Product.objects.get(name=data['name'])
-        print(product)
-        if("name" in data):
-            product.name = data['name']
-            product.save()
-        if("external_product_ID" in data):
-            product.external_product_ID = data['external_product_ID']
-            product.save()
-        if("active" in data):
-            product.active = data['active']
-            product.save()
+        for p in data["products"]:
+            product = Product.objects.get(product_ID=p['product_ID'])
+            if("name" in p):
+                product.name = p['name']
+                product.save()
+            if("external_product_ID" in p):
+                product.external_product_ID = p['external_product_ID']
+                product.save()
+            if("active" in p):
+                product.active = p['active']
+                product.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
@@ -597,7 +597,7 @@ def sendNotification():
     return r
 
 @csrf_exempt
-@api_view(['POST'])
+@api_view(['PATCH'])
 def encoder(request, id):
     data = json.loads(request.body)
     member = Member.objects.get(external_member_ID=id)

@@ -23,7 +23,7 @@ def searchProducttoAdd(products):
     arrP = []
     for p in products:
         #filter by external_presales_member_ID and return the presales_member_ID
-        prod = Product.objects.filter(external_product_ID=p)
+        prod = Product.objects.filter(product_ID=p)
         if(prod):
             arrP.append(prod[0].product_ID)
     return arrP
