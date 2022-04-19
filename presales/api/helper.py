@@ -59,7 +59,6 @@ def searchActivity(activity):
         account_ID = activity['account_ID'], 
         location = activity['location'], 
         activity_Type = request_activity_Type,
-        activity_Level = activity['activity_Level'], 
         oneDateTime=date1,
         status = activity['status'], 
         flag=activity['flag']
