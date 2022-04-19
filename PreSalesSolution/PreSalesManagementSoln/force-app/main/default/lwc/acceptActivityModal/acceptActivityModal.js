@@ -100,6 +100,7 @@ export default class AcceptActivityModal extends LightningElement {
         activityPatchBody.status = 'Accept'
         activityPatchBody.activity_ID = this.activity.activity_ID
         activityPatchBody.members = this.activity.team.map(member => member.Id)
+        activityPatchBody.leadMember = this.activity.leadMember
 
         if(this.activity.selectedDateTime){
             activityPatchBody.selectedDateTime = this.activity.selectedDateTime.date.toISOString()
