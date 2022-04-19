@@ -1,30 +1,27 @@
 <template>
     <lightning-record-view-form record-id={opportunityId} object-api-name="Opportunity"></lightning-record-view-form>
         <lightning-card title="Request a Presales Activity" >
-            <div class="slds-var-p-around_medium">
+
+            <template if:true={showAlert}>
+                <div class="slds-box_x-small slds-box slds-theme_shade slds-theme_alert-texture slds-theme_warning">
+                    <p>
+                        <strong>Be sure you only want to select one date!</strong> 
+                    </p>
+                </div>
+            </template>
             
+            <div class="slds-var-p-around_medium">
             <!--Search Products..add and remove -->
             <div class="search-table slds-box search-wrapper" style="background-color: #eef4ff;">
-                <label for="date1" class="slds-text-title" >Product</label>
-                <lightning-input    class="search" 
-                                    label="Search" 
-                                    type="search" 
-                                    id="search"
-                                    variant="label-hidden"
-                                    onchange={productSelector.searchEvt} >
-                </lightning-input>
-           
-                <template if:false={searchBarEmpty}>    
-                    <div class="slds-dropdown slds-dropdown_large">
-                        <template for:each={filteredProducts} for:item="product">
-                                <lightning-menu-item    key={product.product_ID}
-                                                        value={product}
-                                                        label={product.name} 
-                                                        onclick={productSelector.addProd} >
-                                </lightning-menu-item>
-                        </template>
-                    </div>
-                </template>
+                <label for="date1" class="slds-text-title" ></label>
+                <lightning-combobox name="product"
+                                    label="Product"
+                                    value={value}
+                                    placeholder="Select Product"
+                                    options={productSelector.products}
+                                    onchange={productSelector.addProd} 
+                                    required>
+                </lightning-combobox>
 
                 <abbr title="required" class="slds-required">*</abbr>
                 <label for="date1" class="slds-text-title" >Selected:</label>
@@ -39,29 +36,15 @@
                             </lightning-pill>
                     </template>
                 </div>
-            </div>
-
-            <div class="slds-grid slds-gutters_xx-small">
-            
-                <lightning-combobox name="activity_type" 
-                                    label="Activity Type"
-                                    placeholder="Select activity type" 
-                                    options={activityTypes}
-                                    class="slds-col slds-size_3-of-5"
-                                    onchange={selectActivityType} 
-                                    required >
-                </lightning-combobox>
-
-                <lightning-combobox name="activity_level" 
-                                    label="Activity Level" 
-                                    placeholder="Select activity level" 
-                                    options={activityLevels}
-                                    class="slds-col slds-size_2-of-5" 
-                                    onchange={selectActivityLevel} 
-                                    required >
-                </lightning-combobox>
-
-            </div>
+            </div>      
+    
+            <lightning-combobox name="activity_type" 
+                                label="Activity Type"
+                                placeholder="Select activity type" 
+                                options={activityTypes} 
+                                onchange={selectActivityType} 
+                                required >
+            </lightning-combobox>
 
             <lightning-combobox name="location" 
                                 label="Location" 
@@ -70,33 +53,22 @@
                                 class="slds-var-p-top_small slds-var-p-bottom_small" 
                                 onchange={setLocation} >
             </lightning-combobox>
-
+            
             <abbr title="required" class="slds-required">*</abbr>
             <label for="date1" class="slds-text-title" >Date</label>
             <lightning-input type="datetime" label=" " data-item="date1" variant="label-hidden" onchange={dateInputHandler} required></lightning-input>
-
-            <template if:false={alternateDates}>
-                <lightning-button variant="base" label="Add Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates}></lightning-button>
-            </template>
-
-            <template if:true={alternateDates}>
-                <lightning-input type="datetime" label=" " data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
-                <lightning-input type="datetime" label=" " data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
-                <lightning-button variant="base" label="Hide Alternate Dates" class="slds-align_absolute-center" onclick={showAlternateDates} ></lightning-button>
-            </template>
+            <lightning-input type="datetime" label=" " data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+            <lightning-input type="datetime" label=" " data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
 
             <!--Text Description-->
-            
             <lightning-textarea id="textarea" 
                                 label="Notes" 
                                 onchange ={updateNotes} >
             </lightning-textarea>
-            
-            <lightning-input type="checkbox" label="This is an unexpected event" class="slds-var-p-top_small" onchange={setFlag}></lightning-input>
-                    
 
             <!--Submit button class="button"-->
-            <lightning-button   variant="submit" 
+            <lightning-button   id="dateAlert"
+                                variant="submit" 
                                 label="Submit" 
                                 type="submit" 
                                 disabled={isSubmitDisabled} 

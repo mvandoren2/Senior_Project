@@ -1,4 +1,4 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement,api} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productsList';
@@ -21,7 +21,7 @@ export default class SalesRequestForm extends LightningElement {
         this.accountId = this.account[0].Id    
     }
 
-
+    
     //pull activity types and put into combobox
     
     activityType = ''
@@ -41,21 +41,6 @@ export default class SalesRequestForm extends LightningElement {
    
     selectActivityType(event) {        
         this.activityType = event.detail.value;
-
-        this.setDisableButton()
-    }
-
-    activityLevel = '';
-
-    activityLevels = [
-            { label: 'Level 1', value: 'Level 1' },
-            { label: 'Level 2', value: 'Level 2' },
-            { label: 'Level 3', value: 'Level 3' },
-            { label: 'Level 4', value: 'Level 4' },
-    ];
-   
-    selectActivityLevel(event) {        
-        this.activityLevel = event.detail.value;
 
         this.setDisableButton()
     }
@@ -85,12 +70,6 @@ export default class SalesRequestForm extends LightningElement {
         this.setDisableButton()
     }
 
-    alternateDates = false 
-
-    showAlternateDates = () => {
-        this.alternateDates = !this.alternateDates
-    }
-
     notes = '';
 
     updateNotes = (evt) => {
@@ -110,41 +89,48 @@ export default class SalesRequestForm extends LightningElement {
         this.isSubmitDisabled = !(
             this.selectedProducts.length &&
             this.activityType !== '' &&
-            this.activityLevel !== '' &&
             this.date1
         )
+    }
+    //Show Date Alert
+    showAlert = false;
+    setAlert = () => {
+        this.showAlert =!this.showAlert
     }
 
     //POST JSON ----------
     handleUploadAction(){
-        let memberId = Id ? Id : '0055f0000041g1mAAA'
-        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
 
-        let selectedProducts = this.selectedProducts.map(product => product.product_ID)
-
-        let jsonData = {
-            "createdByMember": memberId,
-            "opportunity_ID": opportunity_Id,
-            "account_ID": this.accountId,
-            "products": selectedProducts,
-            "activity_Type": parseInt(this.activityType, 10),
-            "activity_Level": this.activityLevel,
-            "location": this.location,
-            "oneDateTime": this.date1,
-            "twoDateTime": this.date2 ? this.date2 : null,
-            "threeDateTime": this.date3 ? this.date3 : null,
-            "status": "Request",
-            "notes": this.notes,
-            "flag": this.unexpectedFlag
-        }
-        
-        fetch(this.url + 'activity/', {
+        if (this.date1 !== undefined && this.date2 === undefined && this.date3 === undefined && this.showAlert === false) {
+            this.showAlert = true;
+        } 
+        else if (this.showAlert === true || this.date1 !== undefined || this.date2 !== undefined || this.date3 !== undefined){
+            let memberId = Id ? Id : '0055f0000041g1mAAA'
+            let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
+            let selectedProducts = this.selectedProducts.map(product => product.product_ID)
+            let jsonData = {
+                "createdByMember": memberId,
+                "opportunity_ID": opportunity_Id,
+                "account_ID": this.accountId,
+                "products": selectedProducts,
+                "activity_Type": parseInt(this.activityType, 10),
+                "location": this.location,
+                "oneDateTime": this.date1,
+                "twoDateTime": this.date2 ? this.date2 : null,
+                "threeDateTime": this.date3 ? this.date3 : null,
+                "status": "Request",
+                "notes": this.notes,
+                "flag": this.unexpectedFlag
+            }   
+            
+            fetch(this.url + 'activity/', {
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(jsonData)
-
+    
             }).catch((error) => {
                 console.error('Error:', error);
-            });
+                });
+            }
+        }        
     }
-}
