@@ -106,7 +106,6 @@ def addActivity(request):
 @csrf_exempt
 @api_view(['GET', 'PATCH']) 
 def getActivity(request, activityID):
-    
     if(request.method == 'GET'):
         try:
             activity = Activity.objects.filter(activity_ID=activityID)
