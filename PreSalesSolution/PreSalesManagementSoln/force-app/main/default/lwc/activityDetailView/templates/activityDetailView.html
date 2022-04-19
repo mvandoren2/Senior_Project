@@ -113,6 +113,9 @@
 
                             <td class="slds-var-p-around_small" >
                                 <lightning-layout vertical-align="center">
+                                    <template if:false={teamIsAssigned} >
+                                        <p >No team assigned.</p>
+                                    </template>
 
                                     <lightning-layout-item >
                                         <ul>
@@ -123,16 +126,7 @@
                                             </template>
                                         </ul>
                                     </lightning-layout-item>
-
-                                    <lightning-layout-item alignment-bump="left">
-                                        <lightning-button   variant='neutral'
-                                                            onclick={openTeamModal}
-                                                            label="Manage Team" >
-                                        </lightning-button>
-                                    </lightning-layout-item>
                                 </lightning-layout>
-
-                                
                             </td>
                         </tr>
 
