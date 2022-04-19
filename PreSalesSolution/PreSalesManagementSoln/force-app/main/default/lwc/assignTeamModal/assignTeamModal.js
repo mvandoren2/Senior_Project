@@ -7,6 +7,7 @@ export default class AssignTeamModal extends LightningElement {
 
     @api showModal = async (activity) => {    
 
+        console.log(activity);
         this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
             true : false
         
@@ -78,6 +79,19 @@ export default class AssignTeamModal extends LightningElement {
 
         this.unselectedNinjaMembers = this.suggestedMembers.filter(member => !selectedUserIds.includes(member.external_member_ID));
 
+        const products = this.activity.products.map(product => product.name);
+       
+        for(let i=0; i < this.unselectedNinjaMembers.length; i++){
+            for(let j=0; j < this.unselectedNinjaMembers[i].proficiency.length; j++){
+                if(products.includes(this.unselectedNinjaMembers[i].proficiency[j].product.name)){
+                    this.unselectedNinjaMembers[i].proficiency[j].color = false
+                } else{
+                    this.unselectedNinjaMembers[i].proficiency[j].color = true
+                }
+            }
+        }
+
+        console.log(this.unselectedNinjaMembers)
         if(this.activity.leadMember) {
 
             this.leadMemberId = this.activity.leadMember.Id
