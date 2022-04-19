@@ -1,6 +1,8 @@
+from base64 import encode
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import HttpResponse
 from collections import OrderedDict
@@ -10,7 +12,7 @@ from .helper import *
 from .serializers import *
 import requests
 import json
-from rest_framework.permissions import IsAuthenticated
+import jwt
 
 results = 5 
 
@@ -35,7 +37,7 @@ def addActivity(request):
             account_ID = activity['account_ID'], 
             location = activity['location'], 
             activity_Type = request_activity_Type,
-            oneDateTime=date1,
+            oneDateTime = date1,
             status = activity['status'], 
             flag=activity['flag']
         )
@@ -102,113 +104,133 @@ def addActivity(request):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
-@api_view(['GET', 'PATCH', 'POST', 'DELETE']) 
+@api_view(['GET', 'PATCH']) 
 def getActivity(request, activityID):
-    if(activityID == 'types'):
-        if(request.method =='GET'):
-            activity_Type = ActivityType.objects.all()
-            serializer = ActivityTypeSerializer(activity_Type, many=True)
-            return Response(serializer.data)
-        elif(request.method == 'POST'):
-            activity_Type = json.loads(request.body)
-            for a in activity_Type["activity_types"]:
-                if(ActivityType.objects.filter(name=a['name']).exists()):
-                    pass
-                else:
-                    new_activity_Type = ActivityType(name=a['name'])
-                    new_activity_Type.save()
-            return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
-        elif(request.method == 'DELETE'):
-            activity_Type = json.loads(request.body)
-            activity_Type = ActivityType.objects.get(name=activity_Type['name'])
-            activity_Type.delete()
-            return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
-    else:
-        if(request.method == 'GET'):
-            try:
-                activity = Activity.objects.filter(activity_ID=activityID)
-                serializer = ActivitySerializer(activity, many=True)
+    if(request.method == 'GET'):
+        try:
+            activity = Activity.objects.filter(activity_ID=activityID)
+            serializer = ActivitySerializer(activity, many=True)
 
-                return Response(serializer.data[0])
+            return Response(serializer.data[0])
+        
+        except:
+            return Response(status=204)
+
+    elif(request.method == 'PATCH'):
+        activity_patch = json.loads(request.body)
+
+        updateActivity = Activity.objects.get(activity_ID=activityID)
+
+        #check to see if the json contains a members
+        if('members' in activity_patch):
+            members = activity_patch['members']
+
+            #remove members from the update activity if they do not exist in the memberForm
+            for m in updateActivity.members.all():
+                if(m.external_member_ID not in members):
+                    updateActivity.members.remove(m)
+
+            arrM = searchMember(members)
+            for m in arrM:
+                updateActivity.members.add(m)
             
-            except:
-                return Response(status=204)
+            updateActivity.save()
 
-        elif(request.method == 'PATCH'):
-            activity_patch = json.loads(request.body)
+        if('activityLevel' in activity_patch):
+            updateActivity.activityLevel = activity_patch['activityLevel']
+            updateActivity.save()
 
-            updateActivity = Activity.objects.get(activity_ID=activityID)
-
-            #check to see if the json contains a members
-            if('members' in activity_patch):
-                members = activity_patch['members']
-
-                #remove members from the update activity if they do not exist in the memberForm
-                for m in updateActivity.members.all():
-                    if(m.external_member_ID not in members):
-                        updateActivity.members.remove(m)
-
-                arrM = searchMember(members)
-                for m in arrM:
-                    updateActivity.members.add(m)
-                
+        if('members' in activity_patch):
+            #if the leadMember is not in the memberForm, remove it
+            if('leadMember' in activity_patch):
+                leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
+            if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
+                updateActivity.leadMember = None
                 updateActivity.save()
-
-            if('activityLevel' in activity_patch):
-                updateActivity.activityLevel = activity_patch['activityLevel']
+            elif('leadMember' in activity_patch):
+                member = [activity_patch['leadMember']]
+                memberID = searchMember(member)
+                updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
                 updateActivity.save()
+        
+        if("activeManager" in activity_patch):
+            activeManager = activity_patch['activeManager']
+            if(type(activeManager) != list):
+                activeManager = [activeManager]
+            activeManager = searchMember(activeManager)
+            for member in activeManager:
+                updateActivity.activeManager = Member.objects.get(member_ID=member)
+            updateActivity.save()
 
-            if('members' in activity_patch):
-                #if the leadMember is not in the memberForm, remove it
-                if('leadMember' in activity_patch):
-                    leadM = Member.objects.get(external_member_ID=activity_patch['leadMember'])
-                if(not 'leadMember' in activity_patch or leadM not in updateActivity.members.all()):
-                    updateActivity.leadMember = None
-                    updateActivity.save()
-                elif('leadMember' in activity_patch):
-                    member = [activity_patch['leadMember']]
-                    memberID = searchMember(member)
-                    updateActivity.leadMember = Member.objects.filter(member_ID=memberID[0])[0]
-                    updateActivity.save()
-            
-            if("activeManager" in activity_patch):
-                activeManager = activity_patch['activeManager']
-                if(type(activeManager) != list):
-                    activeManager = [activeManager]
-                activeManager = searchMember(activeManager)
-                for member in activeManager:
-                    updateActivity.activeManager = Member.objects.get(member_ID=member)
-                updateActivity.save()
+        if('status' in activity_patch):
+            updateActivity.status = activity_patch['status']
+            updateActivity.save()
 
-            if('status' in activity_patch):
-                updateActivity.status = activity_patch['status']
-                updateActivity.save()
+        if('flag' in activity_patch):
+            updateActivity.flag = activity_patch['flag']
+            updateActivity.save()
 
-            if('flag' in activity_patch):
-                updateActivity.flag = activity_patch['flag']
-                updateActivity.save()
-
-            if('oneDateTime' in activity_patch):
-                oneDateTime = activity_patch['oneDateTime'].split(".")[0]
+        if('oneDateTime' in activity_patch):
+            if(activity_patch['oneDateTime'] != None):
+                oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
                 updateActivity.oneDateTime = oneDateTime
                 updateActivity.save()
+            elif(activity_patch['oneDateTime'] == None):
+                updateActivity.oneDateTime = None
+                updateActivity.save()
 
-            if('twoDateTime' in activity_patch):
-                twoDateTime = activity_patch['twoDateTime'].split(".")[0]
+        if('twoDateTime' in activity_patch):
+            if(activity_patch['twoDateTime'] != None):
+                twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
                 updateActivity.twoDateTime = twoDateTime
                 updateActivity.save()
+            elif(activity_patch['twoDateTime'] == None):
+                updateActivity.twoDateTime = None
+                updateActivity.save()
 
-            if('threeDateTime' in activity_patch):
-                threeDateTime = activity_patch['threeDateTime'].split(".")[0]
+        if('threeDateTime' in activity_patch):
+            if(activity_patch['threeDateTime'] != None):
+                threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
                 updateActivity.threeDateTime = threeDateTime
                 updateActivity.save()
-
-            if('selectedDateTime' in activity_patch):
-                selectedDateTime = activity_patch['selectedDateTime'].split(".")[0]
-                updateActivity.selectedDateTime = selectedDateTime
+            elif(activity_patch['threeDateTime'] == None):
+                updateActivity.threeDateTime = None
                 updateActivity.save()
 
-            return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+        if('selectedDateTime' in activity_patch):
+            if(activity_patch['selectedDateTime'] != None):
+                selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
+                updateActivity.selectedDateTime = selectedDateTime
+                updateActivity.save()
+            elif(activity_patch['selectedDateTime'] == None):
+                updateActivity.selectedDateTime = None
+                updateActivity.save()
+
+        return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+
+@csrf_exempt
+@api_view(['GET','POST', 'DELETE'])
+def getActivityTypes(request):
+    if(request.method =='GET'):
+        activity_Type = ActivityType.objects.all()
+        serializer = ActivityTypeSerializer(activity_Type, many=True)
+        return Response(serializer.data)
+
+    elif(request.method == 'POST'):
+        activity_Type = json.loads(request.body)
+        for a in activity_Type["activity_types"]:
+            if(ActivityType.objects.filter(name=a['name']).exists()):
+                pass
+            else:
+                new_activity_Type = ActivityType(name=a['name'])
+                new_activity_Type.save()
+        return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+
+    elif(request.method == 'DELETE'):
+        activity_Type = json.loads(request.body)
+        activity_Type = ActivityType.objects.get(name=activity_Type['name'])
+        activity_Type.delete()
+        return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
             
 @api_view(['GET'])
 def getActivities(request):
@@ -401,7 +423,6 @@ def getMembers(request):
         serializers = MemberSerializer(members, many=True)
         return Response(serializers.data)
 
-#FIX PROFICIENCY
 @csrf_exempt
 @api_view(['GET', 'DELETE', 'POST', 'PATCH'])
 def getMember(request, id):
@@ -445,7 +466,7 @@ def getMember(request, id):
         #get the member
         member = Member.objects.get(external_member_ID=id)
 
-        # FIX change proficiencies to accept json object array
+        # proficiencies to accept json object array
         if("proficiency" in data):
             #get the proficiency ID's
             prof = searchProficiency(data['proficiency'])
@@ -478,7 +499,7 @@ def getMemberActivities(request, id):
 
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
-def getProducts(request,):
+def getProducts(request):
     if(request.method == 'GET'):
         if(request.GET.get('active')):
             products = Product.objects.filter(active=request.GET.get('active'))
@@ -495,17 +516,17 @@ def getProducts(request,):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
     elif(request.method == 'PATCH'):
         data = request.data
-        product = Product.objects.get(name=data['name'])
-        print(product)
-        if("name" in data):
-            product.name = data['name']
-            product.save()
-        if("external_product_ID" in data):
-            product.external_product_ID = data['external_product_ID']
-            product.save()
-        if("active" in data):
-            product.active = data['active']
-            product.save()
+        for p in data["products"]:
+            product = Product.objects.get(product_ID=p['product_ID'])
+            if("name" in p):
+                product.name = p['name']
+                product.save()
+            if("external_product_ID" in p):
+                product.external_product_ID = p['external_product_ID']
+                product.save()
+            if("active" in p):
+                product.active = p['active']
+                product.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
@@ -558,6 +579,21 @@ def getUserRoles(request):
         new_user_role.save()
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
+def createURL(member):
+    #get the members token
+    member = Member.objects.get(external_member_ID=member)
+    token = member.token
+    url = "https://login.salesforce.com/services/oauth2/token"
+    data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': token
+    }
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    r = requests.post(url, data=data, headers=headers)
+    return r
+
 #Display and send a notification in dashboard
 def sendNotification():
     url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
@@ -578,3 +614,18 @@ def sendNotification():
     }
     r = requests.post(url, data=json.dumps(data), headers=headers)
     return r
+
+@csrf_exempt
+@api_view(['PATCH'])
+def encoder(request, id):
+    data = json.loads(request.body)
+    member = Member.objects.get(external_member_ID=id)
+    print("Data before encoding: ", data)
+    #use jwt to encode the data
+    token = jwt.encode(data, 'secret', algorithm='HS256')
+    print("Token after encoding:", token)
+    #save the token to the member
+    member.token = token
+    member.save()
+
+    return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')

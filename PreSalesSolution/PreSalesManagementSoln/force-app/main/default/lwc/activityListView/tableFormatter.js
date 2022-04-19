@@ -77,7 +77,7 @@ export class TableFormatter {
         newRow.account      = activity.opportunity.AccountName
         newRow.opportunity  = activity.opportunity.Name
         newRow.product      = activity.products.map(product => product.name).join(', ')
-        newRow.activity     = activity.activity_Type.name + ' ' + activity.activity_Level
+        newRow.activity     = activity.activity_Type.name
         newRow.location     = activity.location
         newRow.date         = selectedDate
         newRow.submittedBy  = activity.submittedBy.Name
