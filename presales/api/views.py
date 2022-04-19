@@ -37,7 +37,7 @@ def addActivity(request):
             account_ID = activity['account_ID'], 
             location = activity['location'], 
             activity_Type = request_activity_Type,
-            oneDateTime=date1,
+            oneDateTime = date1,
             status = activity['status'], 
             flag=activity['flag']
         )
@@ -191,19 +191,22 @@ def getActivity(request, activityID):
                 updateActivity.save()
 
             if('oneDateTime' in activity_patch):
-                oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
-                updateActivity.oneDateTime = oneDateTime
-                updateActivity.save()
+                if(activity_patch['oneDateTime'] != None):
+                    oneDateTime = datetime.fromisoformat(activity_patch['oneDateTime'].split('.')[0] + '+00:00')
+                    updateActivity.oneDateTime = oneDateTime
+                    updateActivity.save()
 
             if('twoDateTime' in activity_patch):
-                twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
-                updateActivity.twoDateTime = twoDateTime
-                updateActivity.save()
+                if(activity_patch['twoDateTime'] != None):
+                    twoDateTime = datetime.fromisoformat(activity_patch['twoDateTime'].split('.')[0] + '+00:00')
+                    updateActivity.twoDateTime = twoDateTime
+                    updateActivity.save()
 
             if('threeDateTime' in activity_patch):
-                threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
-                updateActivity.threeDateTime = threeDateTime
-                updateActivity.save()
+                if(activity_patch['threeDateTime'] != None):
+                    threeDateTime = datetime.fromisoformat(activity_patch['threeDateTime'].split('.')[0] + '+00:00')
+                    updateActivity.threeDateTime = threeDateTime
+                    updateActivity.save()
 
             if('selectedDateTime' in activity_patch):
                 selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
@@ -477,7 +480,6 @@ def getMemberActivities(request, id):
 
     return Response(serializers.data)
 
-# CHANGE PATCH TO AN ARRAY
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH'])
 def getProducts(request):
