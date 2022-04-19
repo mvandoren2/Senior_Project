@@ -209,9 +209,10 @@ def getActivity(request, activityID):
                     updateActivity.save()
 
             if('selectedDateTime' in activity_patch):
-                selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
-                updateActivity.selectedDateTime = selectedDateTime
-                updateActivity.save()
+                if(activity_patch['selectedDateTime'] != None):
+                    selectedDateTime = datetime.fromisoformat(activity_patch['selectedDateTime'].split('.')[0] + '+00:00')
+                    updateActivity.selectedDateTime = selectedDateTime
+                    updateActivity.save()
 
             return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
             
