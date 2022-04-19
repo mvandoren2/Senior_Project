@@ -1,0 +1,131 @@
+<template>
+    <section    role="dialog" 
+                tabindex="-1" 
+                aria-labelledby="modal-heading-01" 
+                aria-modal="true"
+                aria-describedby="modal-content-id-1" 
+                class={boxClasses} >
+
+        <div class="slds-modal__container">            
+            <template if:true={isShowing}>
+
+                <!-- modal header start -->
+                <header class="slds-modal__header">                
+                    <!-- sldsValidatorIgnoreNextLine -->
+                    <lightning-button-icon  icon-name="utility:close" 
+                                            aria-label="close" 
+                                            alternative-text="Close this window" 
+                                            size="large"  
+                                            variant="bare-inverse" 
+                                            onclick={closeModal} 
+                                            title="close" 
+                                            class="slds-modal__close" >  
+                    </lightning-button-icon>  
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Accept Activity</h2>
+                </header>            
+
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-var-p-around_large" id="modal-content-id-1" >
+                    <table>
+                    
+                        <!--Team-->
+                        <tr class="slds-var-m-bottom_medium" >
+                            <td style="vertical-align: top;" >
+                                <p class="slds-col" >Team:</p>
+                            </td>
+
+                            <td class="slds-var-p-bottom_large">
+                                <template if:true={teamIsNotAssigned}>
+                                    <abbr title="required" class="slds-required">A team must be assigned.</abbr>
+                                </template>
+        
+                                <ul class="slds-col">
+                                    <template for:each={activity.team} for:item="member" >
+                                        <li key={member.Id} >
+                                            <p>{member.Name}</p>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!--Date-->
+                        <tr >    
+                            <td style="vertical-align: top;" >
+                                <p >Date:</p>
+                            </td>
+
+                            <td class="slds-var-p-bottom_large" >
+                                <div >
+                                    <lightning-combobox label="Date"
+                                                        name="Date"
+                                                        value="0"
+                                                        options={dateOptions}
+                                                        onchange={selectDate}
+                                                        variant="label-hidden" >
+                                    </lightning-combobox>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!--Notes-->
+                        <tr  >
+                            <td style="vertical-align: top;">
+                                <p >Notes:</p>
+                            </td>
+                            
+                            <td>
+                                <div >
+                                    <c-notes-view   data-activity-id={activity.activity_ID} 
+                                                    data-handlenote="pass" 
+                                                    onchange={addNewNote} >
+                                    </c-notes-view>
+                                </div>
+                            </td>
+                        </tr>
+                    </table> 
+                </div>
+                    
+            </template>
+
+            <!-- modal footer start -->
+            <footer class="slds-modal__footer">
+                <template if:true={teamIsNotAssigned} >
+                    <lightning-button   name="assign_team"
+                                        label="Assign Activity"
+                                        variant="brand"
+                                        onclick={openTeamModal}
+                                        class="slds-float_left" >
+                    </lightning-button>
+                </template>
+
+                <template if:false={teamIsNotAssigned} >
+                    <lightning-button   name="assign_team"
+                                        label="Edit Team"
+                                        variant="brand"
+                                        onclick={openTeamModal}
+                                        class="slds-float_left" >
+                    </lightning-button>
+                </template>
+
+                <lightning-button   name="assign_team"
+                                    label="Accept"
+                                    variant="brand"
+                                    disabled={teamIsNotAssigned}
+                                    onclick={acceptActivity}
+                                    class="slds-var-m-right_small" >
+                </lightning-button>
+
+                <lightning-button   name="assign_team"
+                                    label="Cancel"
+                                    variant="neutral"
+                                    onclick={cancel} >
+                </lightning-button>
+            </footer>
+
+        </div>
+    </section>
+    <div class={backdropClasses}></div>
+
+    <c-assign-team-modal data-patchactivity="false" onteamassigned={selectTeam} oncancel={toggleModalClasses}></c-assign-team-modal>
+</template>
