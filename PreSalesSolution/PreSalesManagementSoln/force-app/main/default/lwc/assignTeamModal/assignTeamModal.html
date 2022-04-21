@@ -170,7 +170,12 @@
                                                 <ul class="slds-var-m-left_xx-large">
                                                     <template for:each={member.proficiency} for:item="proficiency">
                                                         <li key={proficiency.product.name}>
-                                                            <p class="slds-text-body_small" >{proficiency.product.name}: {proficiency.level}</p>       
+                                                            <template if:false={proficiency.color}>
+                                                                <p class="slds-text-body_small">{proficiency.product.name}: {proficiency.level}</p>       
+                                                            </template>
+                                                            <template if:true={proficiency.color}>
+                                                                <p class="slds-text-body_small" style="color:red">{proficiency.product.name}: N/A</p>       
+                                                            </template>
                                                         </li>
                                                     </template>
                                                 </ul>

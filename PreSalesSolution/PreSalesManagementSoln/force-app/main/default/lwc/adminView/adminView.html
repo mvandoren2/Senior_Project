@@ -46,6 +46,7 @@
                             onchange={handleProductChange}>
                 </lightning-dual-listbox>
             </div>
+            <p slot="footer"><lightning-button variant="brand" label="Save" disabled={saveStatus} title="Save Products" onclick={patchProduct} class="slds-m-left_x-small"></lightning-button></p>
         </lightning-card>
     </div>
 

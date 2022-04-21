@@ -1,9 +1,9 @@
 import { LightningElement,track,wire } from 'lwc';
-import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMembers";
 
 export default class AdminView extends LightningElement {
 
     @track notificationStatus = false;
+    @track saveStatus = true;
 
     connectedCallback(){
         this.populateTheBoxes();
@@ -14,7 +14,7 @@ export default class AdminView extends LightningElement {
 
     //fetch products from backend
     async fetchProducts(){
-        await fetch('http://localhost:8080/api/products')
+        await fetch('http://localhost:8080/api/products/')
             .then(response => response.json())
             .then(data => {
                 this.productListdb = data;
@@ -22,7 +22,7 @@ export default class AdminView extends LightningElement {
     }
 
     async fetchActivityTypes(){
-        await fetch('http://localhost:8080/api/activity/types')
+        await fetch('http://localhost:8080/api/activity/types/')
             .then(response => response.json())
             .then(data => {
                 this.activityTypeListdb = data.map(d => d.name);
@@ -184,22 +184,12 @@ export default class AdminView extends LightningElement {
         }
     }
 
+    disabled = [];
+
     //handle changes to dual-list box
     handleProductChange(evt){
-
-        const productArray = evt.target.value;
-
-        for(let i=0; i < productArray.length; i++){
-            const productInfo = {"name": productArray[i], "active":0}
-            this.patchProduct(productInfo);
-        }
-
-        const activeProduct = this.products.filter(product => !productArray.includes(product.label))
-
-        for(let i=0; i < activeProduct.length; i++){
-            const productInfo = {"name": activeProduct[i].label, "active":1}
-            this.patchProduct(productInfo);
-        }
+        this.disabled = evt.detail.value;
+        this.saveStatus = false;
     }
 
     pushProduct(productInfo){
@@ -216,7 +206,27 @@ export default class AdminView extends LightningElement {
             });
     }
 
-    patchProduct(productInfo){
+    patchProduct(){
+        let productArray = [];
+
+        const disabledProduct = this.productListdb.filter(product => this.disabled.includes(product.name));
+        const disabledProductId = disabledProduct.map(product => product.product_ID);
+        
+        for(let i=0; i < disabledProductId.length; i++){
+            productArray.push({"product_ID": disabledProductId[i], "active": 0});
+        }
+
+        const activeProduct = this.products.filter(product => !this.disabled.includes(product.label))
+        const productLabel = activeProduct.map(product => product.label);
+        const activeProductInfo = this.productListdb.filter(product => productLabel.includes(product.name));
+        const activeProductId = activeProductInfo.map(product => product.product_ID);
+
+        for(let i=0; i < activeProductId.length; i++){
+            productArray.push({"product_ID": activeProductId[i], "active": 1});
+        }
+
+        let productInfo = {"products":productArray}
+
         //patch product
         fetch('http://localhost:8080/api/products/', {
                 method: 'PATCH', 
@@ -224,6 +234,9 @@ export default class AdminView extends LightningElement {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(productInfo),
+            })
+            .then(data => {
+               this.saveStatus = true;
             })
             .catch((error) => {
                 console.error('Error:', error);

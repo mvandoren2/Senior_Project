@@ -1,13 +1,13 @@
 //Template imports
-import viewDetail from './templates/activityDetailView.html'
-import manageRequest from './templates/activityDetailView_manager-request.html'
-import manageActivity from './templates/activityDetailView_manager-active.html'
-import manageExpiredActivity from './templates/activityDetailView_manager-expired.html'
-import memberActivity from './templates/activityDetailView_member-active.html'
-import leadMemberActivity from './templates/activityDetailView_lead-active.html'
-import leadMemberExpiredActivity from './templates/activityDetailView_lead-expired.html'
-import salesRequest from './templates/activityDetailView_sales-request.html'
-import salesActivity from './templates/activityDetailView_sales-active.html'
+import viewDetail                   from './templates/activityDetailView.html' //done
+import manageRequest                from './templates/activityDetailView_manager-request.html' //done
+import manageActivity               from './templates/activityDetailView_manager-active.html' //done
+import manageExpiredActivity        from './templates/activityDetailView_manager-expired.html' //not sure if I need this
+import memberActivity               from './templates/activityDetailView_member-active.html' 
+import leadMemberActivity           from './templates/activityDetailView_lead-active.html' 
+import leadMemberExpiredActivity    from './templates/activityDetailView_lead-expired.html'
+import salesRequest                 from './templates/activityDetailView_sales-request.html'
+import salesActivity                from './templates/activityDetailView_sales-active.html'
 
 import { LightningElement, api } from 'lwc';
 import Id from "@salesforce/user/Id"
@@ -24,8 +24,8 @@ export default class ActivityDetailView extends LightningElement {
     url = 'http://localhost:8080/api/'
 
     fetchCurrentUser = () => {
-        const userID = Id ? Id : '0055f0000041g1mAAA'
-        const urlString = this.url + 'member/' + userID + '/'
+        this.userID = Id ? Id : '0055f000007NzdoAAC'
+        const urlString = this.url + 'member/' + this.userID + '/'
 
         fetch(urlString, )
             .then(res => res.json())
@@ -55,6 +55,8 @@ export default class ActivityDetailView extends LightningElement {
     getManagerTemplate = () => {
         switch(this.activity.status) {
             case 'Request':
+                return manageRequest
+
             case 'Reschedule': 
                 return manageRequest
 
@@ -76,8 +78,10 @@ export default class ActivityDetailView extends LightningElement {
             case 'Scheduled':{
                 let template = memberActivity
                 
-                if(Id === this.activity.leadMember)
+                if(this.userID === this.activity.leadMember.Id){
+                    
                     template = leadMemberActivity
+                }
                 
                 return template
             }
@@ -85,7 +89,7 @@ export default class ActivityDetailView extends LightningElement {
             case 'Expire':{
                 let template = memberActivity
                 
-                if(Id === this.activity.leadMember)
+                if(this.userID === this.activity.leadMember)
                     template = leadMemberExpiredActivity
                 
                 return template
@@ -121,8 +125,7 @@ export default class ActivityDetailView extends LightningElement {
             this.activity = activity
             this.activity_unmodified = Object.assign({}, activity)
             
-            this.setProducts()
-            this.setDateIsOptional()
+            this.setViewState()
         }
 
         this.isOpen = true
@@ -166,6 +169,13 @@ export default class ActivityDetailView extends LightningElement {
     //
     //Populate view fields
     //
+
+    setViewState = () => {
+        this.setProducts()
+        this.setDateIsOptional()
+        this.requestIsReschedule = this.activity.status === 'Reschedule'
+        this.teamIsAssigned = this.activity.team.length
+    }
 
     products = []
 
@@ -219,6 +229,13 @@ export default class ActivityDetailView extends LightningElement {
             this.activity.selectedDate = this.activity.dates.find(date => date.id === selectedDateId)
 
         this.activityModified = true
+    }
+
+    editDateOptions = (evt) => {
+        this.activity.dates = evt.detail.dates
+        this.activity_unmodified = this.activity
+
+        this.setDateIsOptional()
     }
 
     selectTeam = (evt) => {
