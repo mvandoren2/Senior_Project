@@ -2,10 +2,17 @@
     <lightning-record-view-form record-id={opportunityId} object-api-name="Opportunity"></lightning-record-view-form>
         <lightning-card title="Request a Presales Activity" >
 
-            <template if:true={showAlert}>
-                <div class="slds-box_x-small slds-box slds-theme_shade slds-theme_alert-texture slds-theme_warning">
+            <template if:true={dateWarningShowing}>
+                <div class="slds-box
+                            slds-box_x-small 
+                            slds-theme_shade 
+                            slds-theme_alert-texture 
+                            slds-theme_warning
+                            slds-var-m-around_x-small" >
                     <p>
-                        <strong>Be sure you only want to select one date!</strong> 
+                        <strong>
+                            
+                        </strong> 
                     </p>
                 </div>
             </template>
@@ -16,25 +23,30 @@
                 <label for="date1" class="slds-text-title" ></label>
                 <lightning-combobox name="product"
                                     label="Product"
-                                    value={value}
                                     placeholder="Select Product"
                                     options={productSelector.products}
-                                    onchange={productSelector.addProd} 
-                                    required>
+                                    onchange={productSelector.addProd} >
                 </lightning-combobox>
 
                 <abbr title="required" class="slds-required">*</abbr>
                 <label for="date1" class="slds-text-title" >Selected:</label>
-                <div class="selected-product-container" style="display: flex; gap: 1rem; flex-wrap: wrap;">                    
-                    <template for:each={selectedProducts} for:item="prod">
-                            <lightning-pill key={prod.product_ID}
-                                            variant="destructive" 
-                                            label={prod.name}
-                                            title="Destructive action"
-                                            data-item={prod.product_ID}
-                                            onremove={productSelector.removeProd} >
-                            </lightning-pill>
-                    </template>
+
+                <div class="selected-product-container">                    
+                    <lightning-layout multiple-rows >
+
+                        <template for:each={selectedProducts} for:item="prod">
+                            <lightning-layout-item key={prod.value} >
+                                <lightning-pill variant="destructive" 
+                                                label={prod.label}
+                                                title="Destructive action"
+                                                data-item={prod.value}
+                                                onremove={productSelector.removeProd}
+                                                class="slds-var-m-around_xx-small" >
+                                </lightning-pill>
+                            </lightning-layout-item>
+                        </template>
+
+                    </lightning-layout>
                 </div>
             </div>      
     
@@ -74,7 +86,7 @@
                                 disabled={isSubmitDisabled} 
                                 title="Submit"
                                 class="slds-var-p-top_small slds-align_absolute-center"
-                                onclick={handleUploadAction} >
+                                onclick={handleSubmit} >
             </lightning-button>
         </div>
     </lightning-card>
