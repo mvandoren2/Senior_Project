@@ -7,11 +7,12 @@
                 class={boxClasses} >
         
             
-        <template if:true={isShowing}>
+        <template if:true={isOpen}>
             <div class="slds-modal__container">
 
                 <!-- modal header start -->
                 <header class="slds-modal__header">
+
                     <!-- sldsValidatorIgnoreNextLine -->
                     <lightning-button-icon  icon-name="utility:close" 
                                             aria-label="close" 
@@ -22,6 +23,7 @@
                                             title="close" 
                                             class="slds-modal__close" >  
                     </lightning-button-icon>  
+
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Presales Activity: {activity.status}</h2>
                 </header>            
 
@@ -32,10 +34,11 @@
                         <!--Account-->
                         <tr>
                             <td class="slds-var-p-around_small">
-                                <p>
+                                <p class="slds-text-title" >
                                     Account:
                                 </p>    
                             </td>
+
                             <td class="slds-var-p-around_small">
                                 <a>
                                     {activity.opportunity.AccountName}
@@ -46,10 +49,11 @@
                         <!--Opportunity-->
                         <tr>
                             <td class="slds-var-p-around_small">
-                                <p>
+                                <p class="slds-text-title" >
                                     Opportunity:
                                 </p>
                             </td>
+
                             <td class="slds-var-p-around_small">
                                 <a>
                                     {activity.opportunity.Name}
@@ -60,10 +64,11 @@
                         <!--Product-->
                         <tr>
                             <td class="slds-var-p-around_small" style="vertical-align: top;">
-                                <p>
+                                <p class="slds-text-title" >
                                     Product(s):
                                 </p>    
                             </td>
+
                             <td class="slds-var-p-around_small">
                                 <ul>
                                     <template for:each={products} for:item="product">
@@ -78,10 +83,11 @@
                         <!--Activity-->
                         <tr>
                             <td class="slds-var-p-around_small">
-                                <p>
+                                <p class="slds-text-title" >
                                     Activity Type:
                                 </p>
                             </td>
+
                             <td class="slds-var-p-around_small">
                                 <p>
                                     {activity.activity_Type.name}
@@ -92,7 +98,7 @@
                         <!--Location-->
                         <tr>
                             <td class="slds-var-p-around_small">
-                                <p>
+                                <p class="slds-text-title" >
                                     Location:
                                 </p>        
                             </td>
@@ -103,32 +109,69 @@
                             </td>
                         </tr>
 
+                        <!--Team-->
+                        <tr>
+                            <td class="slds-var-p-around_small slds-text-title" >
+                                <p>
+                                    Team:
+                                </p>
+                            </td>
+
+                            <td class="slds-var-p-around_small" >
+                                <lightning-layout vertical-align="center">
+
+                                    <lightning-layout-item >
+                                        <ul>
+                                            <template for:each={activity.team} for:item="member" >
+                                                <li key={member.Id} >
+                                                    <a >{member.Name}</a>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </lightning-layout-item>
+
+                                </lightning-layout>                                
+                            </td>
+                        </tr>
+
                         <!--Date-->
                         <tr>
-                            <td class="slds-var-p-around_small" style="vertical-align: top;">
-                                <p>
+                            <td class="slds-var-p-around_small"  style="vertical-align: top;">
+                                <p class="slds-var-m-top_x-small slds-text-title" >
                                     Date:
                                 </p>
                             </td>
 
                             <td class="slds-var-p-around_small">
-                                <ul>
-                                    <template for:each={activity.dates} for:item="date" >
-                                        <li key={date.id}>
-                                            <p>{date.localeString}</p>
-                                        </li>
-                                    </template>
-                                </ul>
+                                <lightning-layout vertical-align="center">
+                                    <lightning-layout-item >
+                                        <template if:true={dateIsOptional} >
+                                            <p class="slds-text-title" >Requested Dates:</p>
+                                            <ul class="slds-var-m-left_small" >
+                                                <template for:each={activity.dates} for:item="date" >
+                                                    <li key={date.id}>
+                                                        <p>{date.localeString}</p>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </template>
+        
+                                        <template if:false={dateIsOptional} >
+                                            {activity.selectedDate.localeString}
+                                        </template>
+                                    </lightning-layout-item>
+                                </lightning-layout>
                             </td>
                         </tr>
 
                         <!--Submitted By-->
                         <tr>
                             <td class="slds-var-p-around_small">
-                                <p>
+                                <p class="slds-text-title" >
                                     Submitted By:
                                 </p>
                             </td>
+                            
                             <td class="slds-var-p-around_small">
                                 <a>
                                     {activity.submittedBy.Name}
@@ -139,14 +182,15 @@
                         <!--Notes-->
                         <tr>
                             <td class="slds-var-p-around_small" style="vertical-align: top;">
-                                    <p>
+                                    <p class="slds-text-title" >
                                         Notes:
                                     </p>
                             </td>
+                            
                             <td class="slds-var-p-around_small">
                                 <div >
                                     <c-notes-view   data-activity-id={activity.activity_ID} 
-                                                    data-max-items="3" >
+                                                    data-handlenote="post" >
                                     </c-notes-view>
                                 </div>
                             </td>
@@ -157,10 +201,15 @@
 
                 <!-- modal footer start -->
                 <footer class="slds-modal__footer">
-
+                    <lightning-button   variant='neutral'
+                                        onclick={closeModal}
+                                        label='Close'
+                                        class="slds-float_right" >
+                    </lightning-button>
                 </footer>
             </div>
         </template>
     </section>
+
     <div class={backdropClasses}></div>
 </template>

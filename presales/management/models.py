@@ -46,7 +46,6 @@ class Member(models.Model):
    external_member_ID = models.CharField(max_length=50, unique=True)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
    proficiency = models.ManyToManyField(Proficiency, blank=True)
-   token = models.CharField(max_length=500, blank=True, null=True)
 
    class meta:
       verbose_name = 'Member'
@@ -95,7 +94,7 @@ class Activity(models.Model):
    account_ID = models.CharField(max_length=100)
    location = models.CharField(max_length = 50, choices = location_choice, default = 'Remote')
    activity_Type = models.ForeignKey(ActivityType, on_delete=models.CASCADE)    
-   activity_Level = models.CharField(max_length=50, choices = activity_Levels, default = 'Level 1')
+   activity_Level = models.CharField(max_length=50, choices = activity_Levels, blank=True, null=True, default = 'Level 1')
    createdByMember = models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='createdByMember')
    members = models.ManyToManyField(Member, blank=True)
    leadMember =  models.ForeignKey(Member, on_delete=models.CASCADE, blank=True, null=True, related_name='leadMember')

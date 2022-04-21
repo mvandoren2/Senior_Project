@@ -1,4 +1,4 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productsList';
@@ -21,7 +21,7 @@ export default class SalesRequestForm extends LightningElement {
         this.accountId = this.account[0].Id    
     }
 
-
+    
     //pull activity types and put into combobox
     
     activityType = ''
@@ -45,23 +45,8 @@ export default class SalesRequestForm extends LightningElement {
         this.setDisableButton()
     }
 
-    activityLevel = '';
-
-    activityLevels = [
-            { label: 'Level 1', value: 'Level 1' },
-            { label: 'Level 2', value: 'Level 2' },
-            { label: 'Level 3', value: 'Level 3' },
-            { label: 'Level 4', value: 'Level 4' },
-    ];
-   
-    selectActivityLevel(event) {        
-        this.activityLevel = event.detail.value;
-
-        this.setDisableButton()
-    }
-
-    selectedProducts = [];
-    filteredProducts = [];
+    @track selectedProducts = [];
+    @track filteredProducts = [];
     searchBarEmpty = true
     
     productSelector = new ProductSelector(this)
@@ -83,12 +68,7 @@ export default class SalesRequestForm extends LightningElement {
         this[name] = evt.target.value
 
         this.setDisableButton()
-    }
-
-    alternateDates = false 
-
-    showAlternateDates = () => {
-        this.alternateDates = !this.alternateDates
+        this.setDateWarningShowing()
     }
 
     notes = '';
@@ -110,17 +90,40 @@ export default class SalesRequestForm extends LightningElement {
         this.isSubmitDisabled = !(
             this.selectedProducts.length &&
             this.activityType !== '' &&
-            this.activityLevel !== '' &&
             this.date1
         )
+    }
+    //Show Date Alert
+    
+    dateWarningShowing = false    
+    
+    setDateWarningShowing = () => {
+        const singleDateSelected = 
+            (this.date1 && this.date2 === undefined && this.date3 === undefined) ||
+            (this.date1 === undefined && this.date2 && this.date3 === undefined) ||
+            (this.date1 === undefined && this.date2 === undefined && this.date3)
+
+        this.dateWarningShowing = singleDateSelected && this.submitAttempted && !this.dateWarningShowing
+    }
+
+    submitAttempted = false
+
+    handleSubmit = () => {
+        this.submitAttempted = true
+
+        this.setDateWarningShowing()
+
+        if(!this.dateWarningShowing)
+            this.handleUploadAction()        
     }
 
     //POST JSON ----------
     handleUploadAction(){
         let memberId = Id ? Id : '0055f0000041g1mAAA'
+
         let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
 
-        let selectedProducts = this.selectedProducts.map(product => product.product_ID)
+        let selectedProducts = this.selectedProducts.map(product => parseInt(product.value, 10))
 
         let jsonData = {
             "createdByMember": memberId,
@@ -128,7 +131,6 @@ export default class SalesRequestForm extends LightningElement {
             "account_ID": this.accountId,
             "products": selectedProducts,
             "activity_Type": parseInt(this.activityType, 10),
-            "activity_Level": this.activityLevel,
             "location": this.location,
             "oneDateTime": this.date1,
             "twoDateTime": this.date2 ? this.date2 : null,
@@ -136,15 +138,16 @@ export default class SalesRequestForm extends LightningElement {
             "status": "Request",
             "notes": this.notes,
             "flag": this.unexpectedFlag
-        }
+        }   
         
         fetch(this.url + 'activity/', {
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(jsonData)
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(jsonData)
 
-            }).catch((error) => {
-                console.error('Error:', error);
-            });
+        }).catch((error) => {
+            console.error('Error:', error);
+        
+        });      
     }
 }

@@ -9,6 +9,7 @@
                      
         <div class="slds-modal__container" >
             <!-- Modal header here -->
+            <!-- sldsValidatorIgnoreNextLine -->
             <lightning-button-icon  icon-name="utility:close" 
                                     aria-label="close" 
                                     alternative-text="Close this window" 
@@ -19,26 +20,28 @@
                                     class="slds-modal__close" >  
             </lightning-button-icon>
             <header class="slds-modal__header">
-                <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Reschedule Activity</h1>
+                <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h1>
             </header>
 
             <!-- Modal body starts here -->
 
             <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
 
-                <p class="slds-var-m-bottom_small"> 
-                    The other party will be notified of your request to reschedule.
-                </p>
-
-                <p class="slds-var-m-bottom_small">
-                    <i>Please provide as many options for the new date/time as possible for them to select from.</i>
-                </p>
+                <template if:true={showRescheduleText} >
+                    <p class="slds-var-m-bottom_small"> 
+                        The other party will be notified of your request to reschedule.
+                    </p>
+    
+                    <p class="slds-var-m-bottom_small">
+                        <i>Please provide as many options for the new date/time as possible for them to select from.</i>
+                    </p>
+                </template>
 
                 <lightning-layout horizontal-align="center">
 
                     <lightning-layout-item >
                         <abbr title="required" class="slds-required">*</abbr>
-                        <label for="date1" class="slds-text-title" >Reschedule Options</label>
+                        <label for="date1" class="slds-text-title" >{inputLabel}</label>
                 
                         <lightning-input    type="datetime" 
                                             label=" " 
@@ -72,9 +75,9 @@
             <!-- Modal footer starts here -->
             <footer class="slds-modal__footer">
                 <lightning-button   variant='destructive-text'
-                                    onclick={handleUploadAction}
+                                    onclick={submitHandler}
                                     disabled={isSubmitDisabled}
-                                    label="Request Reschedule" >
+                                    label={submitLabel} >
                 </lightning-button>
 
                 <lightning-button   variant='neutral'

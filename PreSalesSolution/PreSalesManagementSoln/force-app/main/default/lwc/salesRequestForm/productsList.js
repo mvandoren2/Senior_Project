@@ -1,4 +1,6 @@
+
 import SalesRequestForm from "./salesRequestForm";
+
 
 export class ProductSelector {
     constructor (parentObj) {
@@ -11,53 +13,35 @@ export class ProductSelector {
     }
 
     products = []
-
+ 
     getProducts = () => {
         fetch(this.parent.url + 'products/')
             .then(res => res.json())
-            .then(data => {this.products = data})
+            .then((data) => {
+                this.products = data.map(item => ({
+                    label: item.name, 
+                    value: item.product_ID.toString()
+                }))
+            })
+            
     }
-
-    //search for products in the text bar
-    searchEvt = (evt) => {
-        const value = evt.target.value;
-        if (value === '') {
-            this.parent.filteredProducts = [];
-            this.parent.searchBarEmpty = true
-
-        } else {
-            const lValue = value.toLowerCase();
-            this.parent.filteredProducts = this.products.filter(item => item.name.toLowerCase().includes(lValue));
-            this.parent.searchBarEmpty = false || !this.parent.filteredProducts.length
-        }
-    }
-
     //event button to add to cart
     addProd = (evt) => {
-        const prod = evt.target.value;
-
-        if (this.parent.selectedProducts.includes(prod))
-            return;
+        const prod = this.products.find(product => product.value === evt.target.value);
 
         this.parent.selectedProducts.push(prod);
-        this.products = this.products.filter(item => item.product_ID !== prod.product_ID);
-        
-        this.parent.template.querySelector(".search").value = '';
-        this.searchEvt({target:{value: ''}})
+        this.products = this.products.filter(item => item !== prod);
+        this.parent.template.querySelector("lightning-combobox").value ='';
 
         this.parent.setDisableButton()
-    }
+    } 
 
     //event button to remove from cart
     removeProd = (evt) => {
-        const product_ID = parseInt(evt.target.dataset.item, 10)
-        const product = this.parent.selectedProducts.find(item => item.product_ID === product_ID)
+        const product = this.parent.selectedProducts.find(item => item.value === evt.target.dataset.item)
 
         this.products.push(product);
         this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item !== product);
-
-        this.parent.template.querySelector(".search").value = '';
-        this.searchEvt({target:{value: ''}})
 
         this.parent.setDisableButton()
     }
