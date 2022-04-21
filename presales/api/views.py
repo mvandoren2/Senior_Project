@@ -1,18 +1,17 @@
-from base64 import encode
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from django.http import HttpResponse
 from collections import OrderedDict
 from management.models import *
 from itertools import chain
-from .helper import *
 from .serializers import *
-import requests
+from .helper import *
 import json
-import jwt
 
 results = 5 
 
@@ -104,7 +103,7 @@ def addActivity(request):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
-@api_view(['GET', 'PATCH']) 
+@api_view(['GET', 'PATCH', 'DELETE'])
 def getActivity(request, activityID):
     if(request.method == 'GET'):
         try:
@@ -115,6 +114,11 @@ def getActivity(request, activityID):
         
         except:
             return Response(status=204)
+
+    elif(request.method == 'DELETE'):
+        activity_Delete = Activity.objects.get(activity_ID=activityID)
+        activity_Delete.delete()
+        return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
 
     elif(request.method == 'PATCH'):
         activity_patch = json.loads(request.body)
@@ -498,7 +502,7 @@ def getMemberActivities(request, id):
     return Response(serializers.data)
 
 @csrf_exempt
-@api_view(['GET', 'POST', 'PATCH'])
+@api_view(['GET', 'POST', 'PATCH', 'DELETE'])
 def getProducts(request):
     if(request.method == 'GET'):
         if(request.GET.get('active')):
@@ -528,6 +532,11 @@ def getProducts(request):
                 product.active = p['active']
                 product.save()
         return HttpResponse(json.dumps({'PATCH Success': 'True'}), content_type='application/json')
+    elif(request.method == 'DELETE'):
+        data = request.data
+        product = Product.objects.get(product_ID=data['product_ID'])
+        product.delete()
+        return HttpResponse(json.dumps({'DELETE Success': 'True'}), content_type='application/json')
 
 @csrf_exempt
 @api_view(['PATCH', 'DELETE'])
@@ -579,53 +588,9 @@ def getUserRoles(request):
         new_user_role.save()
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
-def createURL(member):
-    #get the members token
-    member = Member.objects.get(external_member_ID=member)
-    token = member.token
-    url = "https://login.salesforce.com/services/oauth2/token"
-    data = {
-        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-        'assertion': token
-    }
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-    r = requests.post(url, data=data, headers=headers)
-    return r
-
-#Display and send a notification in dashboard
-def sendNotification():
-    url = "https://scs-4d-dev-ed.my.salesforce.com/services/data/v46.0/actions/standard/customNotificationAction"
-
-    data = {
-        'inputs': [{
-               'customNotifTypeId': '0ML5f000000brbbGAA',
-               'recipientIds' : ['0055f000002968SAAQ'],
-               'title': 'test',
-               'body': 'This is a custom notification.',
-               'targetId': '0065f000003swZ9AAI'
-               }]
-            }
-
-    headers = {
-        "Authorization": "Bearer 00D5f000003H4cm!ASAAQJKTo8flvPbaKObo_i6Dvajk4cc_YM9nLSyJd0YYPEv0YrlSpiXaEbXNz617RS.UdsiL2XfbBIyuBE9ANpMkVp8ye0KH",
-        "Content-Type": "application/json"
-    }
-    r = requests.post(url, data=json.dumps(data), headers=headers)
-    return r
-
-@csrf_exempt
-@api_view(['PATCH'])
-def encoder(request, id):
-    data = json.loads(request.body)
-    member = Member.objects.get(external_member_ID=id)
-    print("Data before encoding: ", data)
-    #use jwt to encode the data
-    token = jwt.encode(data, 'secret', algorithm='HS256')
-    print("Token after encoding:", token)
-    #save the token to the member
-    member.token = token
-    member.save()
-
-    return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
+def getToken(request, org):
+    if(request.method == 'GET'):
+        #get the org from the user
+        org = User.objects.get(username=org)
+        token = str(Token.objects.get(user=org))        
+        return HttpResponse(json.dumps({'Token': token}), content_type='application/json')

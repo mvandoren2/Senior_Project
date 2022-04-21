@@ -10,9 +10,10 @@ except:
     STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
     # HTTPS SETTINGS
-    SECURE_SSL_REDIRECT = True
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
     #will be True when we have SSL certificate
     SECURE_SSL_REDIRECT = False
 

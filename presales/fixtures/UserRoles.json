@@ -1,0 +1,30 @@
+[
+    {
+        "model": "management.userrole",
+        "pk": 1,
+        "fields": {
+            "name": "Sales Representative"
+        }
+    },
+    {
+        "model": "management.userrole",
+        "pk": 2,
+        "fields": {
+            "name": "Admin"
+        }
+    },
+    {
+        "model": "management.userrole",
+        "pk": 3,
+        "fields": {
+            "name": "Presales Member"
+        }
+    },
+    {
+        "model": "management.userrole",
+        "pk": 4,
+        "fields": {
+            "name": "Presales Manager"
+        }
+    }
+]
