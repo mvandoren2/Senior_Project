@@ -17,6 +17,7 @@ export default class AdminView extends LightningElement {
         await fetch('http://localhost:8080/api/products/')
             .then(response => response.json())
             .then(data => {
+                console.log('Success: ', data);
                 this.productListdb = data;
             })
     }
@@ -25,6 +26,7 @@ export default class AdminView extends LightningElement {
         await fetch('http://localhost:8080/api/activity/types/')
             .then(response => response.json())
             .then(data => {
+                console.log('Success: ', data);
                 this.activityTypeListdb = data.map(d => d.name);
             })
     }
@@ -75,7 +77,7 @@ export default class AdminView extends LightningElement {
                 this.products.push(...productList);
 
                 //create a product info to push
-                const productInfo = {"name": evt.target.value};
+                const productInfo = {"products": [{"name": evt.target.value}]};
 
                 this.pushProduct(productInfo);
             } else {
@@ -102,7 +104,7 @@ export default class AdminView extends LightningElement {
             if(!this.activityTypeListdb.includes(evt.target.value)){
 
                 //create a activity type info to push
-                const activityType = {"name": evt.target.value};
+                const activityType = {"activity_types": [{"name": evt.target.value}]};
 
                 this.pushActivityType(activityType);
 
@@ -173,6 +175,10 @@ export default class AdminView extends LightningElement {
                     },
                     body: JSON.stringify(deletedActivity),
                 })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success: ', data);
+                })
                 .catch((error) => {
                     console.error('Error', error)
                 })
@@ -201,6 +207,10 @@ export default class AdminView extends LightningElement {
                 },
                 body: JSON.stringify(productInfo),
             })
+            .then(response => response.json())
+                .then(data => {
+                    console.log('Success: ', data);
+                })
             .catch((error) => {
                 console.error('Error:', error);
             });
@@ -235,6 +245,10 @@ export default class AdminView extends LightningElement {
                 },
                 body: JSON.stringify(productInfo),
             })
+            .then(response => response.json())
+                .then(data => {
+                    console.log('Success: ', data);
+                })
             .then(data => {
                this.saveStatus = true;
             })
@@ -251,6 +265,10 @@ export default class AdminView extends LightningElement {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(activityType),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
             })
             .catch((error) => {
                 console.error('Error:', error);
