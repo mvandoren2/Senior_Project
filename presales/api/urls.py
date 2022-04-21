@@ -21,10 +21,12 @@ urlpatterns = [
     #Singleton and collection Member endpoints
     path('member/<id>/', views.getMember),
     path('member/<id>/activities/', views.getMemberActivities),
-    path('member/<id>/token/', views.encoder),
     path('members/', views.getMembers),
     path('members/roles/', views.getUserRoles),
 
     #Collection Product endpoint
     path('products/', views.getProducts),
+
+    #COllect Token endpoint
+    path('token/<org>/', views.getToken),
 ]

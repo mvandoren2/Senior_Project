@@ -46,7 +46,6 @@ class Member(models.Model):
    external_member_ID = models.CharField(max_length=50, unique=True)
    user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, blank=True, null=True)
    proficiency = models.ManyToManyField(Proficiency, blank=True)
-   token = models.CharField(max_length=500, blank=True, null=True)
 
    class meta:
       verbose_name = 'Member'
