@@ -1,5 +1,6 @@
 from unicodedata import name
 from management.models import *
+from django.db.models import Q
 from datetime import datetime
 import jwt
 
@@ -67,6 +68,30 @@ def searchActivity(activity):
         return True
     else:
         return False
+
+def queryActivities(queries) :
+    query = Activity.objects.all()
+
+    if(queries.get('opportunity')):
+        query &= query.filter(opportunity_ID=queries.get('opportunity'))
+    if(queries.get('account')):
+        query &= query.filter(account_ID=queries.get('account'))
+    if(queries.get('member')):
+        salesforce_user_ID = queries.get('member')
+
+        memberID = Member.objects.get(external_member_ID=salesforce_user_ID).member_ID
+        
+        query &= query.filter(Q(members__member_ID=memberID) | Q(activeManager=memberID) | Q(createdByMember=memberID))
+
+    if(queries.get('product')):
+        query &= query.filter(products=int(queries.get('product')))
+    if(queries.get('status')):
+        query &= query.filter(status=queries.get('status'))
+    if(queries.get('flag')):
+        query &= query.filter(flag=queries.get('flag'))
+
+    return query
+
 
 def searchProficiency(prodLevels):
     arrP = []

@@ -238,59 +238,43 @@ def getActivityTypes(request):
             
 @api_view(['GET'])
 def getActivities(request):
-    query = Activity.objects.all()
-    
-    if(request.GET.get('opportunity_ID') or request.GET.get('activeManager') or request.GET.get('account_ID') or request.GET.get('createdByMember') or request.GET.get('members') or request.GET.get('products') or request.GET.get('status') or request.GET.get('flag')):
-        #query whatever is passed in
-        new_query = Activity.objects.none()
+    activities = queryActivities(request.GET)
 
-        if(request.GET.get('opportunity_ID')):
-            new_query |= query.filter(opportunity_ID=request.GET.get('opportunity_ID'))
-        if(request.GET.get('account_ID')):
-            new_query |= query.filter(account_ID=request.GET.get('account_ID'))
-        if(request.GET.get('createdByMember')):
-            new_query |= query.filter(createdByMember=request.GET.get('createdByMember'))
-        if(request.GET.get('activeManager')):
-            new_query |= query.filter(createdByMember=request.GET.get('activeManager'))
-        if(request.GET.get('members')):
-            new_query |= query.filter(members=request.GET.get('members'))
-        if(request.GET.get('products')):
-            new_query |= query.filter(products=request.GET.get('products'))
-        if(request.GET.get('status')):
-            new_query |= query.filter(status=request.GET.get('status'))
-        if(request.GET.get('flag')):
-            new_query |= query.filter(flag=request.GET.get('flag'))
+    serializer = ActivitySerializer(activities, many=True)
 
-        #serialize the query
-        serializer = ActivitySerializer(new_query, many=True)
-        return Response(serializer.data)
-    else:
-        serializer = ActivitySerializer(query, many=True)
-
-        return Response(serializer.data)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def getActiveActvivities(request):
     #get all activities with the status of accapt, reschedule, schedule, and request
-    activities = Activity.objects.filter(status__in=['Accept', 'Reschedule', 'Schedule', 'Request'])
+    activities = queryActivities(request.GET)
+    
+    activities &= activities.filter(status__in=['Accept', 'Reschedule', 'Scheduled', 'Request'])    
+
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def getAcceptedActivities(request):
-    activities = Activity.objects.filter(status__in=['Accept', 'Scheduled'])
+    activities = queryActivities(request.GET)
+    
+    activities = activities.filter(status__in=['Accept', 'Scheduled'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def getRequestActivities(request):
-    activities = Activity.objects.filter(status__in=['Reschedule', 'Request'])
+    activities = queryActivities(request.GET)
+    
+    activities = activities.filter.filter(status__in=['Reschedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def getPastActivities(request):
-    activities = Activity.objects.filter(status__in=['Cancel', 'Expire', 'Complete'])
+    activities = queryActivities(request.GET)
+    
+    activities = activities.filter.filter(status__in=['Cancel', 'Expire', 'Complete'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
