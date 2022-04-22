@@ -1,8 +1,8 @@
-from unicodedata import name
+from time import time
 from management.models import *
 from django.db.models import Q
 from datetime import datetime
-import jwt
+from django.utils import timezone
 
 def searchMember(members):
     arrM = []
@@ -14,6 +14,8 @@ def searchMember(members):
         else:
             #save the external_presales_member_ID and return the presales_member_ID
             newMem = Member(external_member_ID=m)
+            if('user_role' in m):
+                newMem.user_role = UserRole.objects.get(name=m['user_role'])
             newMem.user_role = UserRole.objects.get(name='Sales Representative')
             newMem.save()
             arrM.append(newMem.member_ID)
@@ -111,3 +113,82 @@ def isWithinAnHour(date1, date2):
         return True
     else:
         return False
+
+def addData():
+    currentTime = timezone.now(tz=timezone.utc)
+
+    #create dummby data for userRoles
+    userRole = UserRole(name='Sales Representative')
+    userRole.save()
+    userRole = UserRole(name='Presales Member')
+    userRole.save()
+    userRole = UserRole(name='Presales Manager')
+    userRole.save()
+    userRole = UserRole(name='Admin')
+    userRole.save()
+
+    #create dummy data for products
+    products = [
+        {
+            'name': 'Product 1',
+            'external_product_ID': '1',
+            'active': True
+        },
+        {
+            'name': 'Product 2',
+            'external_product_ID': '2',
+            'active': True
+        },
+        {
+            'name': 'Product 3',
+            'external_product_ID': '3',
+            'active': True
+        }
+    ]
+    searchProducttoCreate(products)
+
+    #create dummy data for members
+    members = [
+        {
+            'external_member_ID': '1',
+            'user_role': 'Sales Representative'
+        },
+        {
+            'external_member_ID': '2',
+            'user_role': 'Presales Manager'
+        },
+        {
+            'external_member_ID': '3',
+            'user_role': 'Presales Member'
+        },
+        {
+            'external_member_ID': '4',
+            'user_role': 'Admin'
+        }
+    ]
+    searchMember(members)
+
+    #create dummy data for activity types
+    activityTypes = ActivityType(name='Activity Type 1')
+    activityTypes.save()
+
+    #create dummy data for activity
+    activities = Activity(
+        opportunity_ID=1,
+        account_ID=1,
+        location='Location 1',
+        activity_Type=activityTypes,
+        oneDateTime=currentTime,
+        status='Request',
+        flag=True
+    )
+    activities.save()
+
+    #create dummy data for note
+    notes = Note(
+        activity = activities,
+        member = Member.objects.get(member_ID=1),
+        note_text = 'Note 1',
+        note_date = currentTime
+    )
+    notes.save()

@@ -13,8 +13,6 @@ from .serializers import *
 from .helper import *
 import json
 
-results = 5 
-
 @csrf_exempt
 @api_view(['POST'])
 def addActivity(request):
