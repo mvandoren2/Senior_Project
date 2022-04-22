@@ -90,7 +90,7 @@ def isWithinAnHour(date1, date2):
         return False
 
 def addData():
-    currentTime = timezone.now(tz=timezone.utc)
+    currentTime = datetime.now(timezone=timezone.utc)
 
     #create dummby data for userRoles
     userRole = UserRole(name='Sales Representative')
