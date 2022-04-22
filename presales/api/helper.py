@@ -140,7 +140,7 @@ def addData():
     searchMember(members)
 
     #create dummy data for activity types
-    activityTypes = ActivityType(name='Activity Type 1', description='Description 1')
+    activityTypes = ActivityType(name='Activity Type 1')
     activityTypes.save()
 
     #create dummy data for activity
