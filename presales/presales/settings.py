@@ -143,12 +143,15 @@ CUSTOM_CALLBACK = "management.callback.oauth_callback"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+# https
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # HTTPS SETTINGS
 SECURE_SSL_REDIRECT = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
-#will be True when we have SSL certificate
+# Will be True when we have SSL certificate
 SECURE_SSL_REDIRECT = False
 
 # Maybes
