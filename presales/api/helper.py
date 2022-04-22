@@ -1,5 +1,7 @@
+from time import time
 from management.models import *
 from datetime import datetime
+from django.utils import timezone
 
 def searchMember(members):
     arrM = []
@@ -149,7 +151,7 @@ def addData():
         account_ID=1,
         location='Location 1',
         activity_Type=activityTypes,
-        oneDateTime=datetime.now(),
+        oneDateTime=timezone.now(),
         status='Request',
         flag=True
     )
@@ -160,6 +162,6 @@ def addData():
         activity = activities,
         member = Member.objects.get(member_ID=1),
         note_text = 'Note 1',
-        note_date = datetime.now()
+        note_date = timezone.now()
     )
     notes.save()
