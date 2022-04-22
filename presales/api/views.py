@@ -359,7 +359,7 @@ def getSuggestedMembers(request, activityID):
         
         #see if the proficiency is the same as the activity
         prof = list(memID[0].proficiency.all())
-        print(prof)
+
         #make prof into a list
         prof = [str(p)[:-2] for p in prof]
 
@@ -449,6 +449,7 @@ def getMember(request, id):
 
     elif(request.method == 'PATCH'):
         data = request.data
+        
         #get the member
         member = Member.objects.get(external_member_ID=id)
 
