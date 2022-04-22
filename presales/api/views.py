@@ -264,7 +264,7 @@ def getAcceptedActivities(request):
 def getRequestActivities(request):
     activities = queryActivities(request.GET)
     
-    activities = activities.filter.filter(status__in=['Reschedule', 'Request'])
+    activities = activities.filter(status__in=['Reschedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
@@ -272,7 +272,7 @@ def getRequestActivities(request):
 def getPastActivities(request):
     activities = queryActivities(request.GET)
     
-    activities = activities.filter.filter(status__in=['Cancel', 'Expire', 'Complete'])
+    activities = activities.filter(status__in=['Cancel', 'Expire', 'Complete'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 
