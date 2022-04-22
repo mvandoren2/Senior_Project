@@ -116,7 +116,6 @@ def isWithinAnHour(date1, date2):
 
 def addData():
     currentTime = timezone.now()
-    print(currentTime)
 
     #create dummby data for userRoles
     userRole = UserRole(name='Sales Representative')
