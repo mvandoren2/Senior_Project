@@ -18,18 +18,19 @@ export class ProductSelector {
         fetch(this.parent.url + 'products/')
             .then(res => res.json())
             .then((data) => {
-                this.products = data.map(item => ({label: item.name, value: item.product_ID.toString()}))   
+                this.products = data.map(item => ({
+                    label: item.name, 
+                    value: item.product_ID.toString()
+                }))
             })
             
     }
     //event button to add to cart
     addProd = (evt) => {
-        const prod = evt.target.value;
+        const prod = this.products.find(product => product.value === evt.target.value);
 
-        if (this.parent.selectedProducts.includes(prod))
-            return;
         this.parent.selectedProducts.push(prod);
-        this.products = this.products.filter(item => item.product_ID !== prod.product_ID);
+        this.products = this.products.filter(item => item !== prod);
         this.parent.template.querySelector("lightning-combobox").value ='';
 
         this.parent.setDisableButton()
@@ -37,13 +38,10 @@ export class ProductSelector {
 
     //event button to remove from cart
     removeProd = (evt) => {
-        const product_ID = parseInt(evt.target.dataset.item, 10)
-        const product = this.parent.selectedProducts.find(item => item.product_ID === product_ID)
+        const product = this.parent.selectedProducts.find(item => item.value === evt.target.dataset.item)
 
         this.products.push(product);
         this.parent.selectedProducts = this.parent.selectedProducts.filter(item => item !== product);
-
-        this.parent.template.querySelector("selectedProducts").value = '';
 
         this.parent.setDisableButton()
     }

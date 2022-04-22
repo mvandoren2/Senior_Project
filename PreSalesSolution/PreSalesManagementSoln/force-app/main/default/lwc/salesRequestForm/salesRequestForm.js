@@ -1,4 +1,4 @@
-import { LightningElement,api} from 'lwc';
+import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productsList';
@@ -45,8 +45,8 @@ export default class SalesRequestForm extends LightningElement {
         this.setDisableButton()
     }
 
-    selectedProducts = [];
-    filteredProducts = [];
+    @track selectedProducts = [];
+    @track filteredProducts = [];
     searchBarEmpty = true
     
     productSelector = new ProductSelector(this)
@@ -68,6 +68,7 @@ export default class SalesRequestForm extends LightningElement {
         this[name] = evt.target.value
 
         this.setDisableButton()
+        this.setDateWarningShowing()
     }
 
     notes = '';
@@ -93,44 +94,60 @@ export default class SalesRequestForm extends LightningElement {
         )
     }
     //Show Date Alert
-    showAlert = false;
-    setAlert = () => {
-        this.showAlert =!this.showAlert
+    
+    dateWarningShowing = false    
+    
+    setDateWarningShowing = () => {
+        const singleDateSelected = 
+            (this.date1 && this.date2 === undefined && this.date3 === undefined) ||
+            (this.date1 === undefined && this.date2 && this.date3 === undefined) ||
+            (this.date1 === undefined && this.date2 === undefined && this.date3)
+
+        this.dateWarningShowing = singleDateSelected && this.submitAttempted && !this.dateWarningShowing
+    }
+
+    submitAttempted = false
+
+    handleSubmit = () => {
+        this.submitAttempted = true
+
+        this.setDateWarningShowing()
+
+        if(!this.dateWarningShowing)
+            this.handleUploadAction()        
     }
 
     //POST JSON ----------
     handleUploadAction(){
+        let memberId = Id ? Id : '0055f0000041g1mAAA'
 
-        if (this.date1 !== undefined && this.date2 === undefined && this.date3 === undefined && this.showAlert === false) {
-            this.showAlert = true;
-        } 
-        else if (this.showAlert === true || this.date1 !== undefined || this.date2 !== undefined || this.date3 !== undefined){
-            let memberId = Id ? Id : '0055f0000041g1mAAA'
-            let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
-            let selectedProducts = this.selectedProducts.map(product => product.product_ID)
-            let jsonData = {
-                "createdByMember": memberId,
-                "opportunity_ID": opportunity_Id,
-                "account_ID": this.accountId,
-                "products": selectedProducts,
-                "activity_Type": parseInt(this.activityType, 10),
-                "location": this.location,
-                "oneDateTime": this.date1,
-                "twoDateTime": this.date2 ? this.date2 : null,
-                "threeDateTime": this.date3 ? this.date3 : null,
-                "status": "Request",
-                "notes": this.notes,
-                "flag": this.unexpectedFlag
-            }   
-            
-            fetch(this.url + 'activity/', {
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(jsonData)
-    
-            }).catch((error) => {
-                console.error('Error:', error);
-                });
-            }
-        }        
+        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
+
+        let selectedProducts = this.selectedProducts.map(product => parseInt(product.value, 10))
+
+        let jsonData = {
+            "createdByMember": memberId,
+            "opportunity_ID": opportunity_Id,
+            "account_ID": this.accountId,
+            "products": selectedProducts,
+            "activity_Type": parseInt(this.activityType, 10),
+            "location": this.location,
+            "oneDateTime": this.date1,
+            "twoDateTime": this.date2 ? this.date2 : null,
+            "threeDateTime": this.date3 ? this.date3 : null,
+            "status": "Request",
+            "notes": this.notes,
+            "flag": this.unexpectedFlag
+        }   
+        
+        fetch(this.url + 'activity/', {
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(jsonData)
+
+        }).catch((error) => {
+            console.error('Error:', error);
+        
+        });      
     }
+}
