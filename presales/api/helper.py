@@ -88,6 +88,16 @@ def isWithinAnHour(date1, date2):
         return False
 
 def addData():
+    #create dummby data for userRoles
+    userRole = UserRole(name='Sales Representative')
+    userRole.save()
+    userRole = UserRole(name='Presales Member')
+    userRole.save()
+    userRole = UserRole(name='Presales Manager')
+    userRole.save()
+    userRole = UserRole(name='Admin')
+    userRole.save()
+
     #create dummy data for products
     products = [
         {
