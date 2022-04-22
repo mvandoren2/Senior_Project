@@ -90,6 +90,8 @@ def isWithinAnHour(date1, date2):
         return False
 
 def addData():
+    currentTime = timezone.now(tz=timezone.utc)
+
     #create dummby data for userRoles
     userRole = UserRole(name='Sales Representative')
     userRole.save()
@@ -151,7 +153,7 @@ def addData():
         account_ID=1,
         location='Location 1',
         activity_Type=activityTypes,
-        oneDateTime=timezone.now(),
+        oneDateTime=currentTime,
         status='Request',
         flag=True
     )
@@ -162,6 +164,6 @@ def addData():
         activity = activities,
         member = Member.objects.get(member_ID=1),
         note_text = 'Note 1',
-        note_date = timezone.now()
+        note_date = currentTime
     )
     notes.save()
