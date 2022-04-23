@@ -117,7 +117,7 @@ class Note(models.Model):
    note_ID = models.AutoField(primary_key=True)
    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
    member = models.ForeignKey(Member, on_delete=models.CASCADE)
-   note_text = models.CharField(max_length=500, unique=True)
+   note_text = models.CharField(max_length=500)
    note_date = models.DateTimeField(auto_now_add=True)
 
    class meta:

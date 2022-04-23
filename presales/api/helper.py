@@ -52,19 +52,26 @@ def searchProducttoCreate(products):
     
 def searchActivity(activity):
     #search to see if there is a activity with the same opportunity_ID, acount_ID, and date
-
     request_activity_Type = ActivityType.objects.get(type_ID=activity['activity_Type'])        
 
     date1 = datetime.fromisoformat(activity['oneDateTime'].split('.')[0] + '+00:00')
 
+    prods = []
+    
+    for p in activity['products']:
+        prod = Product.objects.get(product_ID=p)
+        #if the product exist then add it to a list
+        if(prod):
+            prods.append(prod)
+
     act = Activity.objects.filter(
         opportunity_ID=activity['opportunity_ID'], 
         account_ID = activity['account_ID'], 
-        location = activity['location'], 
+        location = activity['location'],
+        products = prods,
         activity_Type = request_activity_Type,
         oneDateTime=date1,
-        status = activity['status'], 
-        flag=activity['flag']
+        status = activity['status']
     )
     if(act):
         return True
@@ -142,7 +149,7 @@ def addData():
         {
             'name': 'Product 3',
             'external_product_ID': '3',
-            'active': True
+            'active': False
         }
     ]
     searchProducttoCreate(products)
