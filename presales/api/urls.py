@@ -12,6 +12,7 @@ urlpatterns = [
     
     #Collection Activity endpoints
     path('activities/', views.getActivities),
+    path('activities/current/', views.getCurrentActivities),
     path('activities/active/', views.getActiveActvivities),
     path('activities/accepted/', views.getAcceptedActivities),
     path('activities/requests/', views.getRequestActivities),
@@ -27,6 +28,6 @@ urlpatterns = [
     #Collection Product endpoint
     path('products/', views.getProducts),
 
-    #COllect Token endpoint
+    #Collect Token endpoint
     path('token/<org>/', views.getToken),
 ]
