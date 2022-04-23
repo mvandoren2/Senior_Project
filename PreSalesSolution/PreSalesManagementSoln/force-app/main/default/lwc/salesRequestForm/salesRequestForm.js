@@ -5,11 +5,24 @@ import { ProductSelector } from './productsList';
 
 export default class SalesRequestForm extends LightningElement {
     connectedCallback () {
+        this.opportunityId = this.getAttribute('data-opportunity')
+
         this.getAccountId()
         this.getActivityType()
     }
 
-    @api opportunityId;
+    boxClasses = 'slds-modal'
+    backdropClasses = 'slds-backdrop'
+
+    @api toggleModalClasses = () => {
+
+
+        this.boxClasses = this.boxClasses === 'slds-modal' ? 
+            'slds-modal slds-fade-in-open' : 'slds-modal'
+
+        this.backdropClasses = this.backdropClasses === 'slds-backdrop' ? 
+            'slds-backdrop slds-backdrop_open' : 'slds-backdrop'
+    }
 
     url = "http://localhost:8080/api/"
 
@@ -113,8 +126,10 @@ export default class SalesRequestForm extends LightningElement {
 
         this.setDateWarningShowing()
 
-        if(!this.dateWarningShowing)
-            this.handleUploadAction()        
+        if(!this.dateWarningShowing){
+            this.handleUploadAction()     
+            this.toggleModalClasses()
+        }   
     }
 
     //POST JSON ----------

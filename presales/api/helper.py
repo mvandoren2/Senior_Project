@@ -148,25 +148,29 @@ def addData():
     searchProducttoCreate(products)
 
     #create dummy data for members
-    members = [
-        {
-            'external_member_ID': '1',
-            'user_role': 'Sales Representative'
-        },
-        {
-            'external_member_ID': '2',
-            'user_role': 'Presales Manager'
-        },
-        {
-            'external_member_ID': '3',
-            'user_role': 'Presales Member'
-        },
-        {
-            'external_member_ID': '4',
-            'user_role': 'Admin'
-        }
-    ]
-    searchMember(members)
+    members = Member(
+            external_member_ID = 1,
+            user_role = UserRole.objects.get(roles_ID=1)
+        )
+    members.save()
+    
+    members = Member(
+            external_member_ID = 2,
+            user_role = UserRole.objects.get(roles_ID=2)
+        )
+    members.save()
+    
+    members = Member(
+            external_member_ID = 3,
+            user_role = UserRole.objects.get(roles_ID=3)
+        )
+    members.save()
+    
+    members = Member(
+            external_member_ID = 4,
+            user_role = UserRole.objects.get(roles_ID=4)
+        )
+    members.save()
 
     #create dummy data for activity types
     activityTypes = ActivityType(name='Activity Type 1')

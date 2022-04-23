@@ -1,93 +1,132 @@
 <template>
-    <lightning-record-view-form record-id={opportunityId} object-api-name="Opportunity"></lightning-record-view-form>
-        <lightning-card title="Request a Presales Activity" >
+    <section    role="dialog" 
+                tabindex="-1" 
+                aria-labelledby="modal-heading-01" 
+                aria-modal="true"
+                aria-describedby="modal-content-id-1" 
+                class={boxClasses} >
+        
+        <div class="slds-modal__container" >
+            <header class="slds-modal__header">
+                <!-- sldsValidatorIgnoreNextLine -->
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" 
+                        onclick={cancelHandler}>
+                    <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
 
-            <template if:true={dateWarningShowing}>
-                <div class="slds-box
-                            slds-box_x-small 
-                            slds-theme_shade 
-                            slds-theme_alert-texture 
-                            slds-theme_warning
-                            slds-var-m-around_x-small" >
-                    <p>
-                        <strong>
-                            
-                        </strong> 
-                    </p>
-                </div>
-            </template>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Request a Presales Activity</h2>
+            </header>
+        
+            <div class="slds-modal__content slds-var-p-around_large" >
+                
+                <div class="slds-var-p-around_medium">
+                    <!--Search Products..add and remove -->
+                    <div class="slds-box slds-var-m-bottom_large" style="background-color: #eef4ff; min-height: 9.5rem;">
+                        <label for="date1" class="slds-text-title" ></label>
+                        <lightning-combobox name="product"
+                                            label="Product"
+                                            placeholder="Select Product"
+                                            options={productSelector.products}
+                                            onchange={productSelector.addProd} >
+                        </lightning-combobox>
+        
+                        <div class="slds-var-m-top_x-small" >
+                            <abbr title="required" class="slds-required">*</abbr>
+                            <label for="date1" class="slds-text-title" >Selected:</label>
+                        </div>
+        
+                        <div >                    
+                            <lightning-layout multiple-rows >
+        
+                                <template for:each={selectedProducts} for:item="prod">
+                                    <lightning-layout-item key={prod.value} >
+                                        <lightning-pill variant="plain" 
+                                                        label={prod.label}
+                                                        data-item={prod.value}
+                                                        onremove={productSelector.removeProd}
+                                                        class="slds-var-m-around_xx-small" >
+                                        </lightning-pill>
+                                    </lightning-layout-item>
+                                </template>
+        
+                            </lightning-layout>
+                        </div>
+                    </div>      
             
-            <div class="slds-var-p-around_medium">
-            <!--Search Products..add and remove -->
-            <div class="search-table slds-box search-wrapper" style="background-color: #eef4ff;">
-                <label for="date1" class="slds-text-title" ></label>
-                <lightning-combobox name="product"
-                                    label="Product"
-                                    placeholder="Select Product"
-                                    options={productSelector.products}
-                                    onchange={productSelector.addProd} >
-                </lightning-combobox>
+                    <lightning-combobox name="activity_type" 
+                                        label="Activity Type"
+                                        placeholder="Select activity type" 
+                                        options={activityTypes} 
+                                        onchange={selectActivityType} 
+                                        required >
+                    </lightning-combobox>
+        
+                    <lightning-combobox name="location" 
+                                        label="Location" 
+                                        value={location} 
+                                        options={locationOptions} 
+                                        class="slds-var-p-top_small slds-var-p-bottom_large" 
+                                        onchange={setLocation} >
+                    </lightning-combobox>
 
-                <abbr title="required" class="slds-required">*</abbr>
-                <label for="date1" class="slds-text-title" >Selected:</label>
-
-                <div class="selected-product-container">                    
-                    <lightning-layout multiple-rows >
-
-                        <template for:each={selectedProducts} for:item="prod">
-                            <lightning-layout-item key={prod.value} >
-                                <lightning-pill variant="destructive" 
-                                                label={prod.label}
-                                                title="Destructive action"
-                                                data-item={prod.value}
-                                                onremove={productSelector.removeProd}
-                                                class="slds-var-m-around_xx-small" >
-                                </lightning-pill>
-                            </lightning-layout-item>
-                        </template>
-
-                    </lightning-layout>
-                </div>
-            </div>      
+                    <template if:true={dateWarningShowing}>
+                        <div class="slds-box
+                                    slds-box_x-small 
+                                    slds-theme_shade 
+                                    slds-theme_alert-texture 
+                                    slds-theme_warning
+                                    slds-var-m-around_x-small " >
     
-            <lightning-combobox name="activity_type" 
-                                label="Activity Type"
-                                placeholder="Select activity type" 
-                                options={activityTypes} 
-                                onchange={selectActivityType} 
-                                required >
-            </lightning-combobox>
+                            <div class="slds-grid slds-align_absolute-center"  >
+                                <lightning-icon icon-name="utility:warning" class="slds-var-m-right_small" ></lightning-icon>
+    
+                                <p>
+                                    <strong>
+                                        Please consider providing more than one date option for easier scheduling.
+                                    </strong> 
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    
+                    <lightning-layout horizontal-align="center" class="slds-var-m-bottom_large" >
+                        <lightning-layout-item >
+                            
+                            <abbr title="required" class="slds-required">*</abbr>
+                            <label for="date1" class="slds-text-title" >Date Options</label>
 
-            <lightning-combobox name="location" 
-                                label="Location" 
-                                value={location} 
-                                options={locationOptions} 
-                                class="slds-var-p-top_small slds-var-p-bottom_small" 
-                                onchange={setLocation} >
-            </lightning-combobox>
-            
-            <abbr title="required" class="slds-required">*</abbr>
-            <label for="date1" class="slds-text-title" >Date</label>
-            <lightning-input type="datetime" label=" " data-item="date1" variant="label-hidden" onchange={dateInputHandler} required></lightning-input>
-            <lightning-input type="datetime" label=" " data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
-            <lightning-input type="datetime" label=" " data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                            <lightning-input type="datetime" label="1." data-item="date1" variant="label-hidden" onchange={dateInputHandler} required></lightning-input>
+                            <lightning-input type="datetime" label="2." data-item="date2" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                            <lightning-input type="datetime" label="3." data-item="date3" variant="label-hidden" class="slds-var-p-top_small" onchange={dateInputHandler} ></lightning-input>
+                        
+                        </lightning-layout-item>
+                    </lightning-layout>
+        
+                    <!--Text Description-->
+                    <lightning-textarea id="textarea" 
+                                        label="Notes" 
+                                        onchange ={updateNotes} >
+                    </lightning-textarea>
+                </div>
+            </div>
 
-            <!--Text Description-->
-            <lightning-textarea id="textarea" 
-                                label="Notes" 
-                                onchange ={updateNotes} >
-            </lightning-textarea>
+            <footer class="slds-modal__footer">
+                <lightning-button   label="Submit" 
+                                    variant="brand"
+                                    onclick={handleSubmit} 
+                                    disabled={isSubmitDisabled}
+                                    class="slds-var-m-right_small" >
+                </lightning-button>
 
-            <!--Submit button class="button"-->
-            <lightning-button   id="dateAlert"
-                                variant="submit" 
-                                label="Submit" 
-                                type="submit" 
-                                disabled={isSubmitDisabled} 
-                                title="Submit"
-                                class="slds-var-p-top_small slds-align_absolute-center"
-                                onclick={handleSubmit} >
-            </lightning-button>
+                <lightning-button   label="Cancel" 
+                                    variant="neutral"
+                                    onclick={toggleModalClasses} >
+                </lightning-button>
+            </footer>
         </div>
-    </lightning-card>
+    </section>
+
+    <div class={backdropClasses} ></div>
 </template>
