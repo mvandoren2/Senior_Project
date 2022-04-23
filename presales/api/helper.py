@@ -68,7 +68,7 @@ def searchActivity(activity):
         opportunity_ID=activity['opportunity_ID'], 
         account_ID = activity['account_ID'], 
         location = activity['location'],
-        products = prods,
+        products__in = prods,
         activity_Type = request_activity_Type,
         oneDateTime=date1,
         status = activity['status']
