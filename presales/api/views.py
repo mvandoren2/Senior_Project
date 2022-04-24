@@ -243,7 +243,7 @@ def getActivities(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def getActiveActvivities(request):
+def getCurrentActvivities(request):
     #get all activities with the status of accapt, reschedule, schedule, and request
     activities = queryActivities(request.GET)
     
@@ -265,14 +265,6 @@ def getRequestActivities(request):
     activities = queryActivities(request.GET)
     
     activities = activities.filter(status__in=['Reschedule', 'Request'])
-    serializer = ActivitySerializer(activities, many=True)
-    return Response(serializer.data)
-
-@api_view(['GET'])
-def getCurrentActivities(request):
-    activities = queryActivities(request.GET)
-
-    activities = activities.filter(status__in=['Accept', 'Scheduled', 'Reschedule', 'Request'])
     serializer = ActivitySerializer(activities, many=True)
     return Response(serializer.data)
 

@@ -12,8 +12,7 @@ urlpatterns = [
     
     #Collection Activity endpoints
     path('activities/', views.getActivities),
-    path('activities/current/', views.getCurrentActivities),
-    path('activities/active/', views.getActiveActvivities),
+    path('activities/current/', views.getCurrentActvivities),
     path('activities/accepted/', views.getAcceptedActivities),
     path('activities/requests/', views.getRequestActivities),
     path('activities/past/', views.getPastActivities),
