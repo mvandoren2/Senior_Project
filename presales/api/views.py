@@ -437,8 +437,9 @@ def getMember(request, id):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
     elif(request.method == 'GET'):
-        member = searchMember([id])
-        serializer = MemberSerializer(member[0], many=True)
+        member = searchMember([id])[0]
+        member = Member.objects.filter(member_ID=member)
+        serializer = MemberSerializer(member, many=True)
         return Response(serializer.data[0])
 
     elif(request.method == 'DELETE'):
