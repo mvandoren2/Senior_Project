@@ -78,8 +78,6 @@ export default class AcceptActivityModal extends LightningElement {
     cancel = () => {
         let cancelSignal = new CustomEvent('cancel')
 
-        console.log(this.activity.status)
-
         this.closeModal(cancelSignal)
     }
 

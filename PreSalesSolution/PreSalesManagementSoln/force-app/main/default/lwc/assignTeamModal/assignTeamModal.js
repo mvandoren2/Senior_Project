@@ -6,8 +6,6 @@ export default class AssignTeamModal extends LightningElement {
     isShowing = false
 
     @api showModal = async (activity) => {    
-
-        console.log(activity);
         this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
             true : false
         
@@ -90,8 +88,7 @@ export default class AssignTeamModal extends LightningElement {
                 }
             }
         }
-
-        console.log(this.unselectedNinjaMembers)
+        
         if(this.activity.leadMember) {
 
             this.leadMemberId = this.activity.leadMember.Id
