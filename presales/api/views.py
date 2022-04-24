@@ -408,7 +408,6 @@ def getMembers(request):
         # account = request.GET.get('account')
         # opportunity = request.GET.get('opportunity')
         role = request.GET.get('role')
-
         if(role):
             members = Member.objects.filter(user_role__name=role)
         else:
@@ -446,8 +445,8 @@ def getMember(request, id):
         return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
     elif(request.method == 'GET'):
-        member = Member.objects.filter(external_member_ID=id)
-        serializer = MemberSerializer(member, many=True)
+        member = searchMember([id])
+        serializer = MemberSerializer(member[0], many=True)
         return Response(serializer.data[0])
 
     elif(request.method == 'DELETE'):
