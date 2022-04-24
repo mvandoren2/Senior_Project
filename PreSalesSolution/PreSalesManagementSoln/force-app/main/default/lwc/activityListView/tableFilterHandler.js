@@ -13,6 +13,8 @@ export class TableFilterHandler {
     handleFilter = (evt) => {
         const filterField = evt.target.dataset.item
 
+        console.log(filterField)
+
         const query = evt.target.value
 
         this.filters = this.filters.filter(item => item.field !== filterField)
@@ -23,10 +25,9 @@ export class TableFilterHandler {
         let rows = [...this.parent.rows]
         
         this.filters.forEach(filter => {
-            rows = rows
-                .filter(row => (
-                    row[filter.field].toLowerCase().includes(filter.query.toLowerCase())
-                ))
+            rows = rows.filter(row => (row.data.find(cell => cell.id === filter.field).data.toLowerCase()
+                .includes(filter.query.toLowerCase())
+            ))
         })
 
         this.parent.displayedRows = rows
