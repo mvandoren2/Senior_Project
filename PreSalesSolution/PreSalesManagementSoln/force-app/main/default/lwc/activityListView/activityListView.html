@@ -1,145 +1,109 @@
 <!-- sldsValidatorIgnore -->
 <template  >
-    <div class="slds-table_edit_container slds-is-relative">
-        <table  aria-multiselectable="true" 
+    <div class="slds-is-relative "  >
+        <div >
+            <table  aria-multiselectable="true" 
                 class=" slds-table 
                         slds-table_cell-buffer 
                         slds-table_bordered
                         slds-table_striped " 
                 role="grid" >
 
-            <!-- table head start -->
-            <thead>
-                <tr class="slds-line-height_reset">
-                    
-                    <!-- column headers -->
-                    <template for:each={columns} for:item="column">
-                        <th key={column.fieldName} 
-                            aria-label={column.label} 
-                            aria-sort="descending" 
-                            class="slds-is-sortable slds-cell_action-mode" 
-                            scope="col" >
+                <!-- table head start -->
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        
+                        <!-- column headers -->
+                        <template for:each={columns} for:item="column">
+                            <th key={column.id} 
+                                aria-label={column.label}
+                                class="slds-is-sortable slds-cell_action-mode" 
+                                scope="col" >
 
-                            <a  class=" slds-th__action 
-                                        slds-text-link_reset" 
-                                href="#" 
-                                role="button" 
-                                tabindex="0" >
+                                <a  class=" slds-th__action  slds-text-link_reset" 
+                                    href="#" 
+                                    role="button" 
+                                    tabindex="0" >
 
-                              <span class="slds-assistive-text">Sort by: </span>
+                                    <span class="slds-assistive-text">Sort by: </span>
 
-                              <div class="  slds-grid 
-                                            slds-grid_vertical-align-center 
-                                            slds-has-flexi-truncate" >
+                                    <div class="slds-grid 
+                                                slds-grid_vertical-align-center 
+                                                slds-has-flexi-truncate" >
 
-                                <!--Column Label + Sorting-->
-                                <span   class="slds-truncate" 
-                                        data-item={column.fieldName}
-                                        onclick={columnSortHandler.handleSort}
-                                        title={column.label} >
+                                        <!--Column Label + Sorting-->
+                                        <span   class="slds-truncate" 
+                                                data-item={column.fieldName}
+                                                onclick={columnSortHandler.handleSort}
+                                                title={column.label} >
 
-                                    {column.label}
-                                </span>
+                                            {column.label}
+                                        </span>
+                                    </div>
+                                </a>
+                            </th>
+                        </template>
 
-                              </div>
-                            </a>
-                          </th>
-                    </template>
-                    <th></th>
-                </tr>
-
-                <!-- filter search bars -->
-                <tr class="slds-line-height_reset">
-                    <template for:each={columns} for:item="column">
-                        <th key={column.id}>
-                            <div>
-                                <lightning-input    type="search" 
-                                                    label=" " 
-                                                    variant="label-hidden"
-                                                    data-item={column.fieldName}
-                                                    onchange={tableFilterHandler.handleFilter} >
-                                </lightning-input>
-                            </div>
-                        </th>
-                    </template>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <!-- table body start -->
-            <tbody>
-                <template for:each={displayedRows} for:item="row">
-                    <tr key={row.id} data-item={row.id} class="slds-hint-parent">
-
-                        <!-- data -->
-                        <td scope="row" class="slds-cell-wrap">
-                            <div>
-                                {row.account}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.opportunity}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.product}
-                            </div>
-                        </td>       
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.activity}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div >
-                                {row.date}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.location}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.submittedBy}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="slds-cell-wrap">
-                                {row.presalesTeam}
-                            </div>
-                        </td>
-                        <td class="slds-cell-wrap">
-                            <div>
-                                {row.status}
-                            </div>
-                        </td>
-
-                        <!-- actions -->
-                        <td class="slds-cell-buffer_right">
-                            <div>
-                                <lightning-button-menu alternative-text="Show menu">
-                                    <template for:each={actions} for:item="action">
-                                        <lightning-menu-item    key={action.id} 
-                                                                label={action.label} 
-                                                                data-item={action.name} 
-                                                                onclick={rowActionHandler.handleMenuAction} >
-                                        </lightning-menu-item>
-                                    </template>
-                                </lightning-button-menu>
-                            </div>
-                        </td>
+                        <th class="slds-cell-fixed"></th>
                     </tr>
-                </template>             
-            </tbody>
-        </table>
+
+                    <template if:false={tableFormatter.smallFormat} >
+                        <!-- filter search bars -->
+                        <tr class="slds-line-height_reset">
+                            <template for:each={columns} for:item="column">
+                                <th key={column.id}>
+                                    <div>
+                                        <lightning-input    type="search" 
+                                                            label=" " 
+                                                            variant="label-hidden"
+                                                            data-item={column.label}
+                                                            onchange={tableFilterHandler.handleFilter} >
+                                        </lightning-input>
+                                    </div>
+                                </th>
+                            </template>
+                            <th></th>
+                        </tr>
+                    </template>
+                </thead>
+
+                <!-- table body start -->
+                <tbody >
+                    <template for:each={displayedRows} for:item="row">
+                        <tr key={row.id} data-item={row.id} class="slds-hint-parent">
+
+                            <!-- data -->
+                            <template for:each={row.data} for:item="item" >
+                                <td key={item.id} class="slds-cell-wrap">
+                                    <div>
+                                        {item.data}
+                                    </div>
+                                </td>
+                            </template>
+
+                            <!-- actions -->
+                            <td class="slds-cell-buffer_right">
+                                <div>
+                                    <lightning-button-menu alternative-text="Show menu" class="slds-var-p-right_xx-large" >
+                                        <template for:each={row.actions} for:item="action">
+                                            <lightning-menu-item    key={action.id} 
+                                                                    label={action.label} 
+                                                                    data-item={action.name} 
+                                                                    onclick={rowActionHandler.handleMenuAction} >
+                                            </lightning-menu-item>
+                                        </template>
+                                    </lightning-button-menu>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>             
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!--Row Action Modals-->
-    <c-activity-detail-view onreloadtablerows={loadTableRows}></c-activity-detail-view>
-    <c-assign-team-modal data-patchactivity="true" onteamassigned={loadTableRows}></c-assign-team-modal>
-    <c-status-change-modal ></c-status-change-modal>
+    <c-activity-detail-view onreloadtablerows={loadTableRows} ></c-activity-detail-view>
+    <c-assign-team-modal data-patchactivity="true" onteamassigned={loadTableRows} ></c-assign-team-modal>
+    <c-status-change-modal data-status="decline" onsubmit={loadTableRows} ></c-status-change-modal>
 </template>

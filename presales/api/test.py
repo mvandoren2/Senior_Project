@@ -80,18 +80,20 @@ class Test (APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK) 
 
     #PATCH______________________________________________________________________
-    #def test_Patch_Products(self):
-    #    addData()
-    #    data ={
-    #        "products": [
-    #            {
-    #                "product_ID": 1,
-    #                "external_product_ID": '1'
-    #            }
-    #        ]
-    #    }
-    #    response = self.client.patch("/api/products/'", data, format = 'json')
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_Patch_Products(self):
+        addData()
+        data ={
+            "products": [
+                {
+                    "product_ID": 1,
+                    "external_product_ID": "12",
+                    "name": "Product 6",
+                    "active": 0
+                }
+            ]
+        }
+        response = self.client.patch("/api/products/", data, format = 'json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_Patch_Memeber_ID(self):
         addData()
@@ -110,11 +112,15 @@ class Test (APITestCase):
         response = self.client.patch("/api/activity/note/1/", data, format = 'json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    #def test_Patch_Activity_ID(self):
-    #    addData()
-    #    data ={}
-    #    response = self.client.patch("/api/activity/<activityID>/'", data, format = 'json')
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_Patch_Activity_ID(self):
+        addData()
+        currentTime = timezone.now()
+        data ={
+            "status": "Request",
+            "selectedDateTime": currentTime
+        }
+        response = self.client.patch("/api/activity/1/", data, format = 'json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     #GET_________________________________________________________________________
     def test_GET_Products(self):
@@ -132,15 +138,15 @@ class Test (APITestCase):
         response = self.client.get("/api/members/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-    #def test_GET_Members_ID_Activities(self):
-    #    addData()
-    #    response = self.client.get("/api/member/<id>/activities/")
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_GET_Members_ID_Activities(self):
+        addData()
+        response = self.client.get("/api/member/1/activities/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    #def test_GET_Memeber_ID(self):
-    #    addData()
-    #    response = self.client.get("/api/member/<id>/")
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_GET_Memeber_ID(self):
+        addData()
+        response = self.client.get("/api/member/1/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_GET_Activities_Past(self):
         addData()
@@ -176,6 +182,11 @@ class Test (APITestCase):
         addData()
         response = self.client.get("/api/activity/1/notes/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+            
+    def test_GET_Activity_ID_Note(self):
+        addData()
+        response = self.client.get("/api/activities/current/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         
     def test_GET_Actitivity_ID(self):
         addData()
@@ -198,15 +209,16 @@ class Test (APITestCase):
         response = self.client.delete("/api/activity/1/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    #def test_Delete_Activity_Types(self):
-    #    addData()
-    #    response = self.client.delete("/api/activity/types/")
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_Delete_Activity_Types(self):
+        addData()
+        data = {
+            "name": "Activity Type 1"
+        }
+        response = self.client.delete("/api/activity/types/", data, format = 'json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    #def test_Delete_Memeber(self):
-    #    addData()
-    #    response = self.client.delete("/api/member/<id>/")
-    #    self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    
+    def test_Delete_Memeber(self):
+        addData()
+        response = self.client.delete("/api/member/1/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     

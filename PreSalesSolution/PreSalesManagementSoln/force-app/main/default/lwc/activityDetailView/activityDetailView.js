@@ -78,7 +78,7 @@ export default class ActivityDetailView extends LightningElement {
             case 'Scheduled':{
                 let template = memberActivity
                 
-                if(this.userID === this.activity.leadMember.Id){
+                if(this.activity.leadMember && this.userID === this.activity.leadMember.Id){
                     
                     template = leadMemberActivity
                 }

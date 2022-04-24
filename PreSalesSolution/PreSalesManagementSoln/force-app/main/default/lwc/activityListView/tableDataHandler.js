@@ -15,18 +15,66 @@ export class TableDataHandler {
     }
 
     fetchSalesforceUsers = async () => {
-        let members = await fetch(url + 'members/')
+        let members = await fetch(url + 'members/', {
+            method: 'GET',
+            mode: 'cors'
+        })
             .then(response => response.json())
 
         let memberIds = members.map(member => member.external_member_ID)
         
-        let ret = await GetNinjaUsers({user_Ids: memberIds})
+        let salesforceUsers = await GetNinjaUsers({user_Ids: memberIds})
 
-        return ret
+        return salesforceUsers
+    }
+
+
+    getActivityQueryString = () => {
+        let endpoint = 'activities/'
+        let query = ''
+
+        if(this.params.status)
+            if(this.params.status) {
+                switch(this.params.status) {
+                    case 'accepted' :
+                    case 'requests' :
+                    case 'past' :
+                    case 'current' :
+                        endpoint += this.params.status + '/'
+                        break
+    
+                    default :                
+                        query += '?status=' + this.params.status
+                }
+            }
+
+        let queryAdded = query !== ''
+    
+        if(this.params.opportunity) {
+            query += (queryAdded ? "&" : '?') + 'opportunity=' + this.params.opportunity 
+            queryAdded = true
+        }
+
+        if(this.params.account) {
+            query += (queryAdded ? "&" : '?') + 'account=' + this.params.account
+            queryAdded = true
+        }
+
+        if(this.params.product) {
+            query += (queryAdded ? "&" : '?') + 'product=' + this.params.product
+            queryAdded = true
+        }
+
+        if(this.params.member){
+            query += (queryAdded ? "&" : '?') + 'member=' + this.params.member
+            queryAdded = true
+        }
+
+        return url + endpoint + query
     }
 
     fetchActivities = async () => {
-        let activities = await fetch(url + 'activities/')
+        let activities = await fetch(this.getActivityQueryString())
             .then(res => res.json())
 
         this.opportunities = await this.fetchOpportunities(activities)
@@ -146,7 +194,9 @@ export class TableDataHandler {
     //
     //Serve Processed Table Data
     //
-    getTableData = async () => {
+    getTableData = async (params) => {
+        this.params = params
+
         let detailedData
         let currentUser
 
@@ -154,11 +204,7 @@ export class TableDataHandler {
 
         [currentUser, detailedData] = await Promise.all([this.fetchCurrentUser(), this.fetchActivities()])
 
-        if (!detailedData.length) return this.getEmptyTableData()
-    
-        return {
-            activities: detailedData,
-            user: currentUser
-        }
+        return  detailedData.length ?
+            {activities: detailedData, user: currentUser} : null
     }
 }
