@@ -38,24 +38,9 @@ services:
       - nginx:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - django
-
-  nginx-proxy-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    env_file:
-      - ./.env.staging.proxy-companion
-    volumes:
-      - nginx:/etc/nginx/conf.d/default.conf
-      - certs:/etc/nginx/certs
-      - acme:/etc/acme.sh
-    depends_on:
-      - nginx
 
 volumes:
   pgdata:
   static:
-  nginx:
-  certs:
-  acme:
