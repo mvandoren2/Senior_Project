@@ -211,7 +211,7 @@ class Test (APITestCase):
                 }
             ]
         }
-        response = self.client.patch("/api/products/'", data, format = 'json')
+        response = self.client.patch("/api/product/", data, format = 'json')
         self.assertEqual(response.status_code, 404)  
     
     def test_Patch_Memeber_ID(self):
@@ -220,7 +220,7 @@ class Test (APITestCase):
             "user_role": 'Presales Manager',
             "proficiency": []
         }
-        response = self.client.patch("/api/member/1/'", data, format = 'json')
+        response = self.client.patch("/api/members/1/", data, format = 'json')
         self.assertEqual(response.status_code, 404)
     
     def test_Patch_Activity_Note_ID(self):
@@ -228,7 +228,7 @@ class Test (APITestCase):
         data ={
             "note_text": "Testing 02"
         }
-        response = self.client.patch("/api/activity/note/1/'", data, format = 'json')
+        response = self.client.patch("/api/activity/notes/1/", data, format = 'json')
         self.assertEqual(response.status_code,404)
         
     def test_Patch_Activity_ID(self):
@@ -238,7 +238,7 @@ class Test (APITestCase):
             "status": "Request",
             "selectedDateTime": currentTime
         }
-        response = self.client.patch("/api/activity/1/'", data, format = 'json')
+        response = self.client.patch("/api/actvty/1/", data, format = 'json')
         self.assertEqual(response.status_code, 404)
     
     #GET_________________________________________________________________________
