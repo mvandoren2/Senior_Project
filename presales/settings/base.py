@@ -13,8 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__, os.pardir))))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -25,7 +24,7 @@ SECRET_KEY = 'cg_cd6!gd3jg#_d)2ee@qh+h83c@cf)h+8z4wy45uhn8tru(jg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '54.146.229.49', 'presales-ninja.link', '*']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1', '54.241.156.189', 'presales-ninja.link', '*']
 
 # Application definition
 
