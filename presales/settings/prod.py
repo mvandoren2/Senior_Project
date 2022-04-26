@@ -3,6 +3,9 @@ from .base import *
 try:
     from .dev import *
 except:
+    # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__, os.pardir))))
+
     # Overrides base.py settings here
     DEBUG = False
 
@@ -22,8 +25,6 @@ except:
     SECURE_HSTS_SECONDS = 31536000 # 1 year
     SECURE_HSTS_PRELOAD = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(os.path.join(__file__, os.pardir))))
 
     DATABASES = {
         'default': {
