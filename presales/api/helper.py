@@ -97,7 +97,11 @@ def queryActivities(queries) :
     if(queries.get('status')):
         query &= query.filter(status=queries.get('status'))
     if(queries.get('flag')):
-        query &= query.filter(flag=queries.get('flag'))
+        flag_bool = queries.get('flag') == 'true'
+
+        query &= query.filter(flag=flag_bool)
+    if(queries.get('activityType')):
+        query &= query.filter(activity_Type__name=queries.get('activityType'))
 
     return query
 
