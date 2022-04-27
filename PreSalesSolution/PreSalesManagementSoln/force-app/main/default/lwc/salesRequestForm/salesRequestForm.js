@@ -1,7 +1,7 @@
 import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
-import { ProductSelector } from './productsList';
+import { ProductSelector } from './productSelector';
 
 export default class SalesRequestForm extends LightningElement {
     connectedCallback () {
@@ -59,8 +59,6 @@ export default class SalesRequestForm extends LightningElement {
     }
 
     @track selectedProducts = [];
-    @track filteredProducts = [];
-    searchBarEmpty = true
     
     productSelector = new ProductSelector(this)
 
@@ -129,6 +127,7 @@ export default class SalesRequestForm extends LightningElement {
         if(!this.dateWarningShowing){
             this.handleUploadAction()     
             this.toggleModalClasses()
+            this.reset()
         }   
     }
 
@@ -152,7 +151,7 @@ export default class SalesRequestForm extends LightningElement {
             "threeDateTime": this.date3 ? this.date3 : null,
             "status": "Request",
             "notes": this.notes,
-            "flag": this.unexpectedFlag
+            "flag": false
         }   
         
         fetch(this.url + 'activity/', {
@@ -164,5 +163,15 @@ export default class SalesRequestForm extends LightningElement {
             console.error('Error:', error);
         
         });      
+    }
+
+    reset = () => {
+        this.template.querySelectorAll('.reset-handle').forEach(input => {
+            input.value = null
+        })
+
+        this.template.querySelector('.location-select').value = 'Onsite'
+
+        this.productSelector.reset()
     }
 }

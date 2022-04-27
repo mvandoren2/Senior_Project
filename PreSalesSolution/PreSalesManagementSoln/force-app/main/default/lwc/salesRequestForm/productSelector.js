@@ -45,4 +45,9 @@ export class ProductSelector {
 
         this.parent.setDisableButton()
     }
+
+    reset = () => {
+        this.products = this.products.concat(this.parent.selectedProducts)
+        this.parent.selectedProducts = []
+    }
 }
