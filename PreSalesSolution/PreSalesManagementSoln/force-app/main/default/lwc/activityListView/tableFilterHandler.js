@@ -13,8 +13,6 @@ export class TableFilterHandler {
     handleFilter = (evt) => {
         const filterField = evt.target.dataset.item
 
-        console.log(filterField)
-
         const query = evt.target.value
 
         this.filters = this.filters.filter(item => item.field !== filterField)

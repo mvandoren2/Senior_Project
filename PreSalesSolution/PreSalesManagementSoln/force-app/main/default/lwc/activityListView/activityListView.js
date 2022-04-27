@@ -31,11 +31,14 @@ export default class ActivityListView extends LightningElement {
 
     getParams = () => {
         const attributes = {
-            recordType : this.getAttribute('data-recordtype'),
-            recordId : this.getAttribute('data-recordid'),
+            recordType : this.getAttribute('data-record-type'),
+            recordId : this.getAttribute('data-record-id'),
             member : this.getAttribute('data-member'),
             product : this.getAttribute('data-product'),
             status : this.getAttribute('data-status'),
+            activityType : this.getAttribute('data-activity-type'),
+            date : this.getAttribute('data-activity-date'),
+            flag : this.getAttribute('data-flagged'),
             format : this.getAttribute('data-format')
         }
 
@@ -52,6 +55,15 @@ export default class ActivityListView extends LightningElement {
 
         if(attributes.status)
             params.status = attributes.status
+
+        if(attributes.activityType)
+            params.activityType = attributes.activityType
+        
+        if(attributes.date)
+            params.date = new Date(attributes.date)
+
+        if(attributes.flag)
+            params.flag = 'true'
 
         if(attributes.format)
             params.format = attributes.format
