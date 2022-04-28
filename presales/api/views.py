@@ -476,13 +476,25 @@ def getMember(request, id):
 
 @api_view(['GET'])
 def getMemberActivities(request, id):
-    memID = Member.objects.filter(external_member_ID=id)[0]
+    memID = Member.objects.get(external_member_ID=id)
     actsM = Activity.objects.filter(members=memID)
     actsL = Activity.objects.filter(createdByMember=memID)
-    acts = set(actsM | actsL)
-    serializers = serializers = ActivitySerializer(acts, many=True)
+    actsMa = Activity.objects.filter(activeManager=memID)
+    actsLm = Activity.objects.filter(leadMember=memID)
+    acts = set(actsM | actsL | actsMa | actsLm)
 
-    return Response(serializers.data)
+    #get the member
+    memberS = MemberSerializer(memID, many=False).data
+
+    serializers = ActivitySerializer(acts, many=True).data
+
+    response = {
+        "Member": memberS,
+        "Activities": serializers
+    }
+    
+
+    return Response(response)
 
 @csrf_exempt
 @api_view(['GET', 'POST', 'PATCH', 'DELETE'])
