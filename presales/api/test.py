@@ -6,7 +6,7 @@ from management.models import *
 from .helper import *
 from django.utils import timezone
 
-#POSt___________________________________________________________________
+#POST 200 OK___________________________________________________________________
 class Test (APITestCase):
     
     def test_Post_Products(self):
@@ -155,7 +155,7 @@ class Test (APITestCase):
         response = self.client.post("/api/activity/type/", data, format = 'json')
         self.assertEqual(response.status_code,405 ) 
             
-    #PATCH______________________________________________________________________
+    #PATCH 200 OK______________________________________________________________________
     def test_Patch_Products(self):
         addData()
         data ={
@@ -241,7 +241,7 @@ class Test (APITestCase):
         response = self.client.patch("/api/actvty/1/", data, format = 'json')
         self.assertEqual(response.status_code, 404)
     
-    #GET_________________________________________________________________________
+    #GET 200 OK_________________________________________________________________________
     def test_GET_Products(self):
         addData()
         response = self.client.get("/api/products/")
@@ -317,6 +317,84 @@ class Test (APITestCase):
         response = self.client.get("/api/activity/types/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
+    #GET Query 200 OK_____________________________________________________________________
+    def test_GET_Query_True_Products(self):
+        addData()
+        response = self.client.get("/api/products/?active=1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_False_Products(self):
+        addData()
+        response = self.client.get("/api/products/?active=0")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_Sales_Representative_Members(self):
+        addData()
+        response = self.client.get("/api/members/?role=Sales Representative")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+    def test_GET_Query_Presales_Manager_Members(self):
+        addData()
+        response = self.client.get("/api/members/?role=Presales Member")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_Presales_Manager_Members(self):
+        addData()
+        response = self.client.get("/api/members/?role=Presales Manager")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_Admin_Members(self):
+        addData()
+        response = self.client.get("/api/members/?role=Admin")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_Admin_Members(self):
+        addData()
+        response = self.client.get("/api/members/?role=Admin")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_GET_Query_Activities(self):
+        addData()
+        response = self.client.get("/api/activities/?opportunity=1&account=1&member=1&product=1&status=Request&flag=true&activityType=Activity Type 1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    #GET Query 404 Not_FOUND____________________________________________________________
+    def test_GET_Query_True_Products(self):
+        addData()
+        response = self.client.get("/api/product/?active=1")
+        self.assertEqual(response.status_code, 404)
+    
+    def test_GET_Query_False_Products(self):
+        addData()
+        response = self.client.get("/api/product/?active=0")
+        self.assertEqual(response.status_code, 404)
+    
+    def test_GET_Query_Sales_Representative_Members(self):
+        addData()
+        response = self.client.get("/api/member/?role=Sales Representative")
+        self.assertEqual(response.status_code, 404)
+        
+    def test_GET_Query_Presales_Members(self):
+        addData()
+        response = self.client.get("/api/member/?role=Presales Member")
+        self.assertEqual(response.status_code, 404)
+    
+    def test_GET_Query_Presales_Manager_Members(self):
+        addData()
+        response = self.client.get("/api/member/?role=Presales Manager")
+        self.assertEqual(response.status_code, 404)
+        
+    def test_GET_Query_Admin_Members(self):
+        addData()
+        response = self.client.get("/api/member/?role=Admin")
+        self.assertEqual(response.status_code, 404)
+
+    def test_GET_Query_Activities(self):
+        addData()
+        response = self.client.get("/api/activties/?opportunity=1&account=1&member=1&product=1&status=Request&flag=true&activityType=Activity Type 1")
+        self.assertEqual(response.status_code, 404)
+
+
     #GET 404 NOT_FOUND__________________________________________________________________
     def test_GET_Products(self):
         addData()
@@ -383,13 +461,13 @@ class Test (APITestCase):
         response = self.client.get("/api/Actvity/1/")
         self.assertEqual(response.status_code, 404)
     
-    #GET 204 NO CONTENT_________________________________________________________
+    #GET 204 NO_CONTENT_______________________________________________________________
     def test_GET_Activity_Type(self):
         addData()
         response = self.client.get("/api/activity/TYPES/")
         self.assertEqual(response.status_code, 204)
         
-    #DELETE_____________________________________________________________________
+    #DELETE 200 OK_____________________________________________________________________
     def test_Delete_Activity_Note_ID(self):
         addData()
         response = self.client.delete("/api/activity/note/1/")
