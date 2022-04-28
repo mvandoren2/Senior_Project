@@ -14,8 +14,8 @@ except:
 
     # # HTTPS SETTINGS
     # SECURE_SSL_REDIRECT = True
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SESSION_COOKIE_SECURE = True
 
     # #will be True when we have SSL certificate
     # SECURE_SSL_REDIRECT = True
