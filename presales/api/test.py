@@ -111,7 +111,7 @@ class Test (APITestCase):
         addData()
         currentTime = timezone.now()
         data ={ 
-                "activity_Type": '1',
+                "activity_Type": 1,
                 "oneDateTime": currentTime,
                 "twoDateTime": currentTime,
                 "threeDateTime": currentTime,
@@ -468,6 +468,14 @@ class Test (APITestCase):
         self.assertEqual(response.status_code, 204)
         
     #DELETE 200 OK_____________________________________________________________________
+    def test_Delete_Products(self):
+        addData()
+        data = {
+            "product_ID": 2
+        }
+        response = self.client.delete("/api/products/", data, format = 'json' )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
     def test_Delete_Activity_Note_ID(self):
         addData()
         response = self.client.delete("/api/activity/note/1/")
