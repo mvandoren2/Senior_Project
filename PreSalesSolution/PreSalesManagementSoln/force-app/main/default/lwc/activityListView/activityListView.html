@@ -105,5 +105,8 @@
     <!--Row Action Modals-->
     <c-activity-detail-view onreloadtablerows={loadTableRows} ></c-activity-detail-view>
     <c-assign-team-modal data-patchactivity="true" onteamassigned={loadTableRows} ></c-assign-team-modal>
-    <c-status-change-modal data-status="decline" onsubmit={loadTableRows} ></c-status-change-modal>
+    <c-status-change-modal onsubmit={loadTableRows} ></c-status-change-modal>
+    <c-accept-activity-modal onsubmit={loadTableRows} ></c-accept-activity-modal>
+    <c-reschedule-form onsubmit={loadTableRows} ></c-reschedule-form>
+    <c-note-modal ></c-note-modal>
 </template>

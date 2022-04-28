@@ -1,16 +1,27 @@
 import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
-import { LightningElement, track } from 'lwc';
+import { api, LightningElement, track } from 'lwc';
 import Id from "@salesforce/user/Id"
 
 
-export default class NotesView extends LightningElement {
+export default class NotesView extends LightningElement {    
     connectedCallback() {
+        this.init()
+    }
+    
+    @api init = () => {
         this.activity_ID = this.getAttribute('data-activity-id')
-        this.maxItems = parseInt(this.getAttribute('data-max-items'), 10)
 
         this.setState(this.getAttribute('data-handlenote'))
         
-        this.getNoteDisplayData()
+        if(this.activity_ID)
+            this.getNoteDisplayData()
+    }
+
+    @api reset = () => {
+        if(this.postNote || this.passNote) {
+            this.template.querySelector('.new-note').value = null
+            this.newNoteText = ''
+        }
     }
 
     passNote = false
@@ -84,8 +95,6 @@ export default class NotesView extends LightningElement {
         return fetch(this.url + this.activity_ID + '/notes/')
             .then(response => response.json())
     }
-
-    newNoteText = ''
 
     changeNewNoteText = (evt) => {        
         this.newNoteText = evt.target.value

@@ -2,7 +2,7 @@ import { LightningElement,api } from 'lwc';
 import Id from '@salesforce/user/Id';
 
 export default class StatusChangeModal extends LightningElement {
-    connectedCallback() {
+    setStatus = () => {
         this.status = this.getAttribute('data-status')
 
         switch(this.status) {
@@ -46,6 +46,8 @@ export default class StatusChangeModal extends LightningElement {
     }
 
     @api showModal = (activity) => {
+        this.setStatus()
+        
         this.toggleModalClasses()
 
         this.activityID = activity.activity_ID
@@ -53,6 +55,8 @@ export default class StatusChangeModal extends LightningElement {
 
     closeModal = (evt) => {
         this.dispatchEvent(evt)
+
+        this.reset()
 
         this.toggleModalClasses()
     }
@@ -126,5 +130,9 @@ export default class StatusChangeModal extends LightningElement {
                 body: JSON.stringify(notePostBody)
             })
         }
+    }
+
+    reset = () => {
+        this.template.querySelector('lightning-textarea').value = null
     }
 }

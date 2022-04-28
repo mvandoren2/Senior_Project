@@ -79,7 +79,7 @@ export class TableFormatter {
 
         newRow.data = rowData
 
-        newRow.actions = this.getRowActions(this.data.user.user_role.name)
+        newRow.actions = this.getRowActions(activity)
     
         return newRow
     }
@@ -99,32 +99,67 @@ export class TableFormatter {
     }
 
     //Builds an array of action names based on the user's role
-    getRowActions = (userProfile) => {
-        const actions = {
-            'Presales Manager': [
-                {id: 'action_' + 0, label: 'Assign Request', name: 'assign_request'},
-                {id: 'action_' + 1, label: 'Decline Request', name: 'decline_request'},
-                {id: 'action_' + 2, label: 'Show Details', name: 'show_details'}
-            ],
+    getRowActions = (activity) => {
+        const userProfile = this.user ? this.user.user_role.name : 'Sales'
 
-            'Presales Member': [
-                {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
-                {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'},
-                {id: 'action_' + 2, label: 'Show Details', name: 'show_details'}
-            ],
+        const status = activity.status
+        
+        const actions =  [
+            {id: 'action_' + 0, label: 'Show Details', name: 'show_details'},
+            {id: 'action_' + 1, label: 'Accept Request', name: 'accept_request'},
+            {id: 'action_' + 2, label: 'Decline Request', name: 'decline'},
+            {id: 'action_' + 3, label: 'Cancel Activity', name: 'cancel'},
+            {id: 'action_' + 4, label: 'Request Reschedule', name: 'date_change'},
+            {id: 'action_' + 5, label: 'Schedule Activity', name: 'show_details'},
+            {id: 'action_' + 6, label: 'Manage Team', name: 'manage_team'},
+            {id: 'action_' + 7, label: 'Complete Activity', name: 'complete'},
+            {id: 'action_' + 8, label: 'Add Notes', name: 'notes'}
+        ]
 
-            'Sales Representative': [
-                {id: 'action_' + 0, label: 'Select Date', name: 'select_date'},
-                {id: 'action_' + 1, label: 'Request Date Change', name: 'date_change'},
-                {id: 'action_' + 2, label: 'Show Details', name: 'show_details'}
-            ],
+        const userRoles = [
+            {
+                role: 'Presales Manager', actions: [
+                    {status: 'Request', actions: [0, 1, 2]},
+                    {status: 'Reschedule', actions: [0, 1, 2]},
+                    {status: 'Expire', actions: [0, 6, 4, 8, 3]},
+                    {status: 'Accept', actions: [0, 6, 8, 3]},
+                    {status: 'Scheduled', actions: [0, 6, 8, 3]},
+                    {status: 'Decline', actions: [0]},
+                    {status: 'Cancel', actions: [0]}
+                ]
+            },
 
-            '' : [
-                {id: 'action_0', label: ' ', name: 'loading_actions'}
-            ]
-        }
+            {
+                role: 'Presales Member', actions: [
+                    {status: 'Request', actions: [0]},
+                    {status: 'Reschedule', actions: [0, 8]},
+                    {status: 'Expire', actions: [0, 8]},
+                    {status: 'Accept', actions: [0, 8]},
+                    {status: 'Scheduled', actions: [0, 7, 8]},
+                    {status: 'Decline', actions: [0]},
+                    {status: 'Cancel', actions: [0]}
+                ]
+            },
 
-        return actions[userProfile]
+            {
+                role: 'Sales', actions: [
+                    {status: 'Request', actions: [0, 8]},
+                    {status: 'Reschedule', actions: [0, 8]},
+                    {status: 'Expire', actions: [0, 8]},
+                    {status: 'Accept', actions: [0, 8, 3]},
+                    {status: 'Scheduled', actions: [0, 8, 3]},
+                    {status: 'Decline', actions: [0]},
+                    {status: 'Cancel', actions: [0]}
+                ]
+            }
+        ]
+
+        let userActions = userRoles.find(user => user.role === userProfile)
+            .actions.find(actionList => actionList.status === status).actions
+
+
+    
+        return userActions.map(action => actions[action])
     }
 
     //Returns an empty table to render before the async method returns
@@ -145,6 +180,8 @@ export class TableFormatter {
         let columns = this.generateTableHeader()
 
         if(this.data) {
+            this.user = this.data.user
+
             tableFormat.display = {
                 columns: columns,
                 data: this.getDisplayRows()

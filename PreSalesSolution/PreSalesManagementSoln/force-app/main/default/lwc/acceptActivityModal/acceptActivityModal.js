@@ -4,7 +4,7 @@ import Id from "@salesforce/user/Id"
 export default class AcceptActivityModal extends LightningElement {
     isShowing = false
     
-    @api showModal = (activity) => {
+    @api showModal = (activity) => {        
         this.toggleModalClasses()
 
         this.isShowing = true
