@@ -140,7 +140,7 @@ def getActivity(request, activityID):
             updateActivity.save()
 
         if('activityLevel' in activity_patch):
-            updateActivity.activityLevel = activity_patch['activityLevel']
+            updateActivity.activity_Level = activity_patch['activityLevel']
             updateActivity.save()
 
         if('members' in activity_patch):
