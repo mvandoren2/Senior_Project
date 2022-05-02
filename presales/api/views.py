@@ -11,6 +11,7 @@ from management.models import *
 from itertools import chain
 from .serializers import *
 from .helper import *
+import smtplib
 import json
 
 @csrf_exempt
@@ -279,22 +280,43 @@ def getPastActivities(request):
 @api_view(['GET'])
 def getSuggestedMembers(request, activityID):
     #get the activity
-    activity = Activity.objects.get(activity_ID=activityID)
-    oID = activity.opportunity_ID
-    aID = activity.account_ID
-    date1 = activity.oneDateTime
-    if(activity.twoDateTime != None):
-        date2 = activity.twoDateTime
-    else:
-        date2 = None
-    if(activity.threeDateTime != None):
-        date3 = activity.threeDateTime
-    else:
-        date3 = None
+    if(activityID == -1):
+        activity = json.loads(request.body)
+        oID = activity['opportunity_ID']
+        aID = activity['activity_ID']
+        date1 = activity['oneDateTime']
 
-    prod = []
-    for p in activity.products.all():
-        prod.append(str(p))
+        if("twoDateTime" in activity):
+            date2 = activity["twoDateTime"]
+        else:
+            date2 = None
+        if("threeDateTime" in activity):
+            date3 = activity["threeDateTime"]
+        else:
+            date3 = None
+
+        prod = []
+        prods = searchProducttoAdd(activity['products'])
+        for p in prods:
+            prod.append(str(p))
+
+    else:
+        activity = Activity.objects.get(activity_ID=activityID)
+        oID = activity.opportunity_ID
+        aID = activity.account_ID
+        date1 = activity.oneDateTime
+        if(activity.twoDateTime != None):
+            date2 = activity.twoDateTime
+        else:
+            date2 = None
+        if(activity.threeDateTime != None):
+            date3 = activity.threeDateTime
+        else:
+            date3 = None
+
+        prod = []
+        for p in activity.products.all():
+            prod.append(str(p))
 
     if(len(prod) == 0):
         prodW = 0
@@ -348,7 +370,7 @@ def getSuggestedMembers(request, activityID):
             conflicts = SimpleActivitySerializer(aList, many=True).data
             m.update({'Conflicts': conflicts})
 
-        #get the count of how manny activity the member is appart of
+        #get the count of how many activity the member is appart of
         oAmount = Activity.objects.filter(opportunity_ID=oID, members=memID[0]).count()
         if(oAmount > 0):
             oAmount = oppW
@@ -589,3 +611,25 @@ def getToken(request, org):
         org = User.objects.get(username=org)
         token = str(Token.objects.get(user=org))        
         return HttpResponse(json.dumps({'Token': token}), content_type='application/json')
+
+@csrf_exempt
+def sendEmail(request):
+    if(request.method == 'POST'):
+        emails = json.loads(request.body)['emails']
+        if(len(emails) == 0):
+            return HttpResponse("No emails to send to", status=409)
+        else:
+            for e in emails:
+                senderEmail = 'presalesn@gmail.com'
+                receiverEmail = e
+                password = 'presalesNinja12345'
+                subject = 'Test 1'
+                body = 'Test 2'
+                message = 'Subject: {}\n\n{}'.format(subject, body)
+
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.starttls()
+                server.login(senderEmail, password)
+                server.sendmail(senderEmail, receiverEmail, message)
+
+            return HttpResponse(json.dumps({'EMAIL Sent': 'True'}), content_type='application/json')
