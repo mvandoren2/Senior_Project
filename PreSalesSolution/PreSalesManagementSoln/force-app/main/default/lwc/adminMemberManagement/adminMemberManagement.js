@@ -1,5 +1,6 @@
 import { LightningElement,track,wire } from 'lwc';
 import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMembers";
+import { url } from 'c/dataUtils';
 
 //actions on the dropdown
 const profLevel = [
@@ -32,13 +33,13 @@ export default class AdminMemberManagement extends LightningElement {
 
     @track changeStatus = true;
 
-    connectedCallback(){
+    connectedCallback() {
         this.fetchAllDbMembers();
         this.fetchAllProducts();
     }
 
-    fetchAllDbMembers(){
-        fetch('http://localhost:8080/api/members')
+    fetchAllDbMembers() {
+        fetch(url + 'members/')
             .then(response => response.json())
             .then(data => {
                 this.assignedUsersInfoFromDB = data;
@@ -46,7 +47,7 @@ export default class AdminMemberManagement extends LightningElement {
     }
 
      //wire and get the users from the salesforce
-     @wire(getPreSalesTeamMembers) teamMembers({error, data}){
+     @wire(getPreSalesTeamMembers) teamMembers({error, data}) {
         if(data){
             this.salesforceUsers = data;
 
@@ -66,18 +67,16 @@ export default class AdminMemberManagement extends LightningElement {
     }
 
     //filter users
-    searchUsersFirstTab(evt){
+    searchUsersFirstTab = (evt) => {
         const value = evt.target.value.toLowerCase();
         this.filteredUnAssignedUsersInfo = this.unassignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
     }
 
     //filter
-    searchUsersSecondTab(evt){
+    searchUsersSecondTab = (evt) => {
         const value = evt.target.value.toLowerCase();
         this.filteredAssignedUsersInfo = this.assignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
     }
-
-
 
     ///MODAL
     @track data = [];    //holds the data of the datatable
@@ -86,7 +85,8 @@ export default class AdminMemberManagement extends LightningElement {
     @track memberId;
     @track memberName;
     @track imgSrc;
-    async openModal(evt) {
+    
+    openModal = async (evt) => {
 
         this.memberId = evt.target.dataset.item;
         const label = evt.target.label;
@@ -95,7 +95,7 @@ export default class AdminMemberManagement extends LightningElement {
             this.saveStatus = true;
             //auto fill the table from backend
             //get a specific member
-            await fetch('http://localhost:8080/api/member/' + this.memberId + '/')
+            await fetch(url + 'member/' + this.memberId + '/')
                 .then(response => response.json())
                 .then(data => {
                     this.membersInfo = data;
@@ -154,8 +154,8 @@ export default class AdminMemberManagement extends LightningElement {
     @track productsDB = [];
     @track dataValue = [];
 
-    async fetchAllProducts(){
-       await fetch('http://localhost:8080/api/products')
+    async fetchAllProducts() {
+       await fetch(url + 'products/')
             .then(response => response.json())
             .then(data => {
                 this.productsDB = data;
@@ -165,7 +165,7 @@ export default class AdminMemberManagement extends LightningElement {
     //function to populate the data 
     @track preSelectedRows = [];
     populateTheTable(label){
-        if(label === 'Manage'){
+        if(label === 'Manage') {
             //get the product names of the member
             const memberProducts = this.membersInfo.proficiency.map(products => products.product.name);
 
@@ -235,7 +235,7 @@ export default class AdminMemberManagement extends LightningElement {
 
     @track selectedRow = [];
 
-    rowSelectionAction(evt){
+    rowSelectionAction(evt) {
 
         this.selectedRow  = evt.detail.selectedRows;
 
@@ -249,7 +249,7 @@ export default class AdminMemberManagement extends LightningElement {
 
     @track saveStatus = false
 
-    handleSave(evt){
+    handleSave(evt) {
     
         const profArray = [];
        
@@ -270,7 +270,7 @@ export default class AdminMemberManagement extends LightningElement {
         }
 
         //push member and their product/proficiencyLevel
-        fetch('http://localhost:8080/api/member/' + this.memberId + '/', {
+        fetch(url + 'member/' + this.memberId + '/', {
                 method: method, 
                 headers: {
                     'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ export default class AdminMemberManagement extends LightningElement {
     //confirmation box
     @track isDialogVisible = false;
 
-    handleClick(event){
+    handleClick(event) {
         if(event.target.label === 'Delete Member'){
 
             this.isDialogVisible = true;
@@ -316,10 +316,10 @@ export default class AdminMemberManagement extends LightningElement {
     }
 
     //delete a member
-    deleteMember(){
+    deleteMember() {
 
          //push member and their product/proficiencyLevel
-         fetch('http://localhost:8080/api/member/' + this.memberId + '/', {
+         fetch(url + 'member/' + this.memberId + '/', {
             method: 'DELETE', 
             headers: {
                 'Content-Type': 'application/json',
@@ -342,7 +342,7 @@ export default class AdminMemberManagement extends LightningElement {
 
 
     //action to edit proficiency level
-    handleRowAction(evt){
+    handleRowAction(evt) {
 
         const actionNumber = evt.detail.action.name;
         const row = evt.detail.row;
@@ -397,7 +397,7 @@ export default class AdminMemberManagement extends LightningElement {
     }
 
     //filter the data according to the radio button
-    handleRadioButtonChange(evt){
+    handleRadioButtonChange = (evt) => {
         this.fetchAllDbMembers();
 
         const selectedBtn = evt.detail.value;

@@ -11,6 +11,7 @@ import salesActivity                from './templates/activityDetailView_sales-a
 
 import { LightningElement, api } from 'lwc';
 import Id from "@salesforce/user/Id"
+import { url } from 'c/dataUtils'
 
 export default class ActivityDetailView extends LightningElement {
     //
@@ -21,11 +22,9 @@ export default class ActivityDetailView extends LightningElement {
         this.fetchCurrentUser()
     }
 
-    url = 'http://localhost:8080/api/'
-
-    fetchCurrentUser = () => {
+    fetchCurrentUser() {
         this.userID = Id ? Id : '0055f000007NzdoAAC'
-        const urlString = this.url + 'member/' + this.userID + '/'
+        const urlString = url + 'member/' + this.userID + '/'
 
         fetch(urlString, )
             .then(res => res.json())
@@ -52,7 +51,7 @@ export default class ActivityDetailView extends LightningElement {
         return viewDetail
     }
 
-    getManagerTemplate = () => {
+    getManagerTemplate() {
         switch(this.activity.status) {
             case 'Request':
                 return manageRequest
@@ -72,7 +71,7 @@ export default class ActivityDetailView extends LightningElement {
         }
     }
 
-    getMemberTemplate = () => {
+    getMemberTemplate() {
         switch(this.activity.status) {
             case 'Accept':
             case 'Scheduled':{
@@ -100,7 +99,7 @@ export default class ActivityDetailView extends LightningElement {
         }
     }
 
-    getSalesTemplate = () => {
+    getSalesTemplate() {
         switch(this.activity.status) {
             case 'Request':
             case 'Reschedule': 
@@ -120,7 +119,7 @@ export default class ActivityDetailView extends LightningElement {
 
     isOpen = false
 
-    @api showModal = (activity) => {
+    @api showModal(activity) {
         if (activity !== this.activity) {
             this.activity = activity
             this.activity_unmodified = Object.assign({}, activity)
@@ -136,12 +135,12 @@ export default class ActivityDetailView extends LightningElement {
 
     isHidden = true
 
-    hideModal = () => {
+    hideModal() {
         this.isHidden = true
         this.toggleModalClasses()
     }
 
-    unhideModal = () => {
+    unhideModal() {
         this.isHidden = false
         this.toggleModalClasses()
     }
@@ -158,7 +157,7 @@ export default class ActivityDetailView extends LightningElement {
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    toggleModalClasses = () => {
+    toggleModalClasses() {
         this.boxClasses = !this.isHidden ? 
             'slds-modal slds-fade-in-open' : 'slds-modal'
 
@@ -170,7 +169,7 @@ export default class ActivityDetailView extends LightningElement {
     //Populate view fields
     //
 
-    setViewState = () => {
+    setViewState() {
         this.setProducts()
         this.setDateIsOptional()
         this.requestIsReschedule = this.activity.status === 'Reschedule'
@@ -179,13 +178,13 @@ export default class ActivityDetailView extends LightningElement {
 
     products = []
 
-    setProducts = () => {
+    setProducts() {
         this.products = this.activity.products.map((product, i) => ({name: product.name, id: i}))
     }
 
     dateIsOptional = true
 
-    setDateIsOptional () {
+    setDateIsOptional() {
         let dateIsNotSelected = !this.activity.selectedDate
 
         if(dateIsNotSelected) {
@@ -196,7 +195,7 @@ export default class ActivityDetailView extends LightningElement {
         this.dateIsOptional = dateIsNotSelected
     }
 
-    validateDates = () => {
+    validateDates() {
         this.activity.dates = this.activity.dates.filter(date => date.date > Date.now())
 
         const oneDateRemains = this.activity.dates.length === 1
@@ -211,7 +210,7 @@ export default class ActivityDetailView extends LightningElement {
 
     dateOptions = []
 
-    setDateOptions = () => {
+    setDateOptions() {
         this.dateOptions.push({label: 'Allow Team Lead to select date', value: "0"})
 
         this.dateOptions = this.dateOptions.concat(
@@ -267,7 +266,7 @@ export default class ActivityDetailView extends LightningElement {
         this.activityModified = false
     }
 
-    patchActivity = () => {
+    patchActivity() {
         let activityPatchBody = {}
 
         activityPatchBody.activity_ID = this.activity.activity_ID
@@ -278,7 +277,7 @@ export default class ActivityDetailView extends LightningElement {
             activityPatchBody.status = 'Scheduled'
         }
 
-        fetch(this.url + 'activity/' + this.activity.activity_ID + '/', {
+        fetch(url + 'activity/' + this.activity.activity_ID + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',

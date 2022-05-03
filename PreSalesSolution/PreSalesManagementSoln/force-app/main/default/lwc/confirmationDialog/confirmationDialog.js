@@ -9,7 +9,7 @@ export default class ConfirmationDialog extends LightningElement {
     @api cancelLabel = ''; //cancel button label
     @api originalMessage; //any event/message/detail to be published back to the parent component
     //handles button clicks
-    handleClick(event){
+    handleClick = (event) => {
         //creates object which will be published to the parent component
         let finalEvent = {
             originalMessage: this.originalMessage,

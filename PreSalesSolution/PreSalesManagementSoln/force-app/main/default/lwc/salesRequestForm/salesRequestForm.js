@@ -1,22 +1,42 @@
+import salesRequestForm from './templates/salesRequestForm.html'
+import activityCreation_manager from './templates/activityCreation_manager.html'
+import activityCreation_team from './templates/activityCreation_team.html'
+
 import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productSelector';
+import { url } from 'c/dataUtils';
+import { buildDetailedActivitiesList } from '../dataUtils/dataUtils';
 
 export default class SalesRequestForm extends LightningElement {
-    connectedCallback () {
-        this.opportunityId = this.getAttribute('data-opportunity')
+    connectedCallback() {
+        this.getActivityTypes()
 
-        this.getAccountId()
-        this.getActivityType()
+        this.initActivity()
+    }
+
+    render() {
+        this.userProfile = this.getAttribute('data-userprofile')
+
+        switch(this.userProfile) {
+            case 'Presales Manager':
+                this.activity.status = 'Accept'
+                return activityCreation_manager
+
+            case 'Presales Member':
+                this.activity.status = 'Scheduled'
+                return activityCreation_team
+            
+            default:
+                return salesRequestForm
+        }
     }
 
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    @api toggleModalClasses = () => {
-
-
+    @api toggleModalClasses() {
         this.boxClasses = this.boxClasses === 'slds-modal' ? 
             'slds-modal slds-fade-in-open' : 'slds-modal'
 
@@ -24,24 +44,39 @@ export default class SalesRequestForm extends LightningElement {
             'slds-backdrop slds-backdrop_open' : 'slds-backdrop'
     }
 
-    url = "http://localhost:8080/api/"
+    initActivity() {
+        this.activity = {}
 
-    getAccountId = async () => {
-        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
-        
-        this.account = await OpportunityData({opportunity_Ids: [opportunity_Id]})
+        this.activity.opportunity_ID = this.getAttribute('data-opportunity')
+        this.getAccountId()
+        this.activity.location = this.locationOptions[0].value
+        this.activity.createdByMember = Id ? Id : '0055f0000041g1mAAA'        
+        this.activity.members = []
+        this.activity.flag = false
+        this.activity.oneDateTime = null
+        this.activity.twoDateTime = null
+        this.activity.threeDateTime = null
 
-        this.accountId = this.account[0].Id    
+        if(this.userProfile === 'Presales Team')
+            this.activity.members = [this.activity.createdByMember]
+
+        this.teamManageLabel = 'Assign Team'
     }
 
+    async getAccountId() {
+        let opportunity_Id = this.activity.opportunity_ID !== undefined ? this.activity.opportunity_ID : '0065f000008xnXzAAI'
+        
+        const account = await OpportunityData({opportunity_Ids: [opportunity_Id]})
+
+        this.activity.account_ID = account[0].Id    
+    }
     
     //pull activity types and put into combobox
     
-    activityType = ''
     activityTypes = [];
 
-    getActivityType(){
-        const endPoint = this.url + "activity/types/";
+    getActivityTypes() {
+        const endPoint = url + "activity/types/";
         fetch(endPoint, {
             method: "GET"
         })
@@ -50,81 +85,89 @@ export default class SalesRequestForm extends LightningElement {
             this.activityTypes = data.map(item => ({label: item.name, value: item.type_ID.toString()}))
         })
     }
+
+    @track productOptions = [];
+    @track selectedProducts = [];
     
+    productSelector = new ProductSelector(this)
    
-    selectActivityType(event) {        
-        this.activityType = event.detail.value;
+    selectActivityType = (event) => {        
+        this.activity.activity_Type = event.detail.value;
 
         this.setDisableButton()
     }
 
-    @track selectedProducts = [];
-    
-    productSelector = new ProductSelector(this)
+    activityLevelOptions = [
+        {label: "Level 1", value: "Level 1"},
+        {label: "Level 2", value: "Level 2"},
+        {label: "Level 3", value: "Level 3"},
+        {label: "Level 4", value: "Level 4"}
+    ]
 
+    setActivityLevel = (evt) => {
+        this.activity.activity_Level = evt.target.value
+    }
+    
     locationOptions = [
         {label: 'On Site', value: 'Onsite'},
         {label: 'Remote', value: 'Remote'}
     ]
 
-    location = this.locationOptions[0].value
-
     setLocation = (evt) => {
-        this.location = evt.target.value
+        this.activity.location = evt.target.value
     }
 
     dateInputHandler = (evt) => {
-        let name = evt.target.dataset.item
+        let dateNum = evt.target.dataset.item
 
-        this[name] = evt.target.value
+        this.activity[dateNum] = evt.target.value
 
         this.setDisableButton()
         this.setDateWarningShowing()
     }
 
-    notes = '';
-
     updateNotes = (evt) => {
-        this.notes = evt.target.value;
+        this.activity.notes = evt.target.value;
     }
 
-    unexpectedFlag = false
-
-    setFlag = () => {
-        this.unexpectedFlag = !this.unexpectedFlag
+    setFlag() {
+        this.activity.flag = !this.activity.flag
     }
-
 
     isSubmitDisabled = true
 
     setDisableButton() {
         this.isSubmitDisabled = !(
             this.selectedProducts.length &&
-            this.activityType !== '' &&
-            this.date1
+            this.activity.activity_Type &&
+            this.activity.oneDateTime
         )
     }
+
     //Show Date Alert
     
     dateWarningShowing = false    
     
-    setDateWarningShowing = () => {
+    setDateWarningShowing() {
         const singleDateSelected = 
-            (this.date1 && this.date2 === undefined && this.date3 === undefined) ||
-            (this.date1 === undefined && this.date2 && this.date3 === undefined) ||
-            (this.date1 === undefined && this.date2 === undefined && this.date3)
+            (this.activity.oneDateTime && this.activity.twoDateTime === undefined && this.activity.threeDateTime === undefined) ||
+            (this.activity.oneDateTime === undefined && this.activity.twoDateTime && this.activity.threeDateTime === undefined) ||
+            (this.activity.oneDateTime === undefined && this.activity.twoDateTime === undefined && this.activity.threeDateTime)
 
-        this.dateWarningShowing = singleDateSelected && this.submitAttempted && !this.dateWarningShowing
+        this.dateWarningShowing =   singleDateSelected && 
+                                    this.submitAttempted && 
+                                    !this.dateWarningShowing && 
+                                    this.userProfile === 'Sales Team'
     }
 
     submitAttempted = false
 
-    handleSubmit = () => {
+    handleSubmit() {
         this.submitAttempted = true
 
         this.setDateWarningShowing()
 
-        if(!this.dateWarningShowing){
+        if(!this.dateWarningShowing) {
             this.handleUploadAction()     
             this.toggleModalClasses()
             this.reset()
@@ -132,40 +175,34 @@ export default class SalesRequestForm extends LightningElement {
     }
 
     //POST JSON ----------
-    handleUploadAction(){
-        let memberId = Id ? Id : '0055f0000041g1mAAA'
-
-        let opportunity_Id = this.opportunityId !== undefined ? this.opportunityId : '0065f000008xnXzAAI'
-
-        let selectedProducts = this.selectedProducts.map(product => parseInt(product.value, 10))
-
-        let jsonData = {
-            "createdByMember": memberId,
-            "opportunity_ID": opportunity_Id,
-            "account_ID": this.accountId,
-            "products": selectedProducts,
-            "activity_Type": parseInt(this.activityType, 10),
-            "location": this.location,
-            "oneDateTime": this.date1,
-            "twoDateTime": this.date2 ? this.date2 : null,
-            "threeDateTime": this.date3 ? this.date3 : null,
-            "status": "Request",
-            "notes": this.notes,
-            "flag": false
-        }   
-        
-        fetch(this.url + 'activity/', {
+    async handleUploadAction() {    
+    
+        let submittedActivity = await fetch(url + 'activity/', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(jsonData)
-
-        }).catch((error) => {
+            body: JSON.stringify(this.activity)
+        
+        }).then(res => res.json()
+        
+        ).catch((error) => {
             console.error('Error:', error);
         
         });      
+
+        submittedActivity = await buildDetailedActivitiesList([submittedActivity])
+        submittedActivity = submittedActivity[0]
+
+        this.template.querySelector('c-accept-activity-modal').showModal(submittedActivity)
     }
 
-    reset = () => {
+    cancelHandler = () => {
+        this.reset()
+        this.toggleModalClasses()
+    }
+
+    reset() {
+        this.initActivity()
+
         this.template.querySelectorAll('.reset-handle').forEach(input => {
             input.value = null
         })

@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import { url } from 'c/dataUtils';
 
 import Id from '@salesforce/user/Id';
 
@@ -9,7 +10,7 @@ export default class ModalPopupLWC extends LightningElement {
 
     isShowing = false;
 
-    @api showModal = (activity) => {
+    @api showModal(activity) {
         if (activity !== this.activity) {
             this.activity = activity
         }
@@ -21,7 +22,7 @@ export default class ModalPopupLWC extends LightningElement {
         this.toggleModalClasses()
     }
 
-    closeModal = (evt) => {
+    closeModal(evt) {
         this.dispatchEvent(evt)
         
         this.toggleModalClasses()
@@ -32,12 +33,12 @@ export default class ModalPopupLWC extends LightningElement {
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    toggleModalClasses = () => {
+    toggleModalClasses() {
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
     }
 
-    setViewState = () => {
+    setViewState() {
         if(this.editVariant) {
             this.modalTitle = 'Edit Requested Dates'
             this.showRescheduleText = false
@@ -65,7 +66,7 @@ export default class ModalPopupLWC extends LightningElement {
         )
     }
 
-    buildDateObject = (date) => {
+    buildDateObject(date) {
         date = new Date(date)
 
         return {
@@ -76,7 +77,7 @@ export default class ModalPopupLWC extends LightningElement {
     }
 
     //builds a formatted string from a JS Date object
-    dateStringUtil = (date) => {        
+    dateStringUtil(date) {        
         const dateDisplayOptions = {
             weekday:'short', 
             month:"numeric", 
@@ -111,23 +112,21 @@ export default class ModalPopupLWC extends LightningElement {
     }
 
     //PATCH date and time
-    url = 'http://localhost:8080/api/activity/'
+    patchDates() {
+        let memberId = Id ? Id : '0055f0000041g1mAAA'
+        let activity_ID = this.activity.activity_ID;
+        let pushingData = {
 
-    patchDates(){
-    let memberId = Id ? Id : '0055f0000041g1mAAA'
-    let activity_ID = this.activity.activity_ID;
-    let pushingData = {
+            "createdByMember": memberId,
+            "oneDateTime" : this.date1 ? this.date1 : null,
+            "twoDateTime": this.date2 ? this.date2 : null,
+            "threeDateTime": this.date3 ? this.date3 : null
+        }
 
-        "createdByMember": memberId,
-        "oneDateTime" : this.date1 ? this.date1 : null,
-        "twoDateTime": this.date2 ? this.date2 : null,
-        "threeDateTime": this.date3 ? this.date3 : null
-    }
+        if(!this.editVariant)
+            pushingData.status = 'Reschedule'
 
-    if(!this.editVariant)
-        pushingData.status = 'Reschedule'
-
-    fetch(this.url + activity_ID  + '/', {
+        fetch(url + 'activity/' + activity_ID  + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',

@@ -19,22 +19,39 @@
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h2>
                 </header>
 
+                            
+
                 <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <div class="row">
-                        <lightning-textarea name="status_note"
-                                            label={noteLabel}
-                                            required={noteRequired}
-                                            message-when-value-missing="Note required"
-                                            placeholder="Add your notes here"
-                                            onchange={setNoteText} >
-                        </lightning-textarea>
-                
-                    </div> 
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1" style="overflow: initial;" >
+                    <lightning-textarea name="status_note"
+                                        label={noteLabel}
+                                        required={noteRequired}
+                                        message-when-value-missing="Note required"
+                                        placeholder="Add your notes here"
+                                        onchange={setNoteText}
+                                        class="slds-var-m-bottom_medium" >
+                    </lightning-textarea>
+
+                    <template if:true={showCompleteInputs} >
+                        <lightning-combobox label="Evaluate Activity Difficulty Level"
+                                            options={activityLevelOptions}
+                                            onchange={setActivityLevel}
+                                            class="slds-size_2-of-5" >
+                        </lightning-combobox>
+                    </template> 
                 </div>
 
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
+                    <template if:true={showCompleteInputs} >
+                        <lightning-input    type="checkbox"
+                                            label="Flag as unexpected event."
+                                            onchange={setActivityFlag}
+                                            class="slds-float_left" >
+
+                        </lightning-input>
+                    </template>
+
                     <lightning-button   label={submitLabel} 
                                         variant={submitVariant}
                                         onclick={submitStatusChange} 

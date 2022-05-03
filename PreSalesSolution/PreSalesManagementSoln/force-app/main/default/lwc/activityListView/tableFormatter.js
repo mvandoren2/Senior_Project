@@ -3,13 +3,6 @@ import { TableDataHandler } from "./tableDataHandler.js"
 export class TableFormatter {
     tableDataHandler = new TableDataHandler()
 
-    fixCamelCase = (s) => {
-        return s.replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => { 
-                return str.toUpperCase(); 
-            })
-    }
-
     columnLabels = [
         'Account',
         'Opportunity',
@@ -23,17 +16,19 @@ export class TableFormatter {
     ]
 
     //Builds an array of column heading names from the key names of a request object 
-    generateTableHeader = () => {
+    generateTableHeader() {
         let columnLabels = this.columnLabels
         
         if(this.params) {
-            if(this.params.opportunity)
+            this.smallFormat = this.params.format === 'small'
+
+            if(this.params.opportunity && this.smallFormat)
                 columnLabels = columnLabels.filter(column => (column !== 'Account') && (column !== 'Opportunity'))
 
-            if(this.params.account)
-                columnLabels = columnLabels.filter(column => column !== 'Account')
+            if(this.params.account && this.smallFormat)
+                console.log('here')
 
-                this.smallFormat = this.params.format === 'small' ? true : false
+                columnLabels = columnLabels.filter(column => column !== 'Account')
         }
         
         let columns = columnLabels.map((column, i) => ({
@@ -50,11 +45,11 @@ export class TableFormatter {
         actions: []
     }
 
-    getDisplayRows = () => {
+    getDisplayRows() {
         return this.data.activities.map(activity => this.generateDisplayRow(activity))
     }
 
-    generateDisplayRow = (activity) => {
+    generateDisplayRow(activity) {
         let newRow = Object.assign({}, this.emptyDisplayRow)
 
         let rowData = []
@@ -84,7 +79,7 @@ export class TableFormatter {
         return newRow
     }
 
-    setSelectedDate = (date, activityStatus) => {
+    setSelectedDate(date, activityStatus) {
         let dateString = 'Optional'
 
         if(date && activityStatus !== 'Reschedule') {
@@ -99,7 +94,7 @@ export class TableFormatter {
     }
 
     //Builds an array of action names based on the user's role
-    getRowActions = (activity) => {
+    getRowActions(activity) {
         const userProfile = this.user ? this.user.user_role.name : 'Sales'
 
         const status = activity.status
@@ -142,7 +137,7 @@ export class TableFormatter {
             },
 
             {
-                role: 'Sales', actions: [
+                role: 'Sales Representative', actions: [
                     {status: 'Request', actions: [0, 8]},
                     {status: 'Reschedule', actions: [0, 8]},
                     {status: 'Expire', actions: [0, 8]},
@@ -163,15 +158,13 @@ export class TableFormatter {
     }
 
     //Returns an empty table to render before the async method returns
-    getEmptyTableFormat = () => {
-        let data = {display: [this.emptyActivity], activities: []}
-
-        let columns = this.generateTableHeader(data)
+    getEmptyTableFormat() {
+        let columns = this.generateTableHeader()
     
         return {display: {columns: columns, data: []}, activities: [] }
     }
 
-    getTableFormat = async (params) => {
+    async getTableFormat(params) {
         this.params = params
         this.data = await this.tableDataHandler.getTableData(params)
 

@@ -1,7 +1,7 @@
 import { LightningElement, api } from 'lwc';
 
 export default class NoteModal extends LightningElement {   
-    @api showModal = (activity) => {
+    @api showModal(activity) {
         this.notesView = this.template.querySelector('c-notes-view')
 
         this.activityID = activity.activity_ID
@@ -22,7 +22,7 @@ export default class NoteModal extends LightningElement {
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    toggleModalClasses = () => {
+    toggleModalClasses() {
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 
             'slds-modal' : 'slds-modal slds-fade-in-open'
             
