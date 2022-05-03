@@ -1,11 +1,12 @@
 import { LightningElement, track, api } from 'lwc';
 import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
+import { url } from 'c/dataUtils';
 
 export default class AssignTeamModal extends LightningElement {
     
     isShowing = false
 
-    @api showModal = async (activity) => {    
+    @api async showModal(activity) {
         this.patchActivity = this.getAttribute('data-patchactivity') === 'true' ?
             true : false
         
@@ -21,7 +22,7 @@ export default class AssignTeamModal extends LightningElement {
         this.toggleModalClasses()
     }
 
-    closeModal = (evt) => {
+    closeModal(evt) {
         this.toggleModalClasses()
         
         this.isShowing = false
@@ -32,7 +33,7 @@ export default class AssignTeamModal extends LightningElement {
     @track boxClasses = 'slds-modal'
     @track backdropClasses = 'slds-backdrop'
     
-    toggleModalClasses = () => {
+    toggleModalClasses() {
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
     }
@@ -46,10 +47,8 @@ export default class AssignTeamModal extends LightningElement {
     //fetch all members and selected members from djangodb
     membersFetched = false;
 
-    url = 'http://localhost:8080/api/activity/'
-
     async fetchSuggestedMembers() {
-        let suggestedNinjaMembers = await fetch(this.url + this.activity.activity_ID + '/suggested_members/')
+        let suggestedNinjaMembers = await fetch(url + 'activity/' + this.activity.activity_ID + '/suggested_members/')
             .then(response => response.json())
             .catch(err => {console.error('Error: ', err)})
     
@@ -70,7 +69,7 @@ export default class AssignTeamModal extends LightningElement {
         return suggestedNinjaMembers
     }
 
-    setSelectedMembers(){
+    setSelectedMembers() {
         let selectedUserIds = this.activity.team.map(member => member.Id)
 
         this.selectedNinjaMembers = this.suggestedMembers.filter(member => selectedUserIds.includes(member.external_member_ID))
@@ -79,15 +78,27 @@ export default class AssignTeamModal extends LightningElement {
 
         const products = this.activity.products.map(product => product.name);
        
+        let newProficiency = [];
+        firstLoop:
         for(let i=0; i < this.unselectedNinjaMembers.length; i++){
-            for(let j=0; j < this.unselectedNinjaMembers[i].proficiency.length; j++){
-                if(products.includes(this.unselectedNinjaMembers[i].proficiency[j].product.name)){
-                    this.unselectedNinjaMembers[i].proficiency[j].color = false
-                } else{
-                    this.unselectedNinjaMembers[i].proficiency[j].color = true
+            secondLoop:
+            for(let j=0; j < products.length; j++){
+                thirdLoop:
+                for(let k=0; k < this.unselectedNinjaMembers[i].proficiency.length; k++){
+                    if(products[j] === this.unselectedNinjaMembers[i].proficiency[k].product.name){
+                        newProficiency.push({"name":products[j],"color":false,"level":this.unselectedNinjaMembers[i].proficiency[k].level});
+                        break thirdLoop;
+                    }
+                    if(k == this.unselectedNinjaMembers[i].proficiency.length - 1){
+                        newProficiency.push({"name":products[j],"color":true,"level":"N/A"});
+                    }
                 }
             }
+
+            this.unselectedNinjaMembers[i].newProficiency = newProficiency;
+            newProficiency = [];
         }
+
         
         if(this.activity.leadMember) {
 
@@ -128,7 +139,7 @@ export default class AssignTeamModal extends LightningElement {
 
     sortedBy = 'All'
 
-    sortByCombinedWeights(evt){
+    sortByCombinedWeights = (evt) => {
         this.unselectedNinjaMembers_filtered.sort((a, b) => b['Total Percentage'] - a['Total Percentage']);
 
         if(evt)
@@ -137,7 +148,7 @@ export default class AssignTeamModal extends LightningElement {
         this.sortedBy = 'All'
     }
 
-    sortByProficiency(evt){
+    sortByProficiency = (evt) => {
         this.unselectedNinjaMembers_filtered.sort((a, b) => b.productWeight - a.productWeight);
         
         if(evt)
@@ -146,7 +157,7 @@ export default class AssignTeamModal extends LightningElement {
         this.sortedBy = 'Proficiency'
     }
 
-    sortByOpportunityWeight(evt){
+    sortByOpportunityWeight = (evt) => {
         this.unselectedNinjaMembers_filtered.sort((a, b) => b.opportunityWeight - a.opportunityWeight);
         
         if(evt)
@@ -155,7 +166,7 @@ export default class AssignTeamModal extends LightningElement {
         this.sortedBy = 'Opportunity'
     }
 
-    sortByAccountWeight(evt){
+    sortByAccountWeight = (evt) => {
         this.unselectedNinjaMembers_filtered.sort((a, b) => b.accountWeight - a.accountWeight);
 
         if(evt)
@@ -165,7 +176,7 @@ export default class AssignTeamModal extends LightningElement {
     }
 
     //function to change the status of group button
-    setSelectedButton(evt){
+    setSelectedButton = (evt) => {
         const buttonGroup = this.template.querySelectorAll(".sortBtn");
 
         buttonGroup.forEach(btn => {
@@ -198,7 +209,7 @@ export default class AssignTeamModal extends LightningElement {
     }
 
     //onclick change the button label and save the data to selected array
-    assignMemberToTeam(evt) {
+    assignMemberToTeam = (evt) => {
         const memberToAddId = evt.target.dataset.item
 
         const memberToAdd = this.suggestedMembers.find(member => member.external_member_ID === memberToAddId)
@@ -218,7 +229,7 @@ export default class AssignTeamModal extends LightningElement {
 
     }
 
-    removeMemberFromTeam(evt){
+    removeMemberFromTeam = (evt) => {
         const memberToRemoveId = evt.target.dataset.item
 
         for(let i=0; i < this.selectedNinjaMembers.length; i++){
@@ -258,7 +269,7 @@ export default class AssignTeamModal extends LightningElement {
 
     @track saveBtnIsDisabled = true;
     
-    selectLead(evt){
+    selectLead = (evt) => {
 
         this.leadMemberId = evt.target.dataset.item;
 
@@ -285,7 +296,7 @@ export default class AssignTeamModal extends LightningElement {
     patchActivity = false
 
     //save button action
-    selectTeam(){      
+    selectTeam() {      
         if(this.patchActivity)
             this.patchActivityTeam();
 
@@ -302,7 +313,7 @@ export default class AssignTeamModal extends LightningElement {
     }
     
     //push the data to backend
-    patchActivityTeam(){
+    patchActivityTeam() {
         let activity_ID = this.activity.activity_ID;
 
         let patchBody = {
@@ -310,7 +321,7 @@ export default class AssignTeamModal extends LightningElement {
             'leadMember': this.leadMemberId
         }    
 
-        fetch(this.url + activity_ID + '/', {
+        fetch(url + 'activity/' + activity_ID + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',
@@ -322,7 +333,7 @@ export default class AssignTeamModal extends LightningElement {
         });
     }
 
-    cancelSelectTeam() {
+    cancelSelectTeam = () => {
         this.closeModal(new CustomEvent('cancel'))
     }
 }

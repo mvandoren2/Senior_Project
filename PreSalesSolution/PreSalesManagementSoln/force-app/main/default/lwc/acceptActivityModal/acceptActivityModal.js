@@ -1,10 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import Id from "@salesforce/user/Id"
+import { url } from 'c/dataUtils';
 
 export default class AcceptActivityModal extends LightningElement {
     isShowing = false
     
-    @api showModal = (activity) => {        
+    @api showModal(activity) {        
         this.toggleModalClasses()
 
         this.isShowing = true
@@ -17,7 +18,7 @@ export default class AcceptActivityModal extends LightningElement {
         }
     }
 
-    closeModal = (evt) => {
+    closeModal(evt) {
         this.dispatchEvent(evt)
         
         this.toggleModalClasses()
@@ -28,14 +29,14 @@ export default class AcceptActivityModal extends LightningElement {
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    toggleModalClasses = () => {
+    toggleModalClasses() {
         this.boxClasses = this.boxClasses.includes('slds-fade-in-open') ? 'slds-modal' : 'slds-modal slds-fade-in-open'
         this.backdropClasses = this.backdropClasses.includes('slds-backdrop_open') ? 'slds-backdrop' : 'slds-backdrop slds-backdrop_open'
     }
 
     dateOptions = []
 
-    setDateOptions = () => {
+    setDateOptions() {
         this.dateOptions.push({label: 'Allow Team Lead to select date', value: "0"})
 
         this.dateOptions = this.dateOptions.concat(
@@ -46,7 +47,7 @@ export default class AcceptActivityModal extends LightningElement {
         )
     }
 
-    selectDate = (evt) => {
+    selectDate(evt) {
         const selectedDateId = parseInt(evt.target.value, 10)
 
         if(selectedDateId !== 0)
@@ -54,7 +55,7 @@ export default class AcceptActivityModal extends LightningElement {
                 this.activity.dates.find(date => date.id === selectedDateId)
     }
 
-    openTeamModal = () => {
+    openTeamModal() {
         this.toggleModalClasses()
 
         this.template.querySelector('c-assign-team-modal').showModal(this.activity)
@@ -62,7 +63,7 @@ export default class AcceptActivityModal extends LightningElement {
 
     teamIsNotAssigned = true 
 
-    selectTeam = (evt) => {
+    selectTeam(evt) {
         this.activity.team = evt.detail.team
         this.activity.leadMember = evt.detail.leadMember
 
@@ -71,17 +72,17 @@ export default class AcceptActivityModal extends LightningElement {
         this.toggleModalClasses()
     }
 
-    addNewNote = (evt) => {
+    addNewNote(evt) {
         this.activity.notes = evt.detail.note
     }
 
-    cancel = () => {
+    cancel() {
         let cancelSignal = new CustomEvent('cancel')
 
         this.closeModal(cancelSignal)
     }
 
-    acceptActivity = () => {
+    acceptActivity() {
         let acceptSignal = new CustomEvent('accept')
 
         this.patchActivity()
@@ -90,9 +91,7 @@ export default class AcceptActivityModal extends LightningElement {
         this.closeModal(acceptSignal)     
     }
 
-    url = 'http://localhost:8080/api/activity/'
-
-    patchActivity = () => {
+    patchActivity() {
         let activityPatchBody = {}
 
         activityPatchBody.status = 'Accept'
@@ -105,7 +104,7 @@ export default class AcceptActivityModal extends LightningElement {
             activityPatchBody.status = 'Scheduled'
         }
 
-        fetch(this.url + this.activity.activity_ID + '/', {
+        fetch(url + 'activity/' + this.activity.activity_ID + '/', {
             method: 'PATCH', 
             headers: {
                 'Content-Type': 'application/json',
@@ -117,14 +116,14 @@ export default class AcceptActivityModal extends LightningElement {
         });
     }
 
-    postNote = () => {
+    postNote() {
         if(this.activity.notes !== undefined) {
             let notePostBody = {
                 member: Id ? Id : '0055f0000041g1mAAA',
                 note_text: this.activity.notes
             }
 
-            fetch(this.url + this.activity.activity_ID + '/notes/', {
+            fetch(url + 'activity/' + this.activity.activity_ID + '/notes/', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',

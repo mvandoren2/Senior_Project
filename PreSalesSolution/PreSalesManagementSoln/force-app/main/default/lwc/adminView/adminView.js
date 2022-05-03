@@ -1,11 +1,12 @@
-import { LightningElement,track,wire } from 'lwc';
+import { LightningElement,track } from 'lwc';
+import { url } from 'c/dataUtils';
 
 export default class AdminView extends LightningElement {
 
     @track notificationStatus = false;
     @track saveStatus = true;
 
-    connectedCallback(){
+    connectedCallback() {
         this.populateTheBoxes();
     }
 
@@ -14,7 +15,7 @@ export default class AdminView extends LightningElement {
 
     //fetch products from backend
     async fetchProducts(){
-        await fetch('http://localhost:8080/api/products/')
+        await fetch(url + 'products/')
             .then(response => response.json())
             .then(data => {
                 console.log('Success: ', data);
@@ -22,8 +23,8 @@ export default class AdminView extends LightningElement {
             })
     }
 
-    async fetchActivityTypes(){
-        await fetch('http://localhost:8080/api/activity/types/')
+    async fetchActivityTypes() {
+        await fetch(url + '/activity/types/')
             .then(response => response.json())
             .then(data => {
                 console.log('Success: ', data);
@@ -35,7 +36,7 @@ export default class AdminView extends LightningElement {
     @track productValues = [];
     @track deactiveProducts = [];
 
-    async populateTheBoxes(){
+    async populateTheBoxes() {
 
         //products
         await this.fetchProducts();
@@ -60,7 +61,7 @@ export default class AdminView extends LightningElement {
     }
 
     //input fields
-    selectProducts(evt){
+    selectProducts = (evt) => {
         if(evt.keyCode === 13){
 
             const labels = this.products.map(product => product.label);
@@ -99,7 +100,7 @@ export default class AdminView extends LightningElement {
         }
     }
 
-    selectActivityTypes(evt){
+    selectActivityTypes = (evt) => {
         if(evt.keyCode === 13){
             if(!this.activityTypeListdb.includes(evt.target.value)){
 
@@ -138,9 +139,10 @@ export default class AdminView extends LightningElement {
 
     activities = [];
     label;
-    async handelActivityRemove(evt){
+
+    handelActivityRemove = async (evt) => {
         this.label = evt.target.label
-        await fetch('http://localhost:8080/api/activities/')
+        await fetch(url + 'activities/')
             .then(response => response.json())
             .then(data => {
                 this.activities = data;
@@ -156,19 +158,19 @@ export default class AdminView extends LightningElement {
         }   
     }
 
-    deleteConfirm(){
+    deleteConfirm() {
         this.removeActivityType();
         this.closeModal();
     }
 
-    removeActivityType(){
+    removeActivityType() {
         for(let i=0; i < this.activityTypeListdb.length; i++){
             if(this.activityTypeListdb[i] === this.label){
 
                 const deletedActivity = {"name":this.label}
 
                 //delete it from the database
-                fetch('http://localhost:8080/api/activity/types/',{
+                fetch(url + 'activity/types/',{
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
@@ -193,14 +195,14 @@ export default class AdminView extends LightningElement {
     disabled = [];
 
     //handle changes to dual-list box
-    handleProductChange(evt){
+    handleProductChange = (evt) => {
         this.disabled = evt.detail.value;
         this.saveStatus = false;
     }
 
-    pushProduct(productInfo){
+    pushProduct(productInfo) {
         //push the product
-        fetch('http://localhost:8080/api/products/', {
+        fetch(url + 'products/', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -216,7 +218,7 @@ export default class AdminView extends LightningElement {
             });
     }
 
-    patchProduct(){
+    patchProduct() {
         let productArray = [];
 
         const disabledProduct = this.productListdb.filter(product => this.disabled.includes(product.name));
@@ -238,7 +240,7 @@ export default class AdminView extends LightningElement {
         let productInfo = {"products":productArray}
 
         //patch product
-        fetch('http://localhost:8080/api/products/', {
+        fetch(url + 'products/', {
                 method: 'PATCH', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -257,9 +259,9 @@ export default class AdminView extends LightningElement {
             });
     }
 
-    pushActivityType(activityType){
+    pushActivityType(activityType) {
         //push activityType
-        fetch('http://localhost:8080/api/activity/types/', {
+        fetch(url + 'activity/types/', {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',

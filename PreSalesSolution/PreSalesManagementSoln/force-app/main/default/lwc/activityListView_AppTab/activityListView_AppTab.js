@@ -1,33 +1,46 @@
-import { api, LightningElement, track } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import Id from "@salesforce/user/Id"
 import { url } from 'c/dataUtils';
+import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
 
-export default class ActivityListView_Opportunity extends LightningElement {
+export default class ActivityListView_AppTab extends LightningElement {
     @api opportunityId 
 
     connectedCallback() {
-        this.fetchCurrentUser()
+        this.fetchMemberOptions()
     }
 
     @track newActivityLabel = ''
 
-    fetchCurrentUser() {
-        const userID = Id ? Id : '0055f0000041g1mAAA'
-        const urlString = url + 'member/' + userID + '/'
+    async fetchMemberOptions() {
 
-        fetch(urlString)
+        let ninjaMembers = await fetch(url)
             .then(res => res.json())
-            .then(user => {
-                this.userProfile = user.user_role.name
 
-                this.template.querySelector('c-sales-request-form').setAttribute('data-userprofile', this.userProfile)
+        let salesforceMembers = await GetNinjaUsers({user_Ids: ninjaMembers.map(member => member.external_member_ID)})
 
-                const userIsPresales = this.userProfile !== 'Sales Representative'
-                this.newActivityLabel = userIsPresales ? 'Create a New Activity' : 'Request a New Activity'
-            })
+        ninjaMembers.forEach(member => {
+            member.salesforceData = salesforceMembers.find(sfMember => sfMember.Id === member.external_member_ID)
+        })
+
+        let ninjaMembers_sales = ninjaMembers.filter(member => member.user_role.name === 'Sales Representative')
+        let ninjaMembers_presalesTeam = ninjaMembers.filter(member => member.user_role.name === 'Presales Member')
+        let ninjaMembers_managers = ninjaMembers.filter(member => member.user_role.name === 'Presales Manager')
+
+        this.currentUser = ninjaMembers.find(member => member.external_member_ID === Id)
+        this.members_all = ninjaMembers_presalesTeam.concat(ninjaMembers_sales)
+        this.managers = ninjaMembers_managers
+
     }
 
-    @track status = 'current'
+    recordType = ''
+    recordId = ''
+
+    getRecordOptions() {
+
+    }
+
+    status = 'current'
 
     statusOptions = [
         {label: '--- All Activities/Requests ---', value: ''},
@@ -44,7 +57,7 @@ export default class ActivityListView_Opportunity extends LightningElement {
         {label: 'Expired Activities', value: 'Expire'}
     ]
 
-    selectStatus = (evt) => {
+    selectStatus(evt) {
         this.status = evt.target.value
 
         let listView = this.template.querySelector('c-activity-list-view')
@@ -52,6 +65,12 @@ export default class ActivityListView_Opportunity extends LightningElement {
         listView.setAttribute('data-status', this.status)
 
         listView.loadTableRows()
+    }
+
+    memberId = ''
+
+    getMemberOptions() {
+
     }
 
     get opportunityIdTesting () {

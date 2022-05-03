@@ -20,7 +20,7 @@ export default class ActivityListView extends LightningElement {
     rows = this.tableFormat.display.data
     displayedRows = [...this.rows]
 
-    fillTable = (data) => {
+    fillTable(data) {
         this.tableFormat = data
 
         this.columns = this.tableFormat.display.columns
@@ -29,7 +29,7 @@ export default class ActivityListView extends LightningElement {
         this.displayedRows = [...this.rows]
     }
 
-    getParams = () => {
+    getParams() {
         const attributes = {
             recordType : this.getAttribute('data-record-type'),
             recordId : this.getAttribute('data-record-id'),
@@ -71,12 +71,14 @@ export default class ActivityListView extends LightningElement {
         return params
     }
     
-    @api loadTableRows = () => {
+    @api loadTableRows() {
         this.tableFormatter.getTableFormat(this.getParams())
             .then(data => this.fillTable(data))
     }
 
-    getRowById = (rowId) => {
-        return this.tableFormat.activities.find(row => row.activity_ID === rowId)
+    getRowById(rowId) {
+        const activity = Object.assign({}, this.tableFormat.activities.find(row => row.activity_ID === rowId))
+
+        return activity
     }
 }

@@ -8,27 +8,27 @@ export class RowActionHandler {
             throw new Error('RowActionHandler was invoked by an invalid parent')
     }
 
-    showDetail = () => {
+    showDetail() {        
         this.parent.template.querySelector('c-activity-detail-view').showModal(this.row)
     }
 
-    showAccept = () => {
+    showAccept() {
         this.parent.template.querySelector('c-accept-activity-modal').showModal(this.row)
     }
     
-    showManageTeam = () => {
+    showManageTeam() {
         this.parent.template.querySelector('c-assign-team-modal').showModal(this.row)
     }
 
-    showReschedule = () => {
+    showReschedule() {
         this.parent.template.querySelector('c-reschedule-form').showModal(this.row)
     }
 
-    showNotes = () => {
+    showNotes() {
         this.parent.template.querySelector('c-note-modal').showModal(this.row)
     }
 
-    showStatusChange = (status) => {
+    showStatusChange(status) {
         let statusChangeModal = this.parent.template.querySelector('c-status-change-modal')
 
         statusChangeModal.setAttribute('data-status', status)

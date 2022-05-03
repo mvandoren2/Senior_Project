@@ -99,7 +99,7 @@ def addActivity(request):
 
             newNote.save()
 
-        return Response(ActivitySerializer(newActivity).data, status=201)
+        return Response(ActivitySerializer(newActivity).data, status=201, content_type='application/json')
         # return HttpResponse(json.dumps({'POST Success': 'True'}), content_type='application/json')
 
 @csrf_exempt

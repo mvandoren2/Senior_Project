@@ -11,7 +11,7 @@ export class ColumnSortHandler {
     sortAsc = true
     sortedBy
 
-    sortBy = (field, reverse, primer) => {
+    sortBy(field, reverse, primer) {
         const key = (x) => {
             const val = Array.isArray(x[field]) ? x[field][0] : x[field]
             

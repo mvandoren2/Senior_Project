@@ -11,7 +11,7 @@
                 <!-- sldsValidatorIgnoreNextLine -->
                 <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
                         title="Close" 
-                        onclick={toggleModalClasses}>
+                        onclick={cancelHandler}>
                     <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
                     <span class="slds-assistive-text">Close</span>
                 </button>
@@ -28,7 +28,7 @@
                         <lightning-combobox name="product"
                                             label="Product"
                                             placeholder="Select Product"
-                                            options={productSelector.products}
+                                            options={productOptions}
                                             onchange={productSelector.addProd} >
                         </lightning-combobox>
         
@@ -55,14 +55,27 @@
                         </div>
                     </div>      
             
-                    <lightning-combobox name="activity_type" 
-                                        label="Activity Type"
-                                        placeholder="Select activity type" 
-                                        options={activityTypes} 
-                                        onchange={selectActivityType}
-                                        class="reset-handle"
-                                        required >
-                    </lightning-combobox>
+                    <lightning-layout >
+                        <lightning-layout-item class="slds-size_3-of-5" >
+                            <lightning-combobox name="activity_type" 
+                                                label="Activity Type"
+                                                placeholder="Select activity type" 
+                                                options={activityTypes} 
+                                                onchange={selectActivityType}
+                                                class="reset-handle"
+                                                required >
+                            </lightning-combobox>
+                        </lightning-layout-item>
+                            
+                        <lightning-layout-item class="slds-size_2-of-5" >
+                            <lightning-combobox name="activity_level" 
+                                                label="Activity Level"
+                                                options={activityLevelOptions} 
+                                                onchange={setActivityLevel}
+                                                class="reset-handle slds-var-p-left_small" >                    >
+                            </lightning-combobox>
+                        </lightning-layout-item>
+                    </lightning-layout>
         
                     <lightning-combobox name="location" 
                                         label="Location" 
@@ -71,51 +84,31 @@
                                         class="slds-var-p-top_small slds-var-p-bottom_large location-select" 
                                         onchange={setLocation} >
                     </lightning-combobox>
-
-                    <template if:true={dateWarningShowing}>
-                        <div class="slds-box
-                                    slds-box_x-small 
-                                    slds-theme_shade 
-                                    slds-theme_alert-texture 
-                                    slds-theme_warning
-                                    slds-var-m-around_x-small " >
-    
-                            <div class="slds-grid slds-align_absolute-center"  >
-                                <lightning-icon icon-name="utility:warning" class="slds-var-m-right_small" ></lightning-icon>
-    
-                                <p>
-                                    <strong>
-                                        Please consider providing more than one date option for easier scheduling.
-                                    </strong> 
-                                </p>
-                            </div>
-                        </div>
-                    </template>
                     
                     <lightning-layout horizontal-align="center" class="slds-var-m-bottom_large" >
                         <lightning-layout-item >
                             
                             <abbr title="required" class="slds-required">*</abbr>
-                            <label for="date1" class="slds-text-title" >Date Options</label>
+                            <label for="date1" class="slds-text-title" >Date</label>
 
-                            <lightning-input type="datetime" label="1." data-item="date1" variant="label-hidden" onchange={dateInputHandler} class="reset-handle" required></lightning-input>
-                            <lightning-input type="datetime" label="2." data-item="date2" variant="label-hidden" class="slds-var-p-top_small reset-handle" onchange={dateInputHandler} ></lightning-input>
-                            <lightning-input type="datetime" label="3." data-item="date3" variant="label-hidden" class="slds-var-p-top_small reset-handle" onchange={dateInputHandler} ></lightning-input>
+                            <lightning-input type="datetime" label="1." data-item="oneDateTime" variant="label-hidden" onchange={dateInputHandler} class="reset-handle" required></lightning-input>
                         
                         </lightning-layout-item>
-                    </lightning-layout>
-        
+                    </lightning-layout> 
+
                     <!--Text Description-->
                     <lightning-textarea id="textarea" 
                                         label="Notes" 
                                         onchange ={updateNotes}
                                         class="reset-handle" >
                     </lightning-textarea>
+
+                    <lightning-input type="checkbox" label="This is an unexpected event" onchange={flagActivity} ></lightning-input>
                 </div>
             </div>
 
             <footer class="slds-modal__footer">
-                <lightning-button   label="Submit" 
+                <lightning-button   label="Assign" 
                                     variant="brand"
                                     onclick={handleSubmit} 
                                     disabled={isSubmitDisabled}
@@ -124,7 +117,7 @@
 
                 <lightning-button   label="Cancel" 
                                     variant="neutral"
-                                    onclick={toggleModalClasses} >
+                                    onclick={cancelHandler} >
                 </lightning-button>
             </footer>
         </div>

@@ -35,10 +35,13 @@
             </lightning-combobox>
         </div>
 
-        <c-activity-list-view   data-record-type="opportunity" 
-                                data-record-id={opportunityIdTesting}
-                                data-status={status} 
-                                data-format="small" >
+        <c-activity-list-view   data-record-type={recordType}
+                                data-record-id={recordId}
+                                data-status={status}
+                                data-member={memberId}
+                                data-product={productId}
+                                data-activity-type={activityType}
+                                data-activity-date={activityDate} >
         </c-activity-list-view>
     </lightning-card>
         

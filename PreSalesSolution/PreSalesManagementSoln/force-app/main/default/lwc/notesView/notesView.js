@@ -1,6 +1,7 @@
 import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
 import { api, LightningElement, track } from 'lwc';
 import Id from "@salesforce/user/Id"
+import { url } from 'c/dataUtils';
 
 
 export default class NotesView extends LightningElement {    
@@ -8,7 +9,7 @@ export default class NotesView extends LightningElement {
         this.init()
     }
     
-    @api init = () => {
+    @api init() {
         this.activity_ID = this.getAttribute('data-activity-id')
 
         this.setState(this.getAttribute('data-handlenote'))
@@ -17,7 +18,7 @@ export default class NotesView extends LightningElement {
             this.getNoteDisplayData()
     }
 
-    @api reset = () => {
+    @api reset() {
         if(this.postNote || this.passNote) {
             this.template.querySelector('.new-note').value = null
             this.newNoteText = ''
@@ -27,7 +28,7 @@ export default class NotesView extends LightningElement {
     passNote = false
     postNote = false
     
-    setState = (handleNote) => {
+    setState(handleNote) {
         switch(handleNote) {
             case 'pass':
                 this.passNote = true
@@ -48,7 +49,7 @@ export default class NotesView extends LightningElement {
 
     @track notes = []
 
-    getNoteDisplayData = async () => {
+    async getNoteDisplayData() {
         let notes = await this.getNotes()
 
         const memberIds = notes.map(note => note.member.external_member_ID).concat([Id])
@@ -60,7 +61,7 @@ export default class NotesView extends LightningElement {
         this.notes = notes
     }
 
-    buildNoteDisplayObj = (note) => {
+    buildNoteDisplayObj(note) {
         const submittedBy = this.salesforceMembers.find(member => member.Id === note.member.external_member_ID)
 
         note.member.name = submittedBy.Name
@@ -73,7 +74,7 @@ export default class NotesView extends LightningElement {
     }
 
 
-    dateStringUtil = (date) => {        
+    dateStringUtil(date) {        
         const dateDisplayOptions = {
             weekday:'short', 
             month:"numeric", 
@@ -89,21 +90,19 @@ export default class NotesView extends LightningElement {
         return dateString
     }
 
-    url = 'http://localhost:8080/api/activity/'
-
-    getNotes = async () => {
-        return fetch(this.url + this.activity_ID + '/notes/')
+    async getNotes() {
+        return fetch(url + 'activity/' + this.activity_ID + '/notes/')
             .then(response => response.json())
     }
 
-    changeNewNoteText = (evt) => {        
+    changeNewNoteText = (evt)  => {        
         this.newNoteText = evt.target.value
         
         if(this.passNote)            
             this.dispatchEvent(new CustomEvent('change', {detail: {note: this.newNoteText}}))        
     }
 
-    postNewNote = () => {
+    postNewNote() {
         this.userId = Id ? Id : '0055f0000041g1mAAA'
         
         let notePostBody = {
@@ -111,7 +110,7 @@ export default class NotesView extends LightningElement {
             note_text: this.newNoteText
         }
 
-        fetch(this.url + this.activity_ID + '/notes/', {
+        fetch(url + 'activity/' + this.activity_ID + '/notes/', {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json',
@@ -124,7 +123,7 @@ export default class NotesView extends LightningElement {
         this.template.querySelector('lightning-textarea').value = ''
     }
 
-    showNewNote = (note) => {
+    showNewNote(note) {
         note.note_date = Date.now()
         note.member = {external_member_ID: this.userId}
         note.note_ID = this.notes.slice(-1).note_ID + 1
