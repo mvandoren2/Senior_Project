@@ -168,13 +168,13 @@
                                                 </template>
 
                                                 <ul class="slds-var-m-left_xx-large">
-                                                    <template for:each={member.proficiency} for:item="proficiency">
-                                                        <li key={proficiency.product.name}>
+                                                    <template for:each={member.newProficiency} for:item="proficiency">
+                                                        <li key={proficiency.name}>
                                                             <template if:false={proficiency.color}>
-                                                                <p class="slds-text-body_small">{proficiency.product.name}: {proficiency.level}</p>       
+                                                                <p class="slds-text-body_small">{proficiency.name}: {proficiency.level}</p>       
                                                             </template>
                                                             <template if:true={proficiency.color}>
-                                                                <p class="slds-text-body_small" style="color:red">{proficiency.product.name}: N/A</p>       
+                                                                <p class="slds-text-body_small" style="color:red">{proficiency.name}: {proficiency.level}</p>       
                                                             </template>
                                                         </li>
                                                     </template>

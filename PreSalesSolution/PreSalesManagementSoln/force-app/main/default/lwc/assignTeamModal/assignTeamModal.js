@@ -78,15 +78,27 @@ export default class AssignTeamModal extends LightningElement {
 
         const products = this.activity.products.map(product => product.name);
        
+        let newProficiency = [];
+        firstLoop:
         for(let i=0; i < this.unselectedNinjaMembers.length; i++){
-            for(let j=0; j < this.unselectedNinjaMembers[i].proficiency.length; j++){
-                if(products.includes(this.unselectedNinjaMembers[i].proficiency[j].product.name)){
-                    this.unselectedNinjaMembers[i].proficiency[j].color = false
-                } else{
-                    this.unselectedNinjaMembers[i].proficiency[j].color = true
+            secondLoop:
+            for(let j=0; j < products.length; j++){
+                thirdLoop:
+                for(let k=0; k < this.unselectedNinjaMembers[i].proficiency.length; k++){
+                    if(products[j] === this.unselectedNinjaMembers[i].proficiency[k].product.name){
+                        newProficiency.push({"name":products[j],"color":false,"level":this.unselectedNinjaMembers[i].proficiency[k].level});
+                        break thirdLoop;
+                    }
+                    if(k == this.unselectedNinjaMembers[i].proficiency.length - 1){
+                        newProficiency.push({"name":products[j],"color":true,"level":"N/A"});
+                    }
                 }
             }
+
+            this.unselectedNinjaMembers[i].newProficiency = newProficiency;
+            newProficiency = [];
         }
+
         
         if(this.activity.leadMember) {
 
