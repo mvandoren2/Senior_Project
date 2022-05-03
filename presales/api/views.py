@@ -489,9 +489,11 @@ def getMember(request, id):
                 if(p not in prof):
                     member.proficiency.remove(p)
                     member.save()
+
         if("role" in data):
+            print("Here")
             #get the role ID
-            role = UserRole.objects.get(name=data['role'])
+            role = UserRole.objects.get(name=data['user_role'])
             member.user_role = role
             member.save()
 
