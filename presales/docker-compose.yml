@@ -7,7 +7,7 @@ services:
     container_name: django
     command:
       sh -c "export DJANGO_SETTINGS_MODULE=settings.prod &&
-      python manage.py makemigrations --merge &&
+      python manage.py makemigrations &&
       python manage.py migrate && 
       python manage.py loaddata fixtures/UserRoles.json &&
       python manage.py collectstatic --noinput &&
