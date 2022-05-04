@@ -3,73 +3,36 @@
         <lightning-card>
             <h1 slot="title" style="font-size: x-large;">PreSales Ninja Member Management</h1>
             <div class="slds-scrollable_y" style="height: 500px;">
-                <lightning-tabset style="height: 500px;">
-                    <lightning-tab label="UnAssigned Members">
-                        <div onchange={searchUsersFirstTab} style="margin: 0 10px 0 10px">
-                            <lightning-input
-                                name="enter-search"
-                                label="Search with Name/Proficency Level"
-                                type="search"
-                            ></lightning-input>
-                        </div>
-                        <template if:true={filteredUnAssignedUsersInfo}>
-                            <template for:each={filteredUnAssignedUsersInfo} for:item="user">
-                                <ul key={user.Id}>
-                                    <li> 
-                                        <div class="card">
-                                            <div style="padding: 10px;">
-                                                <lightning-avatar variant="circle" size="large" src={user.FullPhotoUrl}></lightning-avatar>
-                                                <span style="margin-left: 10px; font-weight: bold">{user.Name}</span>
-                                                <lightning-button data-item = {user.Id} 
-                                                                variant="brand"
-                                                                label="Add" title="Add/Manage" 
-                                                                onclick={openModal} 
-                                                                class="slds-m-left_x-small assignBtn">
-                                                </lightning-button>
-                                            </div>
-                                        </div>             
-                                    </li>
-                                </ul>
-                            </template>
-                        </template>   
-                    </lightning-tab>
-                    <lightning-tab label="Assigned Members" title="2nd tab extended title">
-                        <div onchange={searchUsersSecondTab} style="margin: 0 10px 0 10px">
-                            <lightning-input
-                                name="enter-search"
-                                label="Search with Name/Proficency Level"
-                                type="search"
-                            ></lightning-input>
-                        </div>
-    
-                        <lightning-radio-group name="radioGroup"
-                              options={options}
-                              value={value}
-                              onchange={handleRadioButtonChange}
-                              type="button" style="text-align: center; margin-top:2%;"></lightning-radio-group>
-    
-                        <template if:true={filteredAssignedUsersInfo}>
-                            <template for:each={filteredAssignedUsersInfo} for:item="user">
-                                <ul key={user.Id}>
-                                    <li> 
-                                        <div class="card">
-                                            <div style="padding: 10px;">
-                                                <lightning-avatar variant="circle" size="large" src={user.FullPhotoUrl}></lightning-avatar>
-                                                <span style="margin-left: 10px; font-weight: bold">{user.Name}</span>
-                                                <lightning-button data-item = {user.Id} 
-                                                                variant="brand"
-                                                                label="Manage" title="Manage" 
-                                                                onclick={openModal} 
-                                                                class="slds-m-left_x-small assignBtn">
-                                                </lightning-button>
-                                            </div>
-                                        </div>             
-                                    </li>
-                                </ul>
-                            </template>
-                        </template>  
-                    </lightning-tab>
-                </lightning-tabset>
+                <div onchange={searchUsersSecondTab} style="margin: 0 10px 0 10px">
+                    <lightning-input
+                        name="enter-search"
+                        label="Search with Name/Proficency Level"
+                        type="search"
+                    ></lightning-input>
+                </div>
+                <template if:true={filteredAllMembersInfo}>
+                    <template for:each={filteredAllMembersInfo} for:item="user">
+                        <ul key={user.Id}>
+                            <li> 
+                                <div class="card">
+                                    <div style="padding: 10px;">
+                                        <lightning-avatar variant="circle" size="large" src={user.FullPhotoUrl}></lightning-avatar>
+                                        <span style="margin-left: 10px; font-weight: bold">{user.Name}</span>
+                                        <lightning-button data-id = {user.Id} 
+                                                          data-status = {user.assigned}
+                                                          data-photo = {user.FullPhotoUrl}
+                                                          data-name = {user.Name}
+                                                        variant="brand"
+                                                        label="Manage" title="Manage" 
+                                                        onclick={openModal} 
+                                                        class="slds-m-left_x-small assignBtn">
+                                        </lightning-button>
+                                    </div>
+                                </div>             
+                            </li>
+                        </ul>
+                    </template>
+                </template>  
             </div>  
         </lightning-card>
     </div>
@@ -122,11 +85,11 @@
                 <!-- Modal/Popup Box LWC footer starts here -->
                 <footer class="slds-modal__footer">
                     <template if:false={saveStatus}>
-                        <lightning-button variant="brand" label="Add Memeber" title="Save" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-button variant="brand" label="Save" title="Add Member" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
                     </template>
                     <template if:true={saveStatus}>
                         <lightning-button variant="destructive" label="Delete Member" title="Delete" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
-                        <lightning-button variant="brand" label="Save Changes" title="Save" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-button variant="brand" label="Save" title="Save" disabled={changeStatus} onclick={handleSave} class="slds-m-left_x-small"></lightning-button>
                     </template>
                 </footer>
             </div>

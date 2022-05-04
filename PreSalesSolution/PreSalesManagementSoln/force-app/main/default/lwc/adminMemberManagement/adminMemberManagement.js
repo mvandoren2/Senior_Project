@@ -28,8 +28,8 @@ export default class AdminMemberManagement extends LightningElement {
     @track salesforceUsers = []
     @track unassignedUsersInfo = []
 
-    @track filteredUnAssignedUsersInfo = [];
-    @track filteredAssignedUsersInfo = [];
+    @track allMembersInfo = [];
+    @track filteredAllMembersInfo = [];
 
     @track changeStatus = true;
 
@@ -52,13 +52,24 @@ export default class AdminMemberManagement extends LightningElement {
             this.salesforceUsers = data;
 
             this.assignedUsersId = this.assignedUsersInfoFromDB.map(members => members.external_member_ID)
+            
             this.unassignedUsersInfo = this.salesforceUsers.filter(member => !this.assignedUsersId.includes(member.Id));
-            this.filteredUnAssignedUsersInfo = this.unassignedUsersInfo;
+
+            for(let i=0; i < this.unassignedUsersInfo.length; i++){
+                this.unassignedUsersInfo[i] = Object.assign({assigned: false}, this.unassignedUsersInfo[i]);
+            }
 
             this.assignedUsersInfo = this.salesforceUsers.filter(member => this.assignedUsersId.includes(member.Id));
 
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
+            for(let i=0; i < this.assignedUsersInfo.length; i++){
+                this.assignedUsersInfo[i] = Object.assign({assigned: true}, this.assignedUsersInfo[i]);
+            }
 
+            this.allMembersInfo = this.assignedUsersInfo.concat(this.unassignedUsersInfo);
+
+            this.filteredAllMembersInfo = this.allMembersInfo;
+
+            console.log(this.filteredAllMembersInfo);
             this.error = undefined;
         } else if(error){
             this.error = error;
@@ -66,16 +77,10 @@ export default class AdminMemberManagement extends LightningElement {
         }
     }
 
-    //filter users
-    searchUsersFirstTab = (evt) => {
-        const value = evt.target.value.toLowerCase();
-        this.filteredUnAssignedUsersInfo = this.unassignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
-    }
-
     //filter
     searchUsersSecondTab = (evt) => {
         const value = evt.target.value.toLowerCase();
-        this.filteredAssignedUsersInfo = this.assignedUsersInfo.filter(item => item.Name.toLowerCase().includes(value));
+        this.filteredAllMembersInfo = this.allMembersInfo.filter(item => item.Name.toLowerCase().includes(value));
     }
 
     ///MODAL
@@ -88,11 +93,16 @@ export default class AdminMemberManagement extends LightningElement {
     
     openModal = async (evt) => {
 
-        this.memberId = evt.target.dataset.item;
-        const label = evt.target.label;
+        this.memberId = evt.target.dataset.id;
 
-        if(label === 'Manage'){
+        const assignStatus = evt.target.dataset.status;
+
+        this.imgSrc = evt.target.dataset.photo;
+        this.memberName = evt.target.dataset.name;
+
+        if(assignStatus === "true"){
             this.saveStatus = true;
+
             //auto fill the table from backend
             //get a specific member
             await fetch(url + 'member/' + this.memberId + '/')
@@ -101,7 +111,7 @@ export default class AdminMemberManagement extends LightningElement {
                     this.membersInfo = data;
                     this.memberRole = this.membersInfo.user_role.name;
                     this.changeStatus = false;
-                    this.populateTheTable(label);
+                    this.populateTheTable(assignStatus);
                 })
                 
             if(this.memberRole === 'Presales Member'){
@@ -110,34 +120,11 @@ export default class AdminMemberManagement extends LightningElement {
                 this.memberRoleIsPreSalesMember = false;
             }
 
-            let member;
-
-            for(let i=0; i < this.filteredAssignedUsersInfo.length; i++){
-                if(this.filteredAssignedUsersInfo[i].Id === this.memberId){
-                    member = this.filteredAssignedUsersInfo[i];
-                    break;
-                }
-            }
-            
-            this.imgSrc = member.FullPhotoUrl;
-            this.memberName = member.Name;
-
         } else {
 
-            let member;
-
-            for(let i=0; i < this.filteredUnAssignedUsersInfo.length; i++){
-                if(this.filteredUnAssignedUsersInfo[i].Id === this.memberId){
-                    member = this.filteredUnAssignedUsersInfo[i];
-                    break;
-                }
-            }
-
-            this.imgSrc = member.FullPhotoUrl;
-            this.memberName = member.Name;
-
-            this.saveStatus = false
-            this.populateTheTable(label)
+            this.memberRole = "Sales Representative";
+            this.saveStatus = false;
+            this.populateTheTable(assignStatus);
         }
 
         this.isModalOpen = true;
@@ -147,6 +134,7 @@ export default class AdminMemberManagement extends LightningElement {
         this.dataValue = [];
         this.data = this.dataValue;
         this.preSelectedRows = [];
+        this.memberRoleIsPreSalesMember = false;
         this.isModalOpen = false;
     }
 
@@ -164,8 +152,9 @@ export default class AdminMemberManagement extends LightningElement {
 
     //function to populate the data 
     @track preSelectedRows = [];
-    populateTheTable(label){
-        if(label === 'Manage') {
+    populateTheTable(assignStatus){
+        if(assignStatus === "true") {
+           
             //get the product names of the member
             const memberProducts = this.membersInfo.proficiency.map(products => products.product.name);
 
@@ -213,13 +202,15 @@ export default class AdminMemberManagement extends LightningElement {
             { label: 'Admin', value: 'Admin' },
             { label: 'Presales Manager', value: 'Presales Manager' },
             { label: 'Presales Member', value: 'Presales Member' },
-            { label: 'Sales Representative', value: 'Sales Representative' },
+            { label: 'UnAssigned', value: 'Sales Representative' },
         ];
     }
 
     handleChange(event) {
         this.changeStatus = false;
         this.memberRole = event.detail.value;
+
+        console.log(this.memberRole)
 
         if(this.memberRole === 'Presales Member'){
             this.memberRoleIsPreSalesMember = true;
@@ -263,12 +254,13 @@ export default class AdminMemberManagement extends LightningElement {
         }
 
         let method = "";
-        if(evt.target.label === "Add Memeber"){
+        if(evt.target.title === "Add Member"){
             method = "POST"
         } else {
             method = "PATCH"
         }
 
+        console.log(pushData);
         //push member and their product/proficiencyLevel
         fetch(url + 'member/' + this.memberId + '/', {
                 method: method, 
@@ -278,17 +270,18 @@ export default class AdminMemberManagement extends LightningElement {
                 body: JSON.stringify(pushData),
             })
             .then(response => response.json())
-            .then(data => {
-                if((data["POST Success"] === 'True') && method === "POST"){
-                    let added = [];
-                    added = this.filteredUnAssignedUsersInfo.filter(member => (member.Id === this.memberId))
-                    this.filteredUnAssignedUsersInfo = this.filteredUnAssignedUsersInfo.filter(member => (member.Id !== this.memberId));
-                    this.filteredAssignedUsersInfo.push(added[0]);
-                }
-            })
             .catch((error) => {
                 console.error('Error:', error);
             });
+
+        for(let i=0; i < this.filteredAllMembersInfo.length; i++){
+            if(this.filteredAllMembersInfo[i].Id === this.memberId){
+                this.filteredAllMembersInfo[i].assigned = true;
+                if(this.memberRole === "Admin"){
+                    this.adminArray = (this.filteredAllMembersInfo[i])
+                }
+            }
+        }
 
         this.closeModal();
     }
@@ -326,16 +319,15 @@ export default class AdminMemberManagement extends LightningElement {
             },
         })
         .then(response => response.json())
-        .then(data => {
-            let deleted = [];
-            deleted = this.filteredAssignedUsersInfo.filter(member => (member.Id == this.memberId));
-            this.filteredAssignedUsersInfo = this.filteredAssignedUsersInfo.filter(member => (member.Id !== this.memberId));
-            this.assignedUsersInfo = this.assignedUsersInfo.filter(member => (member.Id !== this.memberId));
-            this.filteredUnAssignedUsersInfo.push(deleted[0]);
-        })
         .catch((error) => {
             console.error('Error:', error);
         });
+
+        for(let i=0; i < this.filteredAllMembersInfo.length; i++){
+            if(this.filteredAllMembersInfo[i].Id === this.memberId){
+                this.filteredAllMembersInfo[i].assigned = false;
+            }
+        }
 
         this.closeModal();
     }
@@ -390,76 +382,8 @@ export default class AdminMemberManagement extends LightningElement {
         return [
             { label: 'All', value: 'option1' },
             { label: 'Admin', value: 'option2' },
-            { label: 'Sales Rep', value: 'option3' },
-            { label: 'PreSales Manager', value: 'option4' },
-            { label: 'PreSales Members', value: 'option5' },
+            { label: 'PreSales Manager', value: 'option3' },
+            { label: 'PreSales Members', value: 'option4' },
         ];
-    }
-
-    //filter the data according to the radio button
-    handleRadioButtonChange = (evt) => {
-        this.fetchAllDbMembers();
-
-        const selectedBtn = evt.detail.value;
-
-        if(selectedBtn === 'option2'){
-
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
-            
-            let adminId = [];
-            //get the id of all the admins  
-            for(let i=0; i<this.assignedUsersInfoFromDB.length; i++){
-                if(this.assignedUsersInfoFromDB[i].user_role.name === "Admin"){
-                    adminId.push(this.assignedUsersInfoFromDB[i].external_member_ID);
-                }
-            }
-
-            this.filteredAssignedUsersInfo = this.filteredAssignedUsersInfo.filter(member => adminId.includes(member.Id));
-
-        } else if(selectedBtn === 'option3'){
-
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
-
-            let salesId = [];
-            //get the id of all the admins  
-            for(let i=0; i<this.assignedUsersInfoFromDB.length; i++){
-                if(this.assignedUsersInfoFromDB[i].user_role.name === "Sales Representative"){
-                    salesId.push(this.assignedUsersInfoFromDB[i].external_member_ID);
-                }
-            }
-
-            this.filteredAssignedUsersInfo = this.filteredAssignedUsersInfo.filter(member => salesId.includes(member.Id));
-
-        } else if(selectedBtn === 'option4'){
-
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
-
-            let managerId = [];
-            //get the id of all the admins  
-            for(let i=0; i<this.assignedUsersInfoFromDB.length; i++){
-                if(this.assignedUsersInfoFromDB[i].user_role.name === "Presales Manager"){
-                    managerId.push(this.assignedUsersInfoFromDB[i].external_member_ID);
-                }
-            }
-
-            this.filteredAssignedUsersInfo = this.filteredAssignedUsersInfo.filter(member => managerId.includes(member.Id));
-
-        } else if(selectedBtn === 'option5'){
-
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
-
-            let memberId = [];
-            //get the id of all the presales member  
-            for(let i=0; i<this.assignedUsersInfoFromDB.length; i++){
-                if(this.assignedUsersInfoFromDB[i].user_role.name === "Presales Member"){
-                    memberId.push(this.assignedUsersInfoFromDB[i].external_member_ID);
-                }
-            }
-
-            this.filteredAssignedUsersInfo = this.filteredAssignedUsersInfo.filter(member => memberId.includes(member.Id));
-
-        } else {
-            this.filteredAssignedUsersInfo = this.assignedUsersInfo;
-        }
     }
 }
