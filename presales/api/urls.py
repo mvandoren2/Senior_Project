@@ -29,7 +29,4 @@ urlpatterns = [
 
     #Collect Token endpoint
     path('token/<org>/', views.getToken),
-
-    #Send Email endpoint
-    path('email/', views.sendEmail),
 ]
