@@ -613,25 +613,3 @@ def getToken(request, org):
         org = User.objects.get(username=org)
         token = str(Token.objects.get(user=org))        
         return HttpResponse(json.dumps({'Token': token}), content_type='application/json')
-
-@csrf_exempt
-def sendEmail(request):
-    if(request.method == 'POST'):
-        emails = json.loads(request.body)['emails']
-        if(len(emails) == 0):
-            return HttpResponse("No emails to send to", status=409)
-        else:
-            for e in emails:
-                senderEmail = 'presalesn@gmail.com'
-                receiverEmail = e
-                password = 'presalesNinja12345'
-                subject = 'Test 1'
-                body = 'Test 2'
-                message = 'Subject: {}\n\n{}'.format(subject, body)
-
-                server = smtplib.SMTP('smtp.gmail.com', 587)
-                server.starttls()
-                server.login(senderEmail, password)
-                server.sendmail(senderEmail, receiverEmail, message)
-
-            return HttpResponse(json.dumps({'EMAIL Sent': 'True'}), content_type='application/json')
