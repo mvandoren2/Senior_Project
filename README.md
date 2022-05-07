@@ -4,4 +4,6 @@
 #Login Name: user Login Password: user
 
 # The Product
-This project aims to solve the bloated Salesforce components that come with a basic account. We have streamlined the process of requesting, accepting, and denying opportunities with other customers. We have learned that in doing this project we have been able to simplify the process significantly. So far our product is the only one of it's kind that has the ability to hook into salesforce so many other can use the services.
+Client’s problem is there exists no standardized way to manage their pre-sales workforce which has resulted in complete inconsistency in both the management and measurement of the success of those conducting pre-sales operations.
+
+It will provide means for all necessary user roles across teams to request, schedule, and track pre-sales operations, as well as provide metrics for pre-sales team success based on data gathered through use of the product.
