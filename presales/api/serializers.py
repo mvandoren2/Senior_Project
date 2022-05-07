@@ -52,6 +52,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     products = ProductSerializer(read_only=True, many=True)
     createdByMember = MemberSerializer(read_only=True)
     leadMember = MemberSerializer(read_only=True)
+    activeManager = MemberSerializer(read_only=True)
     activity_Type = ActivityTypeSerializer(read_only=True)
 
     class Meta:
