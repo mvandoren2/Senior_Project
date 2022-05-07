@@ -1,7 +1,7 @@
 # Salesforce & Django Login
-#Pre-Sales Management Solution for Salesforce Application
+Pre-Sales Management Solution for Salesforce Application
 
-#Login Name: user Login Password: user
+Login Name: user Login Password: user
 
 # The Product
 Client’s problem is there exists no standardized way to manage their pre-sales workforce which has resulted in complete inconsistency in both the management and measurement of the success of those conducting pre-sales operations.
