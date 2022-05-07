@@ -107,6 +107,7 @@ class Test (APITestCase):
         response = self.client.post("/api/activity/1/notes/", data, format = 'json')
         self.assertEqual(response.status_code, 409) 
     
+    #Post 404 Not_Found_____________________________________________________________
     def test_Post_Activity(self):
         addData()
         currentTime = timezone.now()
@@ -123,10 +124,9 @@ class Test (APITestCase):
                 "createdByMember": 1,
                 "products": [1]
         }
-        response = self.client.post("/api/activity/", data, format = 'json')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post("/api/activty/", data, format = 'json')
+        self.assertEqual(response.status_code, 404)
     
-        
     #PATCH 404 NOT_FOUND__________________________________________________________________
     def test_Post_Products(self):
         addData()
