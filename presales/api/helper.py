@@ -232,6 +232,7 @@ def rescheduleActivity(activity, reschedule):
 
     #get all notes related to the old activity
     notes = Note.objects.filter(activity=activity)
+    
     #add the notes to the new activity
     for n in notes:
         newNote = Note(
