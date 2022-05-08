@@ -1,3 +1,4 @@
+from select import select
 from time import time
 from management.models import *
 from django.db.models import Q
@@ -206,3 +207,37 @@ def addData():
         note_date = currentTime
     )
     notes.save()
+
+def rescheduleActivity(activity, reschedule):
+    #make a new activity with the same information as the old activity
+    newActivity = Activity(
+        opportunity_ID=activity.opportunity_ID,
+        account_ID=activity.account_ID,
+        location=activity.location,
+        activity_Type=activity.activity_Type,
+        activity_Level=activity.activity_Level,
+        createdByMember=searchMember(reschedule['createdByMember'])[0],
+        members=activity.members,
+        leadMember=activity.leadMember,
+        activeManager=activity.activeManager,
+        oneDateTime=reschedule['oneDateTime'],
+        twoDateTime=reschedule['twoDateTime'],
+        threeDateTime=reschedule['threeDateTime'],
+        selectedDate=None,
+        products=activity.products,
+        status=reschedule['status'],
+        flag=reschedule['flag']
+    )
+    newActivity.save()
+
+    #get all notes related to the old activity
+    notes = Note.objects.filter(activity=activity)
+    #add the notes to the new activity
+    for n in notes:
+        newNote = Note(
+            activity = newActivity,
+            member = n.member,
+            note_text = n.note_text,
+            note_date = n.note_date
+        )
+        newNote.save()
