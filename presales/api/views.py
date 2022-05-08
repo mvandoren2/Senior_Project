@@ -126,11 +126,14 @@ def getActivity(request, activityID):
         updateActivity = Activity.objects.get(activity_ID=activityID)
 
         if('status' in activity_patch):
-            updateActivity.status = activity_patch['status']
-            updateActivity.save()
             if(activity_patch['status'] == 'Rescheduled'):
+                updateActivity.status = 'Cancelled'
+                updateActivity.save()
                 rescheduleActivity(updateActivity, activity_patch)
                 return HttpResponse(json.dumps({'RESCHEDULE Success': 'True'}), content_type='application/json')
+            else:
+                updateActivity.status = activity_patch['status']
+                updateActivity.save()
 
         #check to see if the json contains a members
         if('members' in activity_patch):
