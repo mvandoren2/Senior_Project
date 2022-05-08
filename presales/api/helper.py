@@ -209,35 +209,58 @@ def addData():
     notes.save()
 
 def rescheduleActivity(activity, reschedule):
-    #make a new activity with the same information as the old activity
+    #make a new activity with the same information as the old activity'
+    date1 = datetime.fromisoformat(reschedule['oneDateTime'].split('.')[0] + '+00:00')
+    if(reschedule['twoDateTime']):
+        date2 = datetime.fromisoformat(reschedule['oneDateTime'].split('.')[0] + '+00:00')
+    else:
+        date2 = None
+    if(reschedule['threeDateTime']):
+        date3 = datetime.fromisoformat(reschedule['twoDateTime'].split('.')[0] + '+00:00')
+    else:
+        date3 = None
+
     newActivity = Activity(
         opportunity_ID=activity.opportunity_ID,
         account_ID=activity.account_ID,
         location=activity.location,
         activity_Type=activity.activity_Type,
         activity_Level=activity.activity_Level,
-        createdByMember=searchMember(reschedule['createdByMember'])[0],
-        members=activity.members,
         leadMember=activity.leadMember,
         activeManager=activity.activeManager,
-        oneDateTime=reschedule['oneDateTime'],
-        twoDateTime=reschedule['twoDateTime'],
-        threeDateTime=reschedule['threeDateTime'],
-        selectedDate=None,
-        products=activity.products,
+        oneDateTime=date1,
+        twoDateTime=date2,
+        threeDateTime=date3,
         status=reschedule['status'],
-        flag=reschedule['flag']
+        flag=activity.flag
     )
+    newActivity.save()
+
+    #get all products from the old activity
+    products = activity.products.all()
+
+    #add the products to the new activity
+    for p in products:
+        newActivity.products.add(p)
+
+    #get all members that are associated with the activity
+    members = activity.members.all()
+    #add the new activity to the members
+    for member in members:
+        newActivity.members.add(member)
+
+    newActivity.createdByMember=Member.objects.get(external_member_ID=reschedule['createdByMember'])
+
     newActivity.save()
 
     #get all notes related to the old activity
     notes = Note.objects.filter(activity=activity)
-    
+
     #add the notes to the new activity
     for n in notes:
         newNote = Note(
             activity = newActivity,
-            member = n.member,
+            member = Member.objects.get(member_ID=n.member.member_ID),
             note_text = n.note_text,
             note_date = n.note_date
         )
