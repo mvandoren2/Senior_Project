@@ -129,6 +129,7 @@ def getActivity(request, activityID):
             if(activity_patch['status'] == 'Rescheduled'):
                 updateActivity.status = 'Cancel'
                 updateActivity.save()
+                print(updateActivity)
                 rescheduleActivity(updateActivity, activity_patch)
                 return HttpResponse(json.dumps({'RESCHEDULE Success': 'True'}), content_type='application/json')
             else:
