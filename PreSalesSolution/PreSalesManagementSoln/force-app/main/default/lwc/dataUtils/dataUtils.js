@@ -61,7 +61,7 @@ function dateArrayBuilder(activity) {
     })
 }
 
-async function fetchOpportunities(opportunity_Ids) {
+export async function fetchOpportunities(opportunity_Ids) {
     let apexAccountData = await OpportunityData({opportunity_Ids: opportunity_Ids})
         .catch(err => console.error('Error:', err))
 
@@ -81,7 +81,7 @@ async function fetchOpportunities(opportunity_Ids) {
     return opportunities
 }
 
-async function fetchSalesforceUsers() {
+export async function fetchSalesforceUsers() {
     let members = await fetch(url + 'members/')
         .then(response => response.json())
 
@@ -92,10 +92,28 @@ async function fetchSalesforceUsers() {
     salesforceUsers = salesforceUsers.map(user => Object.assign({}, user))
 
     salesforceUsers.forEach(user => {
-        user.member_ID = members.find(member => member.external_member_ID === user.Id).member_ID
+        let djangoData = members.find(member => member.external_member_ID === user.Id)
+
+        user.member_ID = djangoData.member_ID
+        user.proficiency  = djangoData.proficiency
+        user.user_role = djangoData.user_role
     })
 
     return salesforceUsers
+}
+
+export async function fetchProducts() {
+    let products = await fetch(url + 'products/')
+        .then(res => res.json())
+    
+    return products
+}
+
+export async function fetchActivityTypes() {
+    let activityTypes = await fetch(url + 'activity/types/')
+        .then(res => res.json())
+
+    return activityTypes
 }
 
 function buildDetailedActivityObj(activity, opportunities, salesforceMembers) {
@@ -151,20 +169,20 @@ export async function buildDetailedActivitiesList(activities) {
 export function detailedActivityToDjangoFormat(activity) {
     let djangoActivity = {
         activity_ID : activity.activity_ID,
-        members : activity.team,
-        products : activity.products,
-        createdByMember : activity.submittedBy,
-        leadMember : activity.leadMember ? activity.leadMember : null,
-        activeManager : activity.manager ? activity.manager : null,
-        activity_Type : activity.activity_Type,
+        members : activity.team.map(member => member.Id),
+        products : activity.products.map(member => member.product_ID),
+        createdByMember : activity.submittedBy.Id,
+        leadMember : activity.leadMember ? activity.leadMember.Id : null,
+        activeManager : activity.manager ? activity.manager.Id : null,
+        activity_Type : activity.activity_Type.type_ID,
         opportunity_ID : activity.opportunity.Id,
         account_ID : activity.opportunity.AccountId,
         location : activity.location,
         activity_Level : activity.activity_Level ? activity.activity_Level : null,
-        oneDateTime : activity.dates[0] ? activity.dates[0] : null,
-        twoDateTime : activity.dates[1] ? activity.dates[1] : null,
-        threeDateTime : activity.dates[2] ? activity.dates[2] : null,
-        selectedDateTime : activity.selectedDateTime,
+        oneDateTime : activity.dates[0] ? activity.dates[0].date.toISOString() : null,
+        twoDateTime : activity.dates[1] ? activity.dates[1].date.toISOString() : null,
+        threeDateTime : activity.dates[2] ? activity.dates[2].date.toISOString() : null,
+        selectedDateTime : activity.selectedDate.date.toISOString(),
         status : activity.status,
         flag : activity.flag
     }
