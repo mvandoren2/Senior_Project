@@ -1,0 +1,58 @@
+<template>
+    <lightning-record-view-form record-id={recordId} object-api-name="Opportunities"></lightning-record-view-form>    
+
+    <lightning-card >
+        <div slot="title" >
+            <lightning-layout vertical-align="center" >
+                <lightning-layout-item class="slds-var-m-right_small" >
+                    <lightning-icon icon-name="standard:record" ></lightning-icon>
+                </lightning-layout-item>
+
+                <lightning-layout-item >
+                    <h3 class="slds-text-heading_medium" >Presales Activities</h3>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+
+        <div class="slds-var-m-left_large slds-var-m-right_large" >
+            <lightning-layout vertical-align="end" class="slds-var-m-vertical_small" >
+                <lightning-layout-item class="slds-var-m-right_small" >
+                    <lightning-combobox name="account"
+                                        label="Account"
+                                        options={accountOptions}
+                                        value=""
+                                        onchange={selectAccount}
+                                        class="select-account" >
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item class="slds-var-m-right_small" >
+                    <lightning-combobox name="opportunity"
+                                        label="Opportunity"
+                                        options={opportunityOptions}
+                                        value=""
+                                        onchange={selectOpportunity}
+                                        class="select-opportunity" >
+                    </lightning-combobox>
+                </lightning-layout-item>
+
+                <lightning-layout-item if:true={showNewActivityBtn} >
+                    <lightning-button   label={newActivityLabel}
+                                        class="slds-var-p-top_small slds-align_absolute-center"
+                                        onclick={openRequestForm} >
+                    </lightning-button>
+                </lightning-layout-item>                
+            </lightning-layout>
+        </div>
+
+        <div class="slds-scrollable" style="max-height: 20rem;" >
+            <c-activity-list-view   record-type="opportunity" 
+                                    record-id={opportunityIdTesting}
+                                    status="requests" 
+                                    format="small" >
+            </c-activity-list-view>
+        </div>
+    </lightning-card>
+        
+    <c-sales-request-form opportunity={opportunityIdTesting} onsubmit={reloadTable} ></c-sales-request-form>    
+</template>
