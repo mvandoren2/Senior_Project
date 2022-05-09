@@ -1,0 +1,146 @@
+<template>
+    <lightning-card >
+        <div slot="title" >
+            <lightning-layout vertical-align="center" >
+                <lightning-layout-item class="slds-var-m-right_small" >
+                    <lightning-icon icon-name="standard:record" ></lightning-icon>
+                </lightning-layout-item>
+
+                <lightning-layout-item >
+                    <h3 class="slds-text-heading_medium" >Presales Activities</h3>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+
+        <div class="slds-var-m-horizontal_large slds-var-m-vertical_large" >
+            <lightning-combobox name="status" 
+                                label="Activity Status"
+                                options={statusOptions}
+                                value="current" 
+                                onchange={selectStatus}
+                                class="slds-var-m-vertical_small" >
+            </lightning-combobox>                     
+
+            <div class="slds-var-m-vertical_small" >
+                <lightning-layout if:true={filtersShowing} >
+                    <lightning-layout-item class="slds-var-m-right_small" >
+                        <lightning-layout vertical-align="end" class="slds-var-m-vertical_small" >
+                            <lightning-layout-item class="slds-var-m-right_small" >
+                                <lightning-combobox name="account"
+                                                    label="Account"
+                                                    options={accountOptions}
+                                                    value=""
+                                                    onchange={selectAccount}
+                                                    class="select-account" >
+                                </lightning-combobox>
+                            </lightning-layout-item>
+            
+                            <lightning-layout-item class="slds-var-m-right_small" >
+                                <lightning-combobox name="opportunity"
+                                                    label="Opportunity"
+                                                    options={opportunityOptions}
+                                                    value=""
+                                                    onchange={selectOpportunity}
+                                                    class="select-opportunity" >
+                                </lightning-combobox>
+                            </lightning-layout-item>
+                            
+                            <lightning-layout-item if:true={showNewActivityBtn} >
+                                <lightning-button   label={newActivityLabel}
+                                                    class="slds-var-p-top_small slds-align_absolute-center"
+                                                    onclick={openRequestForm} >
+                                </lightning-button>
+                            </lightning-layout-item>
+                        </lightning-layout>
+            
+                        <lightning-layout class="slds-var-m-vertical_small" >
+                            <lightning-layout-item >
+                                <lightning-combobox name="product"
+                                                    label="Product"
+                                                    options={productOptions}
+                                                    value=""
+                                                    onchange={selectProduct}
+                                                    class="slds-var-m-right_small" >
+                        </lightning-combobox>
+                            </lightning-layout-item>
+            
+                            <lightning-layout-item >
+                                <lightning-combobox name="activity_type"
+                                                    label="Activity Type"
+                                                    options={activityTypeOptions}
+                                                    value=""
+                                                    onchange={selectActivityType} >                
+                                </lightning-combobox>
+                            </lightning-layout-item>
+            
+                        </lightning-layout>  
+                    </lightning-layout-item>
+
+                    <lightning-layout-item alignment-bump="left"  >
+                        <div class="slds-var-m-vertical_small" >
+                            <h3 class="slds-text-title" >Date Range</h3>
+
+                            <lightning-layout vertical-align="end" class="slds-var-m-left_medium" >
+                                <lightning-layout-item class="slds-var-m-right_small" >
+                                    <lightning-input    name="date-range_start"
+                                                        label="From"
+                                                        type="date"
+                                                        onchange={setStartDate}
+                                                        class="date-input" >
+                                    </lightning-input>
+                                </lightning-layout-item>
+                
+                                
+                                <lightning-layout-item class="slds-var-m-right_small" >
+                                    <lightning-input    name="date-range_end" 
+                                                        label="To"
+                                                        type="date"
+                                                        onchange={setEndDate}
+                                                        class="date-input" >
+                                    </lightning-input>
+                                </lightning-layout-item>
+
+                                <lightning-layout-item >
+                                    <lightning-button   name="clear-date"
+                                                        label="Clear"
+                                                        variant="neutral"
+                                                        onclick={clearDates} >
+                                    </lightning-button>
+                                </lightning-layout-item>
+
+                            </lightning-layout>
+                        </div>
+
+                        <lightning-combobox name="member"
+                                            label="Assigned Member"
+                                            options={memberOptions}
+                                            value=""
+                                            onchange={selectMember}
+                                            class="slds-var-m-vertical_small" >
+                        </lightning-combobox>
+
+                    </lightning-layout-item>
+                </lightning-layout>
+
+                <lightning-button   name="show_filters"
+                                    label={filterBtnLabel}
+                                    onclick={toggleFilters}
+                                    variant="base"
+                                    class="slds-align_absolute-center slds-var-m-vertical_small" >                                    
+                </lightning-button>
+            </div>
+        </div>
+
+        <c-activity-list-view   record-type={recordType}
+                                record-id={recordId}
+                                status="current"
+                                member={memberId}
+                                product={productId}
+                                activity-type={activityType}
+                                date-range-start={startDate}
+                                date-range-end={endDate} >
+        </c-activity-list-view>
+    </lightning-card>
+        
+    <c-sales-request-form  onsubmit={reloadTable} ></c-sales-request-form>    
+</template>
