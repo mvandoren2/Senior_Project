@@ -6,26 +6,22 @@ import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productSelector';
-import { url } from 'c/dataUtils';
-import { buildDetailedActivitiesList } from '../dataUtils/dataUtils';
+import { url, buildDetailedActivitiesList } from 'c/dataUtils';
 
 export default class SalesRequestForm extends LightningElement {
     connectedCallback() {
-        this.getActivityTypes()
-
-        this.initActivity()
+        this.getActivityTypes()        
     }
 
-    render() {
-        this.userProfile = this.getAttribute('data-userprofile')
+    @api userProfile
+    @api opportunity
 
+    render() {
         switch(this.userProfile) {
             case 'Presales Manager':
-                this.activity.status = 'Accept'
                 return activityCreation_manager
 
             case 'Presales Member':
-                this.activity.status = 'Scheduled'
                 return activityCreation_team
             
             default:
@@ -33,10 +29,15 @@ export default class SalesRequestForm extends LightningElement {
         }
     }
 
+    @api openModal() {
+        this.initActivity()
+        this.toggleModalClasses()
+    }
+
     boxClasses = 'slds-modal'
     backdropClasses = 'slds-backdrop'
 
-    @api toggleModalClasses() {
+    toggleModalClasses() {
         this.boxClasses = this.boxClasses === 'slds-modal' ? 
             'slds-modal slds-fade-in-open' : 'slds-modal'
 
@@ -47,7 +48,7 @@ export default class SalesRequestForm extends LightningElement {
     initActivity() {
         this.activity = {}
 
-        this.activity.opportunity_ID = this.getAttribute('data-opportunity')
+        this.activity.opportunity_ID = this.opportunity
         this.getAccountId()
         this.activity.location = this.locationOptions[0].value
         this.activity.createdByMember = Id ? Id : '0055f0000041g1mAAA'        
@@ -57,8 +58,23 @@ export default class SalesRequestForm extends LightningElement {
         this.activity.twoDateTime = null
         this.activity.threeDateTime = null
 
+        switch(this.userProfile) {
+            case 'Presales Team' :
+                this.activity.members = [this.activity.createdByMember]
+                this.activity.status = 'Scheduled'
+                break
+
+            case 'Presales Manager' :
+                this.activity.activeManager = this.activity.createdByMember
+                this.activity.status = 'Accept'
+                break
+
+            default:
+                this.activity.status = 'Request'
+        }
+
         if(this.userProfile === 'Presales Team')
-            this.activity.members = [this.activity.createdByMember]
+            
 
         this.teamManageLabel = 'Assign Team'
     }
@@ -150,49 +166,80 @@ export default class SalesRequestForm extends LightningElement {
     
     setDateWarningShowing() {
         const singleDateSelected = 
-            (this.activity.oneDateTime && this.activity.twoDateTime === undefined && this.activity.threeDateTime === undefined) ||
-            (this.activity.oneDateTime === undefined && this.activity.twoDateTime && this.activity.threeDateTime === undefined) ||
-            (this.activity.oneDateTime === undefined && this.activity.twoDateTime === undefined && this.activity.threeDateTime)
+            (this.activity.oneDateTime && !this.activity.twoDateTime && !this.activity.threeDateTime) ||
+            (!this.activity.oneDateTime && this.activity.twoDateTime && !this.activity.threeDateTime) ||
+            (!this.activity.oneDateTime && !this.activity.twoDateTime && this.activity.threeDateTime)
 
         this.dateWarningShowing =   singleDateSelected && 
                                     this.submitAttempted && 
                                     !this.dateWarningShowing && 
-                                    this.userProfile === 'Sales Team'
+                                    this.userProfile === 'Sales Representative'
     }
 
     submitAttempted = false
 
-    handleSubmit() {
+    async handleSubmit() {
         this.submitAttempted = true
 
         this.setDateWarningShowing()
 
         if(!this.dateWarningShowing) {
-            this.handleUploadAction()     
-            this.toggleModalClasses()
-            this.reset()
+            let submitResult = await this.handleUploadAction()
+
+            if(!submitResult)
+                this.showDupeWarning = true
+
+            else if(this.userProfile === 'Presales Manager') {
+                this.activity_ID = submitResult.activity_ID
+
+                submitResult = await buildDetailedActivitiesList([submitResult])
+
+                this.toggleModalClasses()
+
+                this.template.querySelector('c-accept-activity-modal').showModal(submitResult[0])
+            }
+
+            else {
+                this.signalAndReset()
+                this.toggleModalClasses()
+            }
         }   
     }
 
     //POST JSON ----------
     async handleUploadAction() {    
-    
         let submittedActivity = await fetch(url + 'activity/', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(this.activity)
         
-        }).then(res => res.json()
-        
-        ).catch((error) => {
-            console.error('Error:', error);
-        
-        });      
+        }).then((res) => {
+            let ret = false
+            
+            if(res.status === 201){
+                ret = res.json()
+            }
 
-        submittedActivity = await buildDetailedActivitiesList([submittedActivity])
-        submittedActivity = submittedActivity[0]
+            return ret
 
-        this.template.querySelector('c-accept-activity-modal').showModal(submittedActivity)
+        }).catch((error) => {
+            console.error('Error: ', error);        
+        });
+
+        return submittedActivity
+    }
+    
+    deleteCancelledActivity = () => {
+        fetch(url + 'activity/' + this.activity_ID + '/', {
+            method: 'DELETE'
+        })
+
+        this.toggleModalClasses()
+    }
+
+    signalAndReset = () => {
+        this.dispatchEvent(new CustomEvent('submit'))
+        this.reset()
     }
 
     cancelHandler = () => {
@@ -210,5 +257,7 @@ export default class SalesRequestForm extends LightningElement {
         this.template.querySelector('.location-select').value = 'Onsite'
 
         this.productSelector.reset()
+
+        this.submitAttempted = false
     }
 }

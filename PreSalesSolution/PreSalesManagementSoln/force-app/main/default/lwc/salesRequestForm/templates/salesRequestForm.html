@@ -20,6 +20,26 @@
             </header>
         
             <div class="slds-modal__content slds-var-p-around_large" >
+
+                <template if:true={showDupeWarning}>
+                    <div class="slds-box
+                                slds-box_x-small 
+                                slds-theme_shade 
+                                slds-theme_alert-texture 
+                                slds-theme_error
+                                slds-var-m-around_x-small " >
+
+                        <div class="slds-grid slds-align_absolute-center"  >
+                            <lightning-icon icon-name="utility:warning" class="slds-var-m-right_small" ></lightning-icon>
+
+                            <p>
+                                <strong>
+                                    The requested activity is in conflict with an existing activity.
+                                </strong> 
+                            </p>
+                        </div>
+                    </div>
+                </template>
                 
                 <div class="slds-var-p-around_medium">
                     <!--Search Products..add and remove -->
