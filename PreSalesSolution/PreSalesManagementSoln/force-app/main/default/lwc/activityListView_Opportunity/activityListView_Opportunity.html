@@ -1,5 +1,5 @@
 <template>
-    <lightning-record-view-form record-id={opportunityId} object-api-name="Opportunity"></lightning-record-view-form>    
+    <lightning-record-view-form record-id={recordId} object-api-name="Opportunities"></lightning-record-view-form>    
 
     <lightning-card >
         <div slot="title" >
@@ -14,13 +14,8 @@
             </lightning-layout>
         </div>
 
-        <lightning-button   slot="actions"
-                            id="dateAlert"
-                            variant="submit" 
-                            label={newActivityLabel} 
-                            type="submit" 
-                            disabled={isSubmitDisabled} 
-                            title="Submit"
+        <lightning-button   slot="actions" 
+                            label={newActivityLabel}
                             class="slds-var-p-top_small slds-align_absolute-center"
                             onclick={openRequestForm} >
         </lightning-button>
@@ -35,12 +30,14 @@
             </lightning-combobox>
         </div>
 
-        <c-activity-list-view   data-record-type="opportunity" 
-                                data-record-id={opportunityIdTesting}
-                                data-status={status} 
-                                data-format="small" >
-        </c-activity-list-view>
+        <div class="slds-scrollable" style="max-height: 20rem;" >
+            <c-activity-list-view   record-type="opportunity" 
+                                    record-id={opportunityIdTesting}
+                                    status="current" 
+                                    format="small" >
+            </c-activity-list-view>
+        </div>
     </lightning-card>
         
-    <c-sales-request-form data-opportunity={opportunityIdTesting} ></c-sales-request-form>    
+    <c-sales-request-form opportunity={opportunityIdTesting} onsubmit={reloadTable} ></c-sales-request-form>    
 </template>

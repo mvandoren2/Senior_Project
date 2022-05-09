@@ -3,7 +3,7 @@ import Id from "@salesforce/user/Id"
 import { url } from 'c/dataUtils';
 
 export default class ActivityListView_Opportunity extends LightningElement {
-    @api opportunityId 
+    @api recordId 
 
     connectedCallback() {
         this.fetchCurrentUser()
@@ -20,14 +20,12 @@ export default class ActivityListView_Opportunity extends LightningElement {
             .then(user => {
                 this.userProfile = user.user_role.name
 
-                this.template.querySelector('c-sales-request-form').setAttribute('data-userprofile', this.userProfile)
+                this.template.querySelector('c-sales-request-form').userProfile = this.userProfile
 
                 const userIsPresales = this.userProfile !== 'Sales Representative'
                 this.newActivityLabel = userIsPresales ? 'Create a New Activity' : 'Request a New Activity'
             })
     }
-
-    @track status = 'current'
 
     statusOptions = [
         {label: '--- All Activities/Requests ---', value: ''},
@@ -44,21 +42,21 @@ export default class ActivityListView_Opportunity extends LightningElement {
         {label: 'Expired Activities', value: 'Expire'}
     ]
 
+    reloadTable = () => {
+        this.template.querySelector('c-activity-list-view').loadTableRows()
+    }
+
     selectStatus = (evt) => {
-        this.status = evt.target.value
+        this.template.querySelector('c-activity-list-view').status = evt.target.value
 
-        let listView = this.template.querySelector('c-activity-list-view')
-
-        listView.setAttribute('data-status', this.status)
-
-        listView.loadTableRows()
+        this.reloadTable()
     }
 
     get opportunityIdTesting () {
-        return this.opportunityId ? this.opportunityId : '0065f000008xnXzAAI'
+        return this.recordId ? this.recordId : '0065f000008xnXzAAI'
     }
 
     openRequestForm() {
-        this.template.querySelector('c-sales-request-form').toggleModalClasses()
+        this.template.querySelector('c-sales-request-form').openModal()
     }
 }
