@@ -132,9 +132,10 @@ export default class ModalPopupLWC extends LightningElement {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(pushingData),
-        })
-        .catch((error) => {
+
+        }).catch((error) => {
             console.error('Error:', error);
+            
         })
     }
 
