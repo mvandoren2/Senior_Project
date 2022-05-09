@@ -156,7 +156,7 @@
                                         </template>
                                     </lightning-layout-item>
                                 
-                                    <lightning-layout-item alignment-bump="left" >
+                                    <lightning-layout-item alignment-bump="left" if:true={userRequestedActivity} >
                                         <lightning-button   variant='destructive-text'
                                                             onclick={openRescheduleModal}
                                                             label='Edit Dates' >
@@ -238,5 +238,5 @@
     <div class={backdropClasses}></div>
 
     <c-reschedule-form data-variant="edit" onsubmit={editDateOptions} oncancel={unhideModal} ></c-reschedule-form>
-    <c-status-change-modal data-status="cancel" onsubmit={closeModal} oncancel={unhideModal} ></c-status-change-modal>
+    <c-status-change-modal data-status="delete" onsubmit={closeModal} oncancel={unhideModal} ></c-status-change-modal>
 </template>

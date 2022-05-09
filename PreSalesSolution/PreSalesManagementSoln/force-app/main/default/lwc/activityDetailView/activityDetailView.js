@@ -7,7 +7,7 @@ import leadMemberActivity           from './templates/activityDetailView_lead-ac
 import salesRequest                 from './templates/activityDetailView_sales-request.html'
 import salesActivity                from './templates/activityDetailView_sales-active.html'
 
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import Id from "@salesforce/user/Id"
 import { url } from 'c/dataUtils'
 
@@ -111,7 +111,7 @@ export default class ActivityDetailView extends LightningElement {
 
     @api showModal(activity) {
         if (activity !== this.activity) {
-            this.activity = activity
+            this.activity = Object.assign({}, activity)
             this.activity_unmodified = Object.assign({}, activity)
             
             this.setViewState()
@@ -161,11 +161,14 @@ export default class ActivityDetailView extends LightningElement {
     //Populate view fields
     //
 
+    @track userRequestedActivity = false
+
     setViewState() {
         this.setProducts()
         this.setDateIsOptional()
         this.requestIsReschedule = this.activity.status === 'Reschedule'
-        this.teamIsAssigned = this.activity.team.length
+        this.teamIsAssigned = this.activity.team.length        
+        this.userRequestedActivity = this.activity.submittedBy.Id === this.userID
     }
 
     products = []
@@ -183,9 +186,6 @@ export default class ActivityDetailView extends LightningElement {
             dateIsNotSelected = this.validateDates()
             this.setDateOptions()
         }
-
-        if(!dateIsNotSelected)
-            console.log(this.activity.selectedDate)
 
         this.dateIsOptional = dateIsNotSelected
     }
@@ -245,10 +245,6 @@ export default class ActivityDetailView extends LightningElement {
         this.activity.selectedDate.localeString = 'Reschedule request sent'
 
         this.unhideModal()
-    }
-
-    get userRequestedActivity() {
-        return this.activity.submittedBy.external_member_ID === this.user.Id
     }
 
     //Patch Activity
