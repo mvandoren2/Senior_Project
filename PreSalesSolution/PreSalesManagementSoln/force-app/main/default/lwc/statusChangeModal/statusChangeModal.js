@@ -44,6 +44,15 @@ export default class StatusChangeModal extends LightningElement {
                 break
             }
 
+            case 'delete': {
+                this.modalTitle = 'Delete Request'
+                this.submitLabel = 'Delete'
+                this.submitVariant = 'destructive'
+                this.showCompleteInputs = false
+                this.deletingRequest = true
+                break
+            }
+
             default:
                 break
         }
@@ -109,10 +118,21 @@ export default class StatusChangeModal extends LightningElement {
 
     //push the data to backend
     submitStatusChange = () =>{
-        this.patchActivity()
-        this.postNote()
+        
+        if(!this.deletingRequest) {
+            this.patchActivity()
+            this.postNote()
+        }
+
+        else this.deleteRequest()
 
         this.closeModal(new CustomEvent('submit'));
+    }
+
+    deleteRequest() {
+        fetch(url + 'activity/' + this.activityID + '/', {method: 'DELETE'})
+
+        this.deletingRequest = false
     }
 
     patchActivity() {

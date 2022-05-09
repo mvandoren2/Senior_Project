@@ -29,7 +29,8 @@
                                         message-when-value-missing="Note required"
                                         placeholder="Add your notes here"
                                         onchange={setNoteText}
-                                        class="slds-var-m-bottom_medium" >
+                                        class="slds-var-m-bottom_medium"
+                                        if:false={deletingRequest} >
                     </lightning-textarea>
 
                     <template if:true={showCompleteInputs} >
@@ -38,7 +39,9 @@
                                             onchange={setActivityLevel}
                                             class="slds-size_2-of-5" >
                         </lightning-combobox>
-                    </template> 
+                    </template>
+                    
+                    <p if:true={deletingRequest} >Are you sure you want to delete this request?</p>
                 </div>
 
                 <!-- Modal/Popup Box LWC footer starts here -->
