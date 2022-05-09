@@ -1,7 +1,9 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <div class="slds-var-m-bottom_xx-large">
-        <lightning-card  title="Presales Ninja Admin">
+        <lightning-card >
+
+            <h3 class="slds-text-heading_medium" slot="title">Presales Ninja Admin</h3>
 
             <template if:true={notificationStatus}>
                 <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error" role="status">
@@ -20,21 +22,21 @@
                 </div>
             </template>
 
-            <div class="slds-var-p-around_medium lgc-bg">
+            <div class="slds-box slds-box_small slds-var-m-around_medium slds-var-p-horizontal_medium" style="background-color: #eef4ff;">
                 <lightning-input    type="text" 
                                     label="Activity Types" 
                                     placeholder="Add activity types..." 
-                                    onkeypress={selectActivityTypes} >
+                                    onkeypress={selectActivityTypes}
+                                    class="slds-var-m-bottom_small" >
                 </lightning-input>
 
                 <lightning-layout multiple-rows="true" >
                     <template for:each={activityTypeListdb} for:item="activity">
-                        <lightning-layout-item key={activity} class="slds-var-m-around_x-small">
+                        <lightning-layout-item key={activity} class="slds-var-m-right_x-small slds-var-m-bottom_x-small">
                             <lightning-pill label={activity} onremove={handelActivityRemove}></lightning-pill>
                         </lightning-layout-item>
                     </template>
                 </lightning-layout>
-
             </div>
 
             <div class="lgc-bg">

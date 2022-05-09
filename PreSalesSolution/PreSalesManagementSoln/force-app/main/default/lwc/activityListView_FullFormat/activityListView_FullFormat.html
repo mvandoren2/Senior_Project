@@ -130,15 +130,9 @@
             </div>
         </div>
 
-        <c-activity-list-view   record-type={recordType}
-                                record-id={recordId}
-                                status="current"
-                                member={memberId}
-                                product={productId}
-                                activity-type={activityType}
-                                date-range-start={startDate}
-                                date-range-end={endDate} >
-        </c-activity-list-view>
+        <div class="slds-scrollable" style="max-height: 40rem;" >
+            <c-activity-list-view   status="current" ></c-activity-list-view>
+        </div>
     </lightning-card>
         
     <c-sales-request-form  onsubmit={reloadTable} ></c-sales-request-form>    

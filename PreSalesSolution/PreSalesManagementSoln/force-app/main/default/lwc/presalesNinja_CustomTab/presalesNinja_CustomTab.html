@@ -1,0 +1,19 @@
+<template>
+    <lightning-layout vertical-align="stretch" >
+        <lightning-layout-item class="slds-var-m-right_medium" >
+            <div class="slds-box slds-theme_default" style="width: 15rem; height: 50rem;" >
+                <lightning-vertical-navigation selected-item="requests" onselect={selectView} >
+                    <lightning-vertical-navigation-item-badge label="New Activity Requests" name="requests" badge-count={requestCount} ></lightning-vertical-navigation-item-badge>
+                    <lightning-vertical-navigation-item label="All Activities" name="activities" ></lightning-vertical-navigation-item>
+                    <lightning-vertical-navigation-item label="Admin" name="admin" ></lightning-vertical-navigation-item>
+                </lightning-vertical-navigation>
+            </div>
+        </lightning-layout-item>
+
+        <lightning-layout-item >
+            <c-activity-list-view_-requests if:true={showRequests} ></c-activity-list-view_-requests>
+            <c-activity-list-view_-full-format if:true={showActivities} ></c-activity-list-view_-full-format>
+            <c-admin-view if:true={showAdmin} ></c-admin-view>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>
