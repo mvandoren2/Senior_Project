@@ -1,11 +1,14 @@
 public with sharing class GetNinjaUsers {
     @AuraEnabled(cacheable=true)
     public static List <User> GetNinjaUsers(List <String> user_Ids){
-        return new Query('User')
+        Query userQuery = new Query('User')
             .selectField('Id')
             .selectField('Name')
-            .selectField('FullPhotoUrl')
-            .addConditionIn('Id', user_Ids)
-            .run();
+            .selectField('FullPhotoUrl');
+            
+        if(user_Ids.size() > 0)   
+            userQuery.addConditionIn('Id', user_Ids);
+            
+        return userQuery.run();
     }
 }
