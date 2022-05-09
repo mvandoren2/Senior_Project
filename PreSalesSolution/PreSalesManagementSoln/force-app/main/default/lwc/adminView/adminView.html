@@ -1,6 +1,7 @@
+<!-- sldsValidatorIgnore -->
 <template>
-    <div style="width: 800px;">
-        <lightning-card  title="Activity Types/Product Management">
+    <div class="slds-var-m-bottom_xx-large">
+        <lightning-card  title="Presales Ninja Admin">
 
             <template if:true={notificationStatus}>
                 <div class="slds-scoped-notification slds-media slds-media_center slds-theme_error" role="status">
@@ -19,34 +20,59 @@
                 </div>
             </template>
 
-            <div class="slds-p-around_medium lgc-bg">
-                <lightning-input type="text" label="Activity Types" placeholder="Add activity types..." onkeypress={selectActivityTypes}></lightning-input>
+            <div class="slds-var-p-around_medium lgc-bg">
+                <lightning-input    type="text" 
+                                    label="Activity Types" 
+                                    placeholder="Add activity types..." 
+                                    onkeypress={selectActivityTypes} >
+                </lightning-input>
 
-                <template for:each={activityTypeListdb} for:item="activity">
-                    <div key={activity} style="display: inline-block; margin:20px 15px 0 0;">
-                        <ul>
-                            <li>
-                                <lightning-pill label={activity} onremove={handelActivityRemove}></lightning-pill>
-                            </li>
-                        </ul>
-                    </div>
-                </template>
+                <lightning-layout multiple-rows="true" >
+                    <template for:each={activityTypeListdb} for:item="activity">
+                        <lightning-layout-item key={activity} class="slds-var-m-around_x-small">
+                            <lightning-pill label={activity} onremove={handelActivityRemove}></lightning-pill>
+                        </lightning-layout-item>
+                    </template>
+                </lightning-layout>
 
             </div>
-            <div class="slds-p-around_medium lgc-bg">
-                <lightning-input type="text" label="Products" placeholder="Add products..." onkeypress={selectProducts}></lightning-input>
 
-                <lightning-dual-listbox name="Products"
-                            label="Activate/Deactivate Products"
-                            source-label="Active"
-                            selected-label="Deactive"
-                            field-level-help="Move the product towards right box to deactivate it!"
-                            options={products}
-                            value={productValues}
-                            onchange={handleProductChange}>
-                </lightning-dual-listbox>
+            <div class="lgc-bg">
+                <lightning-input    type="text" 
+                                    label="Products" 
+                                    placeholder="Add products..." 
+                                    onkeypress={selectProducts}
+                                    class="slds-var-m-around_medium" >
+                </lightning-input>
+
+                <div class="slds-grid slds-grid_vertical slds-var-m-left_medium" >
+                    <lightning-dual-listbox name="Products"
+                                            label="Activate/Deactivate Products"
+                                            source-label="Active"
+                                            selected-label="Deactive"
+                                            field-level-help="Deactivated products will not appear in request forms"
+                                            options={products}
+                                            value={productValues}
+                                            onchange={handleProductChange}
+                                            class="slds-var-m-bottom_medium" >
+                    </lightning-dual-listbox>
+
+                    <template if:false={saveStatus} >
+                        <lightning-button   variant="brand" 
+                                            label="Save Changes" 
+                                            title="Save Products" 
+                                            onclick={patchProduct} >
+                        </lightning-button>
+                    </template>
+                </div>
+                
             </div>
-            <p slot="footer"><lightning-button variant="brand" label="Save" disabled={saveStatus} title="Save Products" onclick={patchProduct} class="slds-m-left_x-small"></lightning-button></p>
+
+            <p slot="footer">
+                
+            </p>
+
+            <c-admin-member-management ></c-admin-member-management>
         </lightning-card>
     </div>
 
@@ -66,7 +92,7 @@
                     <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Are you Sure?</h2>
                 </header>
                 <!-- Modal/Popup Box LWC body starts here -->
-                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <div class="slds-modal__content slds-var-p-around_medium" id="modal-content-id-1">
                     <p>The Activity Type you are trying to delete has existing activity in the system. Deleting the activity type will delete all the acitivies
                         associated with it. Are you sure you would like to delete it?
                     </p>
