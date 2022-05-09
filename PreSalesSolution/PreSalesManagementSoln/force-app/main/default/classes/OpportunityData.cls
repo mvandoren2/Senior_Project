@@ -3,15 +3,22 @@ public with sharing class OpportunityData {
     public static List <Account> OpportunityData(List<String> opportunity_Ids) {
         List<Account> ret = new List<Account>();
         
-        List <Account> accounts = 
-            new Query('Account')
-                .selectField('Name')
-                .addSubquery(
-                    Query.subquery('Opportunities')
-                        .selectFields('Id, Name')
-                        .addConditionIn('Id', opportunity_Ids)
-                )
-                .run();
+        Query acctQuery = new Query('Account').selectFields('Id, Name');
+
+        if(opportunity_Ids.size() > 0)
+            acctQuery.addSubquery(
+                Query.subquery('Opportunities')
+                    .selectFields('Id, Name')
+                    .addConditionIn('Id', opportunity_Ids)
+                );
+
+        else 
+            acctQuery.addSubquery(
+                Query.subquery('Opportunities')
+                    .selectFields('Id, Name')
+                );
+
+        List <Account> accounts = acctQuery.run();
 
         for(Account account : accounts) {
             if(account.Opportunities.size() != 0){
