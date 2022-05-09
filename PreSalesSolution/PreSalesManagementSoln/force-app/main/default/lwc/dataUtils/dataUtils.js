@@ -2,7 +2,7 @@ import id from "@salesforce/user/Id"
 import OpportunityData from "@salesforce/apex/OpportunityData.OpportunityData"
 import GetNinjaUsers from "@salesforce/apex/GetNinjaUsers.GetNinjaUsers"
 
-export const url = "http://localhost:8080/api/"
+export const url = "https://presales-ninja.link/api/"
 
 export async function fetchCurrentUser() {
     const userID = id ? id : '0055f000007NzdoAAC'
@@ -94,7 +94,6 @@ export async function fetchSalesforceUsers() {
     salesforceUsers.forEach(user => {
         let djangoData = members.find(member => member.external_member_ID === user.Id)
 
-        user.member_ID = djangoData.member_ID
         user.proficiency  = djangoData.proficiency
         user.user_role = djangoData.user_role
     })

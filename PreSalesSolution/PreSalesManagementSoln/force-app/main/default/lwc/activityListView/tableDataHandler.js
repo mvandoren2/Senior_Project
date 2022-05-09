@@ -143,8 +143,6 @@ export class TableDataHandler {
         if(dates.find(date => date >= filterDate))
             ret++
 
-        console.debug(ret)
-
         return ret
     }
 

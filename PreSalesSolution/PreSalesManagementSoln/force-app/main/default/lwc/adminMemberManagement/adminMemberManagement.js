@@ -1,5 +1,5 @@
 import { LightningElement,track,wire } from 'lwc';
-import getPreSalesTeamMembers from "@salesforce/apex/getUsers.getPreSalesTeamMembers";
+import GetNinjaUsers from '@salesforce/apex/GetNinjaUsers.GetNinjaUsers';
 import { url } from 'c/dataUtils';
 
 //actions on the dropdown
@@ -47,7 +47,7 @@ export default class AdminMemberManagement extends LightningElement {
     }
 
      //wire and get the users from the salesforce
-     @wire(getPreSalesTeamMembers) teamMembers({error, data}) {
+     @wire(GetNinjaUsers) teamMembers({error, data}) {
         if(data){
             this.salesforceUsers = data;
 

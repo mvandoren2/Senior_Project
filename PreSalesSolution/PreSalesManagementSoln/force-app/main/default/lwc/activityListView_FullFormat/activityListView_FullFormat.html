@@ -23,9 +23,9 @@
 
             <div class="slds-var-m-vertical_small" >
                 <lightning-layout if:true={filtersShowing} >
-                    <lightning-layout-item class="slds-var-m-right_small" >
+                    <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-2" >
                         <lightning-layout vertical-align="end" class="slds-var-m-vertical_small" >
-                            <lightning-layout-item class="slds-var-m-right_small" >
+                            <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                                 <lightning-combobox name="account"
                                                     label="Account"
                                                     options={accountOptions}
@@ -35,7 +35,7 @@
                                 </lightning-combobox>
                             </lightning-layout-item>
             
-                            <lightning-layout-item class="slds-var-m-right_small" >
+                            <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                                 <lightning-combobox name="opportunity"
                                                     label="Opportunity"
                                                     options={opportunityOptions}
@@ -54,17 +54,16 @@
                         </lightning-layout>
             
                         <lightning-layout class="slds-var-m-vertical_small" >
-                            <lightning-layout-item >
+                            <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                                 <lightning-combobox name="product"
                                                     label="Product"
                                                     options={productOptions}
                                                     value=""
-                                                    onchange={selectProduct}
-                                                    class="slds-var-m-right_small" >
+                                                    onchange={selectProduct} >
                         </lightning-combobox>
                             </lightning-layout-item>
             
-                            <lightning-layout-item >
+                            <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                                 <lightning-combobox name="activity_type"
                                                     label="Activity Type"
                                                     options={activityTypeOptions}
