@@ -123,13 +123,6 @@
                                             </template>
                                         </ul>
                                     </lightning-layout-item>
-
-                                    <lightning-layout-item alignment-bump="left">
-                                        <lightning-button   variant='neutral'
-                                                            onclick={openTeamModal}
-                                                            label="Manage Team" >
-                                        </lightning-button>
-                                    </lightning-layout-item>
                                 </lightning-layout>
 
                                 
@@ -145,32 +138,31 @@
                             </td>
 
                             <td class="slds-var-p-around_small">
-                                <template if:true={dateIsOptional} >
-                                    <div >
-                                        <lightning-combobox label="Date"
-                                                            name="Date"
-                                                            value="0"
-                                                            options={dateOptions}
-                                                            onchange={selectDate}
-                                                            variant="label-hidden" >
-                                        </lightning-combobox>
-                                    </div>
-                                </template>
-
-                                <template if:false={dateIsOptional} >
-                                    <lightning-layout vertical-align="center">
-                                        <lightning-layout-item >
-                                            <p>{activity.selectedDate.localeString}</p>
-                                        </lightning-layout-item>
-                                    
-                                        <lightning-layout-item alignment-bump="left" >
-                                            <lightning-button   variant='destructive-text'
-                                                                onclick={openRescheduleModal}
-                                                                label='Reschedule Activity' >
-                                            </lightning-button>
-                                        </lightning-layout-item>
-                                    </lightning-layout>
-                                </template>
+                                <lightning-layout vertical-align="center">
+                                    <lightning-layout-item >
+                                        <template if:true={dateIsOptional} >
+                                            <p class="slds-text-title" >Requested Dates:</p>
+                                            <ul class="slds-var-m-left_small" >
+                                                <template for:each={activity.dates} for:item="date" >
+                                                    <li key={date.id}>
+                                                        <p>{date.localeString}</p>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </template>
+        
+                                        <template if:false={dateIsOptional} >
+                                            {activity.selectedDate.localeString}
+                                        </template>
+                                    </lightning-layout-item>
+                                
+                                    <lightning-layout-item alignment-bump="left" >
+                                        <lightning-button   variant='destructive-text'
+                                                            onclick={openRescheduleModal}
+                                                            label='Reschedule Activity' >
+                                        </lightning-button>
+                                    </lightning-layout-item>
+                                </lightning-layout>
                             </td>
                         </tr>
 
@@ -216,7 +208,8 @@
                         <lightning-button   variant='destructive'
                                             onclick={openStatusChangeModal}
                                             label='Cancel Activity'
-                                            class="slds-float_left" >
+                                            class="slds-float_left"
+                                            if:true={userRequestedActivity} >
                         </lightning-button>
 
                         <lightning-button   variant='neutral'
@@ -244,7 +237,6 @@
     </section>
     <div class={backdropClasses}></div>
 
-    <c-assign-team-modal data-patchactivity="false" onteamassigned={selectTeam} oncancel={unhideModal}></c-assign-team-modal>
     <c-reschedule-form onsubmit={setRescheduleFlag} oncancel={unhideModal} ></c-reschedule-form>
     <c-status-change-modal data-status="cancel" onsubmit={closeModal} oncancel={unhideModal} ></c-status-change-modal>
 </template>

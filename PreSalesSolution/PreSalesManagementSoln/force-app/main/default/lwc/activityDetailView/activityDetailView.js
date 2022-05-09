@@ -1,11 +1,9 @@
 //Template imports
-import viewDetail                   from './templates/activityDetailView.html' //done
-import manageRequest                from './templates/activityDetailView_manager-request.html' //done
-import manageActivity               from './templates/activityDetailView_manager-active.html' //done
-import manageExpiredActivity        from './templates/activityDetailView_manager-expired.html' //not sure if I need this
+import viewDetail                   from './templates/activityDetailView.html'
+import manageRequest                from './templates/activityDetailView_manager-request.html'
+import manageActivity               from './templates/activityDetailView_manager-active.html'
 import memberActivity               from './templates/activityDetailView_member-active.html' 
 import leadMemberActivity           from './templates/activityDetailView_lead-active.html' 
-import leadMemberExpiredActivity    from './templates/activityDetailView_lead-expired.html'
 import salesRequest                 from './templates/activityDetailView_sales-request.html'
 import salesActivity                from './templates/activityDetailView_sales-active.html'
 
@@ -23,10 +21,10 @@ export default class ActivityDetailView extends LightningElement {
     }
 
     fetchCurrentUser() {
-        this.userID = Id ? Id : '0055f000007NzdoAAC'
+        this.userID = Id ? Id : '0055f0000041g1mAAA'
         const urlString = url + 'member/' + this.userID + '/'
 
-        fetch(urlString, )
+        fetch(urlString)
             .then(res => res.json())
             .then(data => {
                 this.user = data
@@ -36,6 +34,7 @@ export default class ActivityDetailView extends LightningElement {
     
     render() {
         if(this.isOpen){
+
             switch(this.userRole) {
                 
                 case 'Presales Manager': 
@@ -52,6 +51,7 @@ export default class ActivityDetailView extends LightningElement {
     }
 
     getManagerTemplate() {
+
         switch(this.activity.status) {
             case 'Request':
                 return manageRequest
@@ -61,10 +61,8 @@ export default class ActivityDetailView extends LightningElement {
 
             case 'Accept':
             case 'Scheduled':
-                return manageActivity
-
             case 'Expire':
-                return manageExpiredActivity
+                return manageActivity
 
             default: 
                 return viewDetail
@@ -74,22 +72,14 @@ export default class ActivityDetailView extends LightningElement {
     getMemberTemplate() {
         switch(this.activity.status) {
             case 'Accept':
-            case 'Scheduled':{
+            case 'Scheduled':
+            case 'Expire': {
                 let template = memberActivity
                 
                 if(this.activity.leadMember && this.userID === this.activity.leadMember.Id){
                     
                     template = leadMemberActivity
                 }
-                
-                return template
-            }
-
-            case 'Expire':{
-                let template = memberActivity
-                
-                if(this.userID === this.activity.leadMember)
-                    template = leadMemberExpiredActivity
                 
                 return template
             }
@@ -145,13 +135,15 @@ export default class ActivityDetailView extends LightningElement {
         this.toggleModalClasses()
     }
 
-    closeModal = () => {
+    closeModal = (evt) => {
+
         this.isOpen = false
         this.isHidden = true
 
         this.toggleModalClasses()
 
-        this.dispatchEvent(new CustomEvent('reloadtablerows'))
+        if(evt.type === 'accept' || evt.type === 'submit')
+            this.dispatchEvent(new CustomEvent('reloadtablerows'))
     }
     
     boxClasses = 'slds-modal'
@@ -192,6 +184,9 @@ export default class ActivityDetailView extends LightningElement {
             this.setDateOptions()
         }
 
+        if(!dateIsNotSelected)
+            console.log(this.activity.selectedDate)
+
         this.dateIsOptional = dateIsNotSelected
     }
 
@@ -202,7 +197,7 @@ export default class ActivityDetailView extends LightningElement {
 
         if(oneDateRemains) {
             this.activity.dates[0].selected = true
-            this.activityModified = true
+            this.activity.selectedDate = this.activity.dates[0]
         }
 
         return !oneDateRemains
@@ -250,6 +245,10 @@ export default class ActivityDetailView extends LightningElement {
         this.activity.selectedDate.localeString = 'Reschedule request sent'
 
         this.unhideModal()
+    }
+
+    get userRequestedActivity() {
+        return this.activity.submittedBy.external_member_ID === this.user.Id
     }
 
     //Patch Activity

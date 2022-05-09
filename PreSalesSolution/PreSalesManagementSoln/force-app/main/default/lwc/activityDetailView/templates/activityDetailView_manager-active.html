@@ -160,13 +160,6 @@
                                         <lightning-layout-item >
                                             <p>{activity.selectedDate.localeString}</p>
                                         </lightning-layout-item>
-                                    
-                                        <lightning-layout-item alignment-bump="left" >
-                                            <lightning-button   variant='destructive-text'
-                                                                onclick={openRescheduleModal}
-                                                                label='Reschedule Activity' >
-                                            </lightning-button>
-                                        </lightning-layout-item>
                                     </lightning-layout>
                                 </template>
                             </td>
@@ -243,6 +236,5 @@
     <div class={backdropClasses}></div>
 
     <c-assign-team-modal data-patchactivity="false" onteamassigned={selectTeam} oncancel={unhideModal}></c-assign-team-modal>
-    <c-reschedule-form onsubmit={setRescheduleFlag} oncancel={unhideModal} ></c-reschedule-form>
     <c-status-change-modal data-status="cancel" onsubmit={closeModal} oncancel={unhideModal} ></c-status-change-modal>
 </template>

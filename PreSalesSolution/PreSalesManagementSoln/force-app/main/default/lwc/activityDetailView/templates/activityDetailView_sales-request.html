@@ -208,7 +208,8 @@
                         <lightning-button   variant='destructive'
                                             onclick={openStatusChangeModal}
                                             label='Delete Request'
-                                            class="slds-float_left" >
+                                            class="slds-float_left"
+                                            if:true={userRequestedActivity} >
                         </lightning-button>
 
                         <lightning-button   variant='neutral'
