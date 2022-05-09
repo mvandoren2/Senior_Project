@@ -29,44 +29,46 @@ export default class ActivityListView extends LightningElement {
         this.displayedRows = [...this.rows]
     }
 
-    getParams() {
-        const attributes = {
-            recordType : this.getAttribute('data-record-type'),
-            recordId : this.getAttribute('data-record-id'),
-            member : this.getAttribute('data-member'),
-            product : this.getAttribute('data-product'),
-            status : this.getAttribute('data-status'),
-            activityType : this.getAttribute('data-activity-type'),
-            date : this.getAttribute('data-activity-date'),
-            flag : this.getAttribute('data-flagged'),
-            format : this.getAttribute('data-format')
-        }
+    @api recordType
+    @api recordId
+    @api member
+    @api product
+    @api status
+    @api activityType
+    @api dateRangeStart
+    @api dateRangeEnd
+    @api flag
+    @api format
 
+    getParams() {
         let params = {}
 
-        if(attributes.recordType)
-            params[attributes.recordType] = attributes.recordId
+        if(this.recordType)
+            params[this.recordType] = this.recordId
 
-        if(attributes.member)
-            params.member = attributes.member
+        if(this.member)
+            params.member = this.member
 
-        if(attributes.product)
-            params.product = attributes.product
+        if(this.product)
+            params.product = this.product
 
-        if(attributes.status)
-            params.status = attributes.status
+        if(this.status)
+            params.status = this.status
 
-        if(attributes.activityType)
-            params.activityType = attributes.activityType
+        if(this.activityType)
+            params.activityType = this.activityType
         
-        if(attributes.date)
-            params.date = new Date(attributes.date)
+        if(this.dateRangeStart)
+            params.dateRangeStart = this.dateRangeStart
 
-        if(attributes.flag)
+        if(this.dateRangeEnd)
+            params.dateRangeEnd = this.dateRangeEnd
+
+        if(this.flag)
             params.flag = 'true'
 
-        if(attributes.format)
-            params.format = attributes.format
+        if(this.format)
+            params.format = this.format
 
         return params
     }

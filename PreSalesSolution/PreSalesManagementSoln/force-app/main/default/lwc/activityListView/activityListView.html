@@ -84,7 +84,7 @@
                             <!-- actions -->
                             <td class="slds-cell-buffer_right">
                                 <div>
-                                    <lightning-button-menu alternative-text="Show menu" class="slds-var-p-right_xx-large" >
+                                    <lightning-button-menu alternative-text="Show menu" menu-alignment="right" >
                                         <template for:each={row.actions} for:item="action">
                                             <lightning-menu-item    key={action.id} 
                                                                     label={action.label} 
@@ -106,7 +106,7 @@
     <c-activity-detail-view onreloadtablerows={loadTableRows} ></c-activity-detail-view>
     <c-assign-team-modal data-patchactivity="true" onteamassigned={loadTableRows} ></c-assign-team-modal>
     <c-status-change-modal onsubmit={loadTableRows} ></c-status-change-modal>
-    <c-accept-activity-modal onsubmit={loadTableRows} ></c-accept-activity-modal>
+    <c-accept-activity-modal onaccept={loadTableRows} ></c-accept-activity-modal>
     <c-reschedule-form onsubmit={loadTableRows} ></c-reschedule-form>
     <c-note-modal ></c-note-modal>
 </template>

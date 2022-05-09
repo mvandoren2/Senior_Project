@@ -106,30 +106,46 @@ export class TableDataHandler {
             sortedActivities = sortedActivities.concat(activities.filter(activity => activity.status === status))
         })
 
-        if(this.params.date)
-            this.filterActivitiesByDate(this.params.date, sortedActivities)
+        if(this.params.dateRangeStart || this.params.dateRangeEnd) {
+            let dateRange = {}
+
+            if(this.params.dateRangeStart)
+                dateRange.start = this.params.dateRangeStart
+
+            if(this.params.dateRangeEnd)
+                dateRange.end = this.params.dateRangeEnd
+            
+            sortedActivities = this.filterActivitiesByDate(dateRange, sortedActivities)
+        }
 
 
         return sortedActivities
     }
 
-    filterActivitiesByDate(date, activities) {
-        date = new Date(date)
+    filterActivitiesByDate(dateRange, activities) {
+        if(dateRange.start)
+            activities = activities.filter(activity => this.dateFilter(dateRange.start, activity) >= 0 )
 
-        return activities.filter(activity => this.dateFilter(date, activity))
+        if(dateRange.end)
+            activities = activities.filter(activity => this.dateFilter(dateRange.end, activity) <= 0)
+
+        return activities
     }
 
     dateFilter(filterDate, activity) {
-        let include = false
+        const dates = activity.selectedDate ? [activity.selectedDate.date.setHours(0,0,0,0)] : activity.dates.map(date => date.date.setHours(0,0,0,0))
 
-        activity.dates.forEach(date => {
-            date = date.date.setHours(0,0,0,0)
+        let ret = 0
 
-            if (date === filterDate.setHours(0,0,0,0))
-                include = true
-        })
+        if(dates.find(date => date <= filterDate))
+            ret--
 
-        return include
+        if(dates.find(date => date >= filterDate))
+            ret++
+
+        console.debug(ret)
+
+        return ret
     }
 
     //

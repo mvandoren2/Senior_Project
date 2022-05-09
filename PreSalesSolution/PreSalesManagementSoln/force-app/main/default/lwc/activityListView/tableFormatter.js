@@ -26,8 +26,6 @@ export class TableFormatter {
                 columnLabels = columnLabels.filter(column => (column !== 'Account') && (column !== 'Opportunity'))
 
             if(this.params.account && this.smallFormat)
-                console.log('here')
-
                 columnLabels = columnLabels.filter(column => column !== 'Account')
         }
         
@@ -58,10 +56,10 @@ export class TableFormatter {
                     
         newRow.id = activity.activity_ID
 
-        if(!this.params.account && !this.params.opportunity && !this.smallFormat)
+        if(!((this.params.account || this.params.opportunity) && this.smallFormat))
             rowData.push({id: 'Account', data: activity.opportunity.AccountName})
 
-        if(!this.params.opportunity && !this.smallFormat)
+        if(!(this.params.opportunity && this.smallFormat))
             rowData.push({id: 'Opportunity', data: activity.opportunity.Name})
         
         rowData.push({id: 'Product', data: activity.products.map(product => product.name).join(', ')})
@@ -118,7 +116,7 @@ export class TableFormatter {
                     {status: 'Reschedule', actions: [0, 1, 2]},
                     {status: 'Expire', actions: [0, 6, 4, 8, 3]},
                     {status: 'Accept', actions: [0, 6, 8, 3]},
-                    {status: 'Scheduled', actions: [0, 6, 8, 3]},
+                    {status: 'Scheduled', actions: [0, 6, 8, 7, 3]},
                     {status: 'Decline', actions: [0]},
                     {status: 'Cancel', actions: [0]}
                 ]
@@ -152,7 +150,8 @@ export class TableFormatter {
         let userActions = userRoles.find(user => user.role === userProfile)
             .actions.find(actionList => actionList.status === status).actions
 
-
+        if(userProfile === 'Presales Member' && activity.leadMember && this.user.external_member_ID === activity.leadMember.external_member_ID)
+            userActions = userActions.filter(val => val !== 7)
     
         return userActions.map(action => actions[action])
     }
