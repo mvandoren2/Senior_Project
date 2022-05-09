@@ -37,6 +37,8 @@ export default class AcceptActivityModal extends LightningElement {
     dateOptions = []
 
     setDateOptions() {
+        this.dateOptions = []
+
         this.dateOptions.push({label: 'Allow Team Lead to select date', value: "0"})
 
         this.dateOptions = this.dateOptions.concat(
@@ -94,6 +96,7 @@ export default class AcceptActivityModal extends LightningElement {
     patchActivity() {
         let activityPatchBody = {}
 
+        activityPatchBody.activeManager = Id ? Id : '0055f0000041g1mAAA'
         activityPatchBody.status = 'Accept'
         activityPatchBody.activity_ID = this.activity.activity_ID
         activityPatchBody.members = this.activity.team.map(member => member.Id)

@@ -56,15 +56,21 @@
                             </td>
 
                             <td class="slds-var-p-bottom_large" >
-                                <div >
-                                    <lightning-combobox label="Date"
-                                                        name="Date"
-                                                        value="0"
-                                                        options={dateOptions}
-                                                        onchange={selectDate}
-                                                        variant="label-hidden" >
-                                    </lightning-combobox>
-                                </div>
+                                <template if:true={activity.selectedDate} >
+                                    <p>{activity.selectedDate.localeString}</p>
+                                </template>
+
+                                <template if:false={activity.selectedDate} >
+                                    <div >
+                                        <lightning-combobox label="Date"
+                                                            name="Date"
+                                                            value="0"
+                                                            options={dateOptions}
+                                                            onchange={selectDate}
+                                                            variant="label-hidden" >
+                                        </lightning-combobox>
+                                    </div>
+                                </template>
                             </td>
                         </tr>
 
