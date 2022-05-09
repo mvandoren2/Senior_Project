@@ -69,7 +69,6 @@ export default class AdminMemberManagement extends LightningElement {
 
             this.filteredAllMembersInfo = this.allMembersInfo;
 
-            console.log(this.filteredAllMembersInfo);
             this.error = undefined;
         } else if(error){
             this.error = error;
@@ -210,8 +209,6 @@ export default class AdminMemberManagement extends LightningElement {
         this.changeStatus = false;
         this.memberRole = event.detail.value;
 
-        console.log(this.memberRole)
-
         if(this.memberRole === 'Presales Member'){
             this.memberRoleIsPreSalesMember = true;
         } else {
@@ -259,8 +256,7 @@ export default class AdminMemberManagement extends LightningElement {
         } else {
             method = "PATCH"
         }
-
-        console.log(pushData);
+        
         //push member and their product/proficiencyLevel
         fetch(url + 'member/' + this.memberId + '/', {
                 method: method, 
