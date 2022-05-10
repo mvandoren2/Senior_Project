@@ -4,12 +4,13 @@ Pre-Sales Management Solution for Salesforce Application
 Login Name: user Login Password: user
 
 # List of Developers
-**Alexander Alestra**
-Anuj Regmi
-Daniel Diep
-Kendall Helms
-Matt Randell Mazon
-Timothy Thao
+**Alexander Alestra**,
+ **Anuj Regmi**,
+ **Daniel Diep**,
+ **Kendall Helms**,
+ **Matt Randell Mazon**,
+ **Timothy Thao**,
+ **Ye Yint Nay Htet**
 
 # The Product
 Client’s problem is there exists no standardized way to manage their pre-sales workforce which has resulted in complete inconsistency in both the management and measurement of the success of those conducting pre-sales operations.
