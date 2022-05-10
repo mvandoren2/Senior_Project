@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import Id from "@salesforce/user/Id"
 import { url } from 'c/dataUtils';
+import SendNinjaNotification from '@salesforce/apex/NinjaNotifications.SendNinjaNotification';
 
 export default class AcceptActivityModal extends LightningElement {
     isShowing = false
@@ -88,23 +89,26 @@ export default class AcceptActivityModal extends LightningElement {
         let acceptSignal = new CustomEvent('accept')
 
         this.patchActivity()
-        this.postNote()   
+        this.postNote()
+        this.sendNotifications()
 
         this.closeModal(acceptSignal)     
     }
+
+    status = 'Accept'
 
     patchActivity() {
         let activityPatchBody = {}
 
         activityPatchBody.activeManager = Id ? Id : '0055f0000041g1mAAA'
-        activityPatchBody.status = 'Accept'
         activityPatchBody.activity_ID = this.activity.activity_ID
         activityPatchBody.members = this.activity.team.map(member => member.Id)
         activityPatchBody.leadMember = this.activity.leadMember
 
         if(this.activity.selectedDateTime){
             activityPatchBody.selectedDateTime = this.activity.selectedDateTime.date.toISOString()
-            activityPatchBody.status = 'Scheduled'
+            this.status = 'Scheduled'
+            activityPatchBody.status = this.status
         }
 
         fetch(url + 'activity/' + this.activity.activity_ID + '/', {
@@ -134,5 +138,20 @@ export default class AcceptActivityModal extends LightningElement {
                 body: JSON.stringify(notePostBody)
             })
         }
+    }
+
+    async sendNotifications() {
+        const notificationWrapper = {
+            activityStatus: this.activity.status === 'Accept' ? 'Assigned' : this.status,
+            opportunityId: this.activity.opportunity.Id,
+            activityType: this.activity.activity_Type.name,
+            dateLocaleString: this.activity.selectedDate ? this.activity.selectedDate.localeString : null,
+            team: this.activity.team.map(member => member.Id),
+            submittedBy: [this.activity.submittedBy.Id]
+        }
+
+        console.log(this.activity)
+
+        SendNinjaNotification({activityInfo: notificationWrapper});
     }
 }

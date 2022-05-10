@@ -6,7 +6,8 @@ import { LightningElement,api, track} from 'lwc';
 import Id from '@salesforce/user/Id';
 import OpportunityData from '@salesforce/apex/OpportunityData.OpportunityData';
 import { ProductSelector } from './productSelector';
-import { url, buildDetailedActivitiesList } from 'c/dataUtils';
+import { url, buildDetailedActivitiesList, fetchSalesforceUsers } from 'c/dataUtils';
+import SendNinjaNotification from '@salesforce/apex/NinjaNotifications.SendNinjaNotification';
 
 export default class SalesRequestForm extends LightningElement {
     connectedCallback() {
@@ -200,6 +201,7 @@ export default class SalesRequestForm extends LightningElement {
             }
 
             else {
+                await this.sendNotifications()
                 this.signalAndReset()
                 this.toggleModalClasses()
             }
@@ -207,7 +209,7 @@ export default class SalesRequestForm extends LightningElement {
     }
 
     //POST JSON ----------
-    async handleUploadAction() {    
+    async handleUploadAction() {        
         let submittedActivity = await fetch(url + 'activity/', {
             method: 'POST', 
             headers: {'Content-Type': 'application/json'},
@@ -227,6 +229,24 @@ export default class SalesRequestForm extends LightningElement {
         });
 
         return submittedActivity
+    }
+
+    async sendNotifications() {
+        let managers = await fetchSalesforceUsers()
+
+        managers = managers.filter(member => member.user_role.name === 'Presales Manager').map(manager => manager.Id)
+
+        const notificationWrapper = {
+            activityStatus: this.userProfile === "Presales Manager" ? 'Assigned' : this.activity.status,
+            opportunityId: this.opportunity,
+            activityType: this.activityTypes.find(type => type.value === this.activity.activity_Type).label,
+            dateLocaleString: this.activity.twoDateTime ? new Date(this.activity.oneDateTime).toLocaleString() : null,
+            managers: managers,
+            team: this.activity.members,
+            submittedBy: [this.activity.createdByMember]
+        }
+
+        SendNinjaNotification({activityInfo: notificationWrapper});
     }
     
     deleteCancelledActivity = () => {
