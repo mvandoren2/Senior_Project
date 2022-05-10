@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+#Token Authentication
+#Switch to True to enable
+tokenAuth = False
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,15 +46,15 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 ]
 
-
-# REST_FRAMEWORK = {  
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.TokenAuthentication',
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES':(
-#         'rest_framework.permissions.IsAuthenticated',
-#    ),
-# }
+if(tokenAuth):
+    REST_FRAMEWORK = {  
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',
+        ),
+        'DEFAULT_PERMISSION_CLASSES':(
+            'rest_framework.permissions.IsAuthenticated',
+        ),
+    }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
