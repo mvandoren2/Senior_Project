@@ -118,7 +118,7 @@
                                         <ul>
                                             <template for:each={activity.team} for:item="member" >
                                                 <li key={member.Id} >
-                                                    <a >{member.Name}</a>
+                                                    <lightning-formatted-email value={member.Email} label={member.Name} hide-icon ></lightning-formatted-email>
                                                 </li>
                                             </template>
                                         </ul>
@@ -169,9 +169,7 @@
                             </td>
                             
                             <td class="slds-var-p-around_small">
-                                <a>
-                                    {activity.submittedBy.Name}
-                                </a>
+                                <lightning-formatted-email value={activity.submittedBy.Email} label={activity.submittedBy.Name} hide-icon ></lightning-formatted-email>
                             </td>
                         </tr>
 

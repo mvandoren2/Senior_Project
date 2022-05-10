@@ -4,7 +4,8 @@ public with sharing class GetNinjaUsers {
         Query userQuery = new Query('User')
             .selectField('Id')
             .selectField('Name')
-            .selectField('FullPhotoUrl');
+            .selectField('FullPhotoUrl')
+            .selectField('Email');
             
         if(user_Ids.size() > 0)   
             userQuery.addConditionIn('Id', user_Ids);
