@@ -25,4 +25,4 @@ For the download we used the git clone command for the repository. Which is here
 ```
 sudo git clone https://github.com/AlexAlestra100/Senior_Project.git
 ```
-If the repository owner changes then you will just need to replace the username "AlexAlestra100" with the owners username.
+If the repository owner changes then you will need to replace the username "AlexAlestra100" with the owners username.
