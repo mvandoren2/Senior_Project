@@ -7,7 +7,7 @@
                     <!--note header-->
                     <lightning-layout>
                         <lightning-layout-item >
-                            <a>{note.member.name}</a>
+                            <lightning-formatted-email value={note.member.Email} label={note.member.name} hide-icon ></lightning-formatted-email>
                         </lightning-layout-item>
 
                         <lightning-layout-item alignment-bump="left">

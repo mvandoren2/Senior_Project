@@ -170,7 +170,7 @@ export default class ActivityListView_AppTab extends LightningElement {
     async getMemberOptions() {
         let members = await fetchSalesforceUsers()
 
-        this.user = members.find(member => member.Id === (Id ? Id : '0055f000007NzdoAAC'))
+        this.user = members.find(member => member.Id === (Id ? Id : '0055f0000041g1mAAA'))
         this.template.querySelector('c-sales-request-form').userProfile = this.user.user_role.name
 
         let presalesMembers = members.filter(member => member.user_role.name === 'Presales Member')

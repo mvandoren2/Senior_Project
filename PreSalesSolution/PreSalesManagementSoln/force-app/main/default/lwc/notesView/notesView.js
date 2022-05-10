@@ -65,6 +65,7 @@ export default class NotesView extends LightningElement {
         const submittedBy = this.salesforceMembers.find(member => member.Id === note.member.external_member_ID)
 
         note.member.name = submittedBy.Name
+        note.memeber.Email = submittedBy.Email
 
         let date = new Date(note.note_date)
 

@@ -10,10 +10,10 @@
             </div>
         </lightning-layout-item>
 
-        <lightning-layout-item >
+        <lightning-layout-item class="slds-align_absolute-center" >
             <c-activity-list-view_-requests if:true={showRequests} ></c-activity-list-view_-requests>
             <c-activity-list-view_-full-format if:true={showActivities} ></c-activity-list-view_-full-format>
-            <c-admin-view if:true={showAdmin} ></c-admin-view>
+            <c-admin-view if:true={showAdmin} style="min-width:55rem; max-width: 100rem;" ></c-admin-view>
         </lightning-layout-item>
     </lightning-layout>
 </template>

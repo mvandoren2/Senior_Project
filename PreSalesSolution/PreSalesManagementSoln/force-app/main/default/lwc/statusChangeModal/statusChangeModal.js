@@ -176,6 +176,9 @@ export default class StatusChangeModal extends LightningElement {
     }
 
     reset() {
-        this.template.querySelector('lightning-textarea').value = null
+        let textBox = this.template.querySelector('lightning-textarea')
+        
+        if(textBox)
+            textBox.value = null
     }
 }

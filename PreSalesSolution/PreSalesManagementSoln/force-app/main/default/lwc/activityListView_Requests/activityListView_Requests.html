@@ -16,7 +16,7 @@
 
         <div class="slds-var-m-left_large slds-var-m-right_large" >
             <lightning-layout vertical-align="end" class="slds-var-m-vertical_small" >
-                <lightning-layout-item class="slds-var-m-right_small" >
+                <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                     <lightning-combobox name="account"
                                         label="Account"
                                         options={accountOptions}
@@ -26,7 +26,7 @@
                     </lightning-combobox>
                 </lightning-layout-item>
 
-                <lightning-layout-item class="slds-var-m-right_small" >
+                <lightning-layout-item class="slds-var-m-right_small slds-size_1-of-3" >
                     <lightning-combobox name="opportunity"
                                         label="Opportunity"
                                         options={opportunityOptions}
@@ -48,8 +48,7 @@
         <div class="slds-scrollable" style="max-height: 40rem;" >
             <c-activity-list-view   record-type="opportunity" 
                                     record-id={opportunityIdTesting}
-                                    status="requests" 
-                                    format="small" >
+                                    status="requests" >
             </c-activity-list-view>
         </div>
     </lightning-card>
