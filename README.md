@@ -1,4 +1,4 @@
-![presales-ninja-logos_white](https://user-images.githubusercontent.com/58407966/168408322-c9eade55-12a9-4cae-90e6-15489d34b2af.png)
+<img src="https://user-images.githubusercontent.com/58407966/168408322-c9eade55-12a9-4cae-90e6-15489d34b2af.png" alt="drawing" style="width:150px;"/>
 # Salesforce & Django Login
 Pre-Sales Management Solution for Salesforce Application
 
