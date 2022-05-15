@@ -60,7 +60,7 @@ export default class SalesRequestForm extends LightningElement {
         this.activity.threeDateTime = null
 
         switch(this.userProfile) {
-            case 'Presales Team' :
+            case 'Presales Member' :
                 this.activity.members = [this.activity.createdByMember]
                 this.activity.status = 'Scheduled'
                 break
@@ -73,11 +73,6 @@ export default class SalesRequestForm extends LightningElement {
             default:
                 this.activity.status = 'Request'
         }
-
-        if(this.userProfile === 'Presales Team')
-            
-
-        this.teamManageLabel = 'Assign Team'
     }
 
     async getAccountId() {
