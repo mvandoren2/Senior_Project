@@ -22,11 +22,13 @@ export class TableFormatter {
         if(this.params) {
             this.smallFormat = this.params.format === 'small'
 
-            if(this.params.opportunity && this.smallFormat)
-                columnLabels = columnLabels.filter(column => (column !== 'Account') && (column !== 'Opportunity'))
+            if(this.smallFormat) {
+                if(this.params.opportunity)
+                    columnLabels = columnLabels.filter(column => (column !== 'Account') && (column !== 'Opportunity'))
 
-            if(this.params.account && this.smallFormat)
-                columnLabels = columnLabels.filter(column => column !== 'Account')
+                else if(this.params.account)
+                    columnLabels = columnLabels.filter(column => column !== 'Account')
+            }
         }
         
         let columns = columnLabels.map((column, i) => ({
@@ -56,19 +58,33 @@ export class TableFormatter {
                     
         newRow.id = activity.activity_ID
 
-        if(!((this.params.account || this.params.opportunity) && this.smallFormat))
-            rowData.push({id: 'Account', data: activity.opportunity.AccountName})
+        if(!this.smallFormat) {
+            if(!(this.params.account || this.params.opportunity))
+                rowData.push()
 
-        if(!(this.params.opportunity && this.smallFormat))
-            rowData.push({id: 'Opportunity', data: activity.opportunity.Name})
+            if(!this.params.opportunity)
+                rowData.push()
+        }
         
-        rowData.push({id: 'Product', data: activity.products.map(product => product.name).join(', ')})
-        rowData.push({id: 'Activity'  , data: activity.activity_Type.name})
-        rowData.push({id: 'Date', data: selectedDate})
-        rowData.push({id: 'Location', data: activity.location})
-        rowData.push({id: 'Submitted By', data: activity.submittedBy.Name})
-        rowData.push({id: 'Presales Team', data: activity.team.map(member => member.Name).join(', ')})
-        rowData.push({id: 'Status' , data: activity.status})
+        rowData.push(
+            {id: 'Account', data: activity.opportunity.AccountName},
+            {id: 'Opportunity', data: activity.opportunity.Name},
+            {id: 'Product', data: activity.products.map(product => product.name).join(', ')},
+            {id: 'Activity'  , data: activity.activity_Type.name},
+            {id: 'Date', data: selectedDate},
+            {id: 'Location', data: activity.location},
+            {id: 'Submitted By', data: activity.submittedBy.Name},
+            {id: 'Presales Team', data: activity.team.map(member => member.Name).join(', ')},
+            {id: 'Status' , data: activity.status}
+        )
+
+        if(this.smallFormat) {
+            if(this.params.account)
+                rowData = rowData.filter(item => (item.id !== 'Account') && (item.id !== 'Opportunity'))
+
+            else if(this.params.opportunity)
+                rowData = rowData.filter(item => item.id !== 'Opportunity')
+        }
 
         newRow.data = rowData
 
@@ -150,9 +166,13 @@ export class TableFormatter {
         let userActions = userRoles.find(user => user.role === userProfile)
             .actions.find(actionList => actionList.status === status).actions
 
-        if(userProfile === 'Presales Member' && activity.leadMember && this.user.external_member_ID === activity.leadMember.external_member_ID)
+        if( userProfile === 'Presales Member' && 
+            activity.leadMember && 
+            this.user.external_member_ID === activity.leadMember.external_member_ID) {
+
             userActions = userActions.filter(val => val !== 7)
-    
+        }
+
         return userActions.map(action => actions[action])
     }
 
