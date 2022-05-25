@@ -22,7 +22,7 @@ sudo git clone https://github.com/mvandoren2/Senior_Project.git
 **Alexander Alestra**<br />
 **Daniel Diep**<br />
 **Kendall Helms**<br />
-**Ye Yint Nay Htet**
+**Ye Yint Nay Htet**<br />
 **Matt Randell Mazon**<br />
 **Anuj Regmi**<br />
 **Timothy Thao**<br />
