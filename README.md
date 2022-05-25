@@ -18,7 +18,7 @@ Which is here:
 ```
 sudo git clone https://github.com/mvandoren2/Senior_Project.git
 ```
-# List of Developers
+# Developers
 **Alexander Alestra**<br />
 **Anuj Regmi**<br />
 **Daniel Diep**<br />
