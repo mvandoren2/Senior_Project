@@ -25,6 +25,5 @@ We ended up using VScode for our developement IDE. We then used python and it's 
 For the download we used the git clone command for the repository.<br />
 Which is here:
 ```
-sudo git clone https://github.com/AlexAlestra100/Senior_Project.git
+sudo git clone https://github.com/mvandoren2/Senior_Project.git
 ```
-If the repository owner changes then you will need to replace the username "AlexAlestra100" with the owners username.
