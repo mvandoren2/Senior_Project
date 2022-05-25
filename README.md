@@ -1,17 +1,8 @@
 <img src="https://user-images.githubusercontent.com/58407966/168408322-c9eade55-12a9-4cae-90e6-15489d34b2af.png" alt="drawing" style="width:150px;"/>
 # Salesforce & Django Login
-Pre-Sales Management Solution for Salesforce Application
+Salesforce.com Lightning Web Component Pre-Sales Management Plugin
 
 Login Name: user Login Password: user
-
-# List of Developers
-**Alexander Alestra**<br />
-**Anuj Regmi**<br />
-**Daniel Diep**<br />
-**Kendall Helms**<br />
-**Matt Randell Mazon**<br />
-**Timothy Thao**<br />
-**Ye Yint Nay Htet**
 
 # The Product
 Client’s problem is there exists no standardized way to manage their pre-sales workforce which has resulted in complete inconsistency in both the management and measurement of the success of those conducting pre-sales operations.
@@ -27,3 +18,11 @@ Which is here:
 ```
 sudo git clone https://github.com/mvandoren2/Senior_Project.git
 ```
+# List of Developers
+**Alexander Alestra**<br />
+**Anuj Regmi**<br />
+**Daniel Diep**<br />
+**Kendall Helms**<br />
+**Matt Randell Mazon**<br />
+**Timothy Thao**<br />
+**Ye Yint Nay Htet**
