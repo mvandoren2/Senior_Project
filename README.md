@@ -20,9 +20,10 @@ sudo git clone https://github.com/mvandoren2/Senior_Project.git
 ```
 # Developers
 **Alexander Alestra**<br />
-**Anuj Regmi**<br />
 **Daniel Diep**<br />
 **Kendall Helms**<br />
-**Matt Randell Mazon**<br />
-**Timothy Thao**<br />
 **Ye Yint Nay Htet**
+**Matt Randell Mazon**<br />
+**Anuj Regmi**<br />
+**Timothy Thao**<br />
+
