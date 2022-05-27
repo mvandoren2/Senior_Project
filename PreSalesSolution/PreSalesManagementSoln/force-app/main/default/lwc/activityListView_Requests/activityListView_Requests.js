@@ -1,10 +1,8 @@
-import { api, LightningElement, track } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import Id from "@salesforce/user/Id"
 import { url, fetchOpportunities } from 'c/dataUtils';
 
 export default class ActivityListView_Requests extends LightningElement {
-    @api recordId 
-
     connectedCallback() {
         this.fetchCurrentUser()
         this.getRecordOptions()
